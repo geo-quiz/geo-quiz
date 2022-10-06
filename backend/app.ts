@@ -1,14 +1,15 @@
-import express, { Express, Request, Response } from 'express';
+import express from 'express';
+import { routes } from './routes';
 
-const app: Express = express();
-const port = 3000;
+const app = express();
 
-app.get('/', (_req: Request, res: Response) => {
-    res.send('Hello World!');
+
+// routes
+app.use('/', routes);
+
+// start the server
+app.listen(3000, () => {
+    console.log(
+        `server running : 'http://localhost:3000`
+    );
 });
-
-app.listen(port, () => {
-    console.log(`App listening at http://localhost:${port}`);
-});
-
-export default {};
