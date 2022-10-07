@@ -65,4 +65,80 @@ function nextQuestion() {
     </section>
 </template>
 
-<style scoped></style>
+<style scoped>
+* {
+    --radius: 5px;
+}
+
+.answers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    width: 75%;
+    justify-content: center;
+}
+
+.answer-button {
+    width: 100%;
+}
+
+.answered {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    width: 75%;
+}
+
+.answered-message {
+    background: #3f72af;
+    border-radius: var(--radius);
+    color: #f9f7f7;
+    padding: 5px;
+}
+
+.button {
+    background: #3f72af;
+    border: none;
+    border-radius: var(--radius);
+    color: #f9f7f7;
+    height: 30px;
+}
+
+.heading {
+    color: #f9f7f7;
+    font-size: 2rem;
+    margin: 0;
+    text-align: center;
+    width: 100%;
+}
+
+p {
+    margin: 0;
+}
+
+section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 50px;
+    height: 100%;
+    justify-content: center;
+}
+
+.question-div {
+    align-items: center;
+    background: #f9f7f7;
+    border-radius: var(--radius);
+    display: flex;
+    justify-content: center;
+    min-height: 100px;
+    overflow-wrap: anywhere;
+    width: 75%;
+}
+
+.question-text {
+    margin: 0;
+    padding: 5px 10px;
+}
+</style>
