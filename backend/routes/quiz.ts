@@ -23,6 +23,5 @@ quizRoute.get('/quiz/:id', (req, res) => {
     } else {
         res.json({message: `quizitem ${quiz} doesn't exist`})
     }
+    
 });
-
-
