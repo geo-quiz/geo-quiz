@@ -103,7 +103,7 @@ function nextQuestion() {
     border: none;
     border-radius: var(--radius);
     color: #f9f7f7;
-    height: 30px;
+    height: 40px;
 }
 
 .heading {
@@ -160,7 +160,6 @@ section {
     }
 
     .button {
-        height: 50px;
         font-size: 1rem;
     }
 
@@ -175,6 +174,18 @@ section {
 
     .question-text {
         font-size: 1.5rem;
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .button {
+        height: 50px;
+    }
+}
+
+@media only screen and (min-width: 1024px) {
+    .button {
+        height: 75px;
     }
 }
 </style>
