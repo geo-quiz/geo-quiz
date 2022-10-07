@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue';
 import router from '@/router';
 
@@ -7,40 +7,61 @@ const answer = 'Paris';
 const answers = ['London', 'Berlin', 'Paris', 'Rome'];
 const isCorrect = ref(false);
 const isAnswered = ref(false);
-const currentAnswer = ref('');
+const isIncorrectAnswer = ref(true);
 
-const CORRECT = 'Correct answer';
-const INCORRECT = `Incorrect answer, the correct answer is ${answer}`;
+const CORRECT = 'Correct answer!';
+const INCORRECT = 'Incorrect answer!';
 
-let msg = ref(INCORRECT);
+const msg = ref(INCORRECT);
 
-function checkAnswer() {
-    if (currentAnswer.value === answer) {
-        isCorrect.value = true;
-        msg.value = CORRECT;
+function answerQuestion(selectedAnswer: string) {
+    if (!isAnswered.value) {
+        const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
+
+        if (indexOfAnswer === findIndexOfCorrectAnswer()) {
+            isCorrect.value = true;
+            msg.value = CORRECT;
+            isIncorrectAnswer.value = false;
+        }
+        isAnswered.value = true;
     }
-    isAnswered.value = true;
+}
+
+function findIndexOfAnswer(selectedAnswer: string) {
+    return answers.indexOf(selectedAnswer);
+}
+
+function findIndexOfCorrectAnswer() {
+    return answers.indexOf(answer);
 }
 
 function nextQuestion() {
     router.push('next');
 }
-
 </script>
 
 <template>
     <section>
-        <h1>Quiz</h1>
-        <p>Question: {{ question }}</p>
-        <ul>
-            <li v-for="(answer, index) in answers" :key="index">
-                <input type="radio" :value="answer" v-model="currentAnswer" />
+        <h2 class="heading">Europe</h2>
+        <div class="question-div">
+            <p class="question-text">{{ question }}</p>
+        </div>
+        <div class="answers">
+            <button
+                v-for="(answer, index) in answers"
+                :key="index"
+                class="answer-button button"
+                @click="answerQuestion(answer)">
                 {{ answer }}
-            </li>
-        </ul>
-        <button v-if="!isAnswered" @click="checkAnswer">Check answer</button>
-        <p v-if="isAnswered">{{ msg }}</p>
-        <button v-if="isAnswered" @click="nextQuestion">Next Question</button>
+            </button>
+        </div>
+        <div v-if="isAnswered" class="answered">
+            <div class="answered-message">
+                <p>{{ msg }}</p>
+                <p v-if="isIncorrectAnswer">Correct answer was: {{ answer }}</p>
+            </div>
+            <button class="button" @click="nextQuestion">Next Question</button>
+        </div>
     </section>
 </template>
 
