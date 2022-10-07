@@ -2,15 +2,15 @@
 import { ref } from 'vue';
 import router from '@/router';
 
-const question = 'What is the capital of France?';
+const question = 'Vad heter huvudstaden i Frankrike?';
 const answer = 'Paris';
-const answers = ['London', 'Berlin', 'Paris', 'Rome'];
+const answers = ['London', 'Berlin', 'Paris', 'Rom'];
 const isCorrect = ref(false);
 const isAnswered = ref(false);
 const isIncorrectAnswer = ref(true);
 
-const CORRECT = 'Correct answer!';
-const INCORRECT = 'Incorrect answer!';
+const CORRECT = 'Rätt';
+const INCORRECT = 'Fel';
 
 const msg = ref(INCORRECT);
 
@@ -42,7 +42,7 @@ function nextQuestion() {
 
 <template>
     <section>
-        <h2 class="heading">Europe</h2>
+        <h2 class="heading">Europa</h2>
         <div class="question-div">
             <p class="question-text">{{ question }}</p>
         </div>
@@ -57,10 +57,10 @@ function nextQuestion() {
         </div>
         <div v-if="isAnswered" class="answered">
             <div class="answered-message">
-                <p>{{ msg }}</p>
-                <p v-if="isIncorrectAnswer">Correct answer was: {{ answer }}</p>
+                <p>{{ msg }} svar!</p>
+                <p v-if="isIncorrectAnswer">Rätt svar var: {{ answer }}</p>
             </div>
-            <button class="button" @click="nextQuestion">Next Question</button>
+            <button class="button" @click="nextQuestion">Nästa Fråga</button>
         </div>
     </section>
 </template>
