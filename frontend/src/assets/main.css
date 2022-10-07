@@ -11,4 +11,5 @@ body {
     flex-direction: column;
     justify-content: center;
     width: 90%;
+    gap: 20px
 }
