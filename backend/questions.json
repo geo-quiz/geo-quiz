@@ -1,0 +1,15 @@
+{"questions":[
+  { "id": 1,
+  "question": "Var ligger paris?",
+  "answers": "hej,nej.hejsan",
+  "correctAnswer": "hej",
+  "continent": "EContinent"
+},
+{
+  "id": 2,
+  "question": "Var ligger grkland?",
+  "answers": "hej,nej.hejsan",
+  "correctAnswer": "hej",
+  "continent": "EContinent"
+}
+]}
