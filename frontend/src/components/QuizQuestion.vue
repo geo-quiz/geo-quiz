@@ -60,7 +60,7 @@ function nextQuestion() {
                 <p>{{ msg }} svar!</p>
                 <p v-if="isIncorrectAnswer">Rätt svar var: {{ answer }}</p>
             </div>
-            <button class="button" @click="nextQuestion">Nästa Fråga</button>
+            <button id="next-question-button" class="button" @click="nextQuestion">Nästa Fråga</button>
         </div>
     </section>
 </template>
@@ -140,5 +140,41 @@ section {
 .question-text {
     margin: 0;
     padding: 5px 10px;
+}
+
+@media only screen and (min-width: 768px) {
+    .answers {
+        width: 75%;
+    }
+
+    .answer-button {
+        width: calc(50% - (15px / 2));
+    }
+
+    .answered {
+        width: 75%;
+    }
+
+    .answered-message {
+        font-size: 1.125rem;
+    }
+
+    .button {
+        height: 50px;
+        font-size: 1rem;
+    }
+
+    #next-question-button {
+        width: 30%;
+    }
+
+    .question-div {
+        min-height: 150px;
+        width: 75%;
+    }
+
+    .question-text {
+        font-size: 1.5rem;
+    }
 }
 </style>
