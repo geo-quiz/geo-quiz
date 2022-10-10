@@ -4,13 +4,13 @@
         "question": "Var ligger Paris?",
         "answers": "hej, nej, hejsan",
         "correctAnswer": "hej",
-        "continent": "EContinent"
+        "continent": "europa"
     },
     {
         "id": 2,
         "question": "Var ligger Grekland?",
         "answers": "hej, nej, hejsan",
         "correctAnswer": "hej",
-        "continent": "EContinent"
+        "continent": "asien"
     }
 ]
