@@ -1,5 +1,4 @@
 {
-    //    "include": ["src/**/*"],
     "compilerOptions": {
         "module": "commonjs",
         "esModuleInterop": true,
@@ -11,7 +10,8 @@
         "strict": true,
         "noImplicitAny": true,
         "noUnusedLocals": true,
-        "noUnusedParameters": true
+        "noUnusedParameters": true,
+        "resolveJsonModule": true
     },
     "lib": [
         "es2021"

@@ -1,20 +1,22 @@
 import { Router } from 'express';
-import questions from '../json/questions.json';
+import questions from '../data/questions.json';
 
-
-
-console.log(questions.id);
-console.log(questions.question);
-console.log(questions.answers);
-console.log(questions.correctAnswer);
-console.log(questions.continent);
 const baseUrl = '/quiz';
 
+//route
 export const quizRoute = Router();
 
-//routes
 quizRoute.get(baseUrl, (_req, res) => {
     res.json(questions);
-
 });
 
+quizRoute.get('/quiz/:id', (req, res) => {
+    const quizId = Number.parseInt(req.params.id);
+    const quizItem = questions.find((quiz) => quiz.id === quizId);
+
+    if (quizItem) {
+        res.json(quizItem);
+    } else {
+        res.status(404).json({ errorMessage: `Quiz with ID: ${quizId} doesn't exist` });
+    }
+});
