@@ -1,6 +1,5 @@
-import express, {Application, Router} from "express";
-import questions from '../questions.json';
-
+import { Router } from 'express';
+import questions from '../data/questions.json';
 
 const baseUrl = '/quiz';
 
@@ -11,17 +10,13 @@ quizRoute.get(baseUrl, (_req, res) => {
     res.json(questions);
 });
 
-
 quizRoute.get('/quiz/:id', (req, res) => {
-    const quiz = req.params.id;
-    const quizItem = questions.questions.filter(quizId => {
-        return quizId.id.toString() === quiz;
-    });
+    const quizId = Number.parseInt(req.params.id);
+    const quizItem = questions.find((quiz) => quiz.id === quizId);
 
-    if (quizItem.length >0){
+    if (quizItem) {
         res.json(quizItem);
     } else {
-        res.json({message: `quizitem ${quiz} doesn't exist`})
+        res.status(404).json({ errorMessage: `Quiz with ID: ${quizId} doesn't exist` });
     }
-    
 });
