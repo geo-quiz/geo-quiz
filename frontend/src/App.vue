@@ -1,17 +1,14 @@
 <script lang="ts" setup>
-import { RouterLink, RouterView } from 'vue-router';</script>
+import PageHeader from './components/PageHeader.vue';</script>
 
 <template>
-    <header>
-        <div class="wrapper">
-            <nav>
-                <RouterLink to="/">Home</RouterLink>
-                <RouterLink to="/quiz">Quiz</RouterLink>
-            </nav>
-        </div>
-    </header>
-
-    <RouterView />
+  <PageHeader/>
+  <RouterView/>
 </template>
 
-<style scoped></style>
+<style>
+@font-face {
+  font-family: "Avigea";
+  src: local("Avigea"), url('/fonts/Avigea.ttf') format("truetype");
+}
+</style>
