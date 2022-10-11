@@ -7,7 +7,6 @@ export const userRoute = Router();
 
 //routes
 userRoute.get(baseUrl, (_req, res) => {
-    res.json({username: 'gertrud'});
+    res.json({ username: 'gertrud' });
 
 });
-

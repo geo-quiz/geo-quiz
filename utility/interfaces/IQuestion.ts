@@ -1,9 +1,10 @@
 import { EContinent } from "../enums/EContinent";
+import { IAnswer } from './IAnswer';
 
-export interface IQuizQuestion {
+export interface IQuestion {
     id: number,
     question: string;
-    answers: string[];
-    correctAnswer: string;
+    answers: IAnswer[];
+    correctAnswer: number;
     continent: EContinent;
 }
