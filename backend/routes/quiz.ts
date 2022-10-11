@@ -1,4 +1,4 @@
-import {Router} from 'express';
+import { Router } from 'express';
 import questions from '../data/questions.json';
 
 const baseUrl = '/quiz';
@@ -17,7 +17,7 @@ quizRoute.get('/quiz/:id', (req, res) => {
     if (quizItem) {
         res.json(quizItem);
     } else {
-        res.status(404).json({errorMessage: `Quiz with ID: ${quizId} doesn't exist`});
+        res.status(404).json({ errorMessage: `Quiz with ID: ${quizId} doesn't exist` });
 
     }
 });
