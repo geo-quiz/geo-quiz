@@ -1,3 +1,13 @@
+@font-face {
+    font-family: "Avigea";
+    src: local("Avigea"), url('public/fonts/Avigea.ttf') format("truetype");
+}
+
+@font-face {
+    font-family: "Work Sans";
+    src: local("Work Sans"), url('public/fonts/WorkSans.ttf') format("truetype");
+}
+
 body {
     background: #112d4e;
     display: flex;
