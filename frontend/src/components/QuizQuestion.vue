@@ -1,16 +1,17 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import router from '@/router';
+import GeoButton from '@/components/GeoButton.vue';
 
-const question = 'Vad heter huvudstaden i Frankrike?';
+const question = 'What is the capital of France?';
 const answer = 'Paris';
-const answers = ['London', 'Berlin', 'Paris', 'Rom'];
+const answers = ['London', 'Berlin', 'Paris', 'Rome'];
 const isCorrect = ref(false);
 const isAnswered = ref(false);
 const isIncorrectAnswer = ref(true);
 
-const CORRECT = 'Rätt';
-const INCORRECT = 'Fel';
+const CORRECT = 'Correct';
+const INCORRECT = 'Wrong';
 
 const msg = ref(INCORRECT);
 
@@ -42,40 +43,39 @@ function nextQuestion() {
 
 <template>
     <section>
-        <h2 class="heading">Europa</h2>
+        <h2 class="heading">Europe</h2>
         <div class="question-div">
             <p class="question-text">{{ question }}</p>
         </div>
         <div class="answers">
-            <button
+            <GeoButton
                 v-for="(answer, index) in answers"
                 :key="index"
                 class="answer-button button"
+                font-size="1.125rem"
+                height="100px"
                 @click="answerQuestion(answer)">
                 {{ answer }}
-            </button>
+            </GeoButton>
         </div>
         <div v-if="isAnswered" class="answered">
             <div class="answered-message">
-                <p>{{ msg }} svar!</p>
-                <p v-if="isIncorrectAnswer">Rätt svar var: {{ answer }}</p>
+                <p>{{ msg }} answer!</p>
+                <p v-if="isIncorrectAnswer">The correct answer is: {{ answer }}</p>
             </div>
-            <button id="next-question-button" class="button" @click="nextQuestion">Nästa Fråga</button>
+            <GeoButton id="next-question-button" class="button" font-size="1.125rem" @click="nextQuestion">Next question
+            </GeoButton>
         </div>
     </section>
 </template>
 
 <style scoped>
-* {
-    --radius: 5px;
-}
-
 .answers {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    width: 75%;
     justify-content: center;
+    width: 75%;
 }
 
 .answer-button {
@@ -96,14 +96,6 @@ function nextQuestion() {
     border-radius: var(--radius);
     color: #f9f7f7;
     padding: 5px;
-}
-
-.button {
-    background: #3f72af;
-    border: none;
-    border-radius: var(--radius);
-    color: #f9f7f7;
-    height: 40px;
 }
 
 .heading {
@@ -155,14 +147,6 @@ section {
         width: 75%;
     }
 
-    .answered-message {
-        font-size: 1.125rem;
-    }
-
-    .button {
-        font-size: 1rem;
-    }
-
     #next-question-button {
         width: 30%;
     }
@@ -179,13 +163,13 @@ section {
 
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
     .button {
-        height: 50px;
+        font-size: 1.5rem;
     }
 }
 
 @media only screen and (min-width: 1024px) {
     .button {
-        height: 75px;
+        font-size: 1.75rem;
     }
 }
 </style>
