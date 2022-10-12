@@ -58,7 +58,7 @@ function nextQuestion() {
         <div v-if="isAnswered" class="answered">
             <div class="answered-message">
                 <p>{{ msg }} svar!</p>
-                <p v-if="isIncorrectAnswer">Rätt svar var: {{ answer }}</p>
+                <p v-if="isIncorrectAnswer">Rätt svar är: {{ answer }}</p>
             </div>
             <button id="next-question-button" class="button" @click="nextQuestion">Nästa Fråga</button>
         </div>
@@ -74,8 +74,8 @@ function nextQuestion() {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    width: 75%;
     justify-content: center;
+    width: 75%;
 }
 
 .answer-button {
@@ -124,6 +124,7 @@ section {
     gap: 50px;
     height: 100%;
     justify-content: center;
+    margin-top: 140px;
 }
 
 .question-div {
