@@ -51,7 +51,7 @@ function nextQuestion() {
             <GeoButton
                 v-for="(answer, index) in answers"
                 :key="index"
-                class="answer-button button"
+                class="button"
                 font-size="1.125rem"
                 height="100px"
                 @click="answerQuestion(answer)">
@@ -63,7 +63,8 @@ function nextQuestion() {
                 <p>{{ msg }} answer!</p>
                 <p v-if="isIncorrectAnswer">The correct answer is: {{ answer }}</p>
             </div>
-            <GeoButton id="next-question-button" class="button" font-size="1.125rem" @click="nextQuestion">Next question
+            <GeoButton id="next-question-button" class="button" font-size="1.125rem" @click="nextQuestion">
+                Next question
             </GeoButton>
         </div>
     </section>
@@ -73,20 +74,16 @@ function nextQuestion() {
 .answers {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: var(--gap);
     justify-content: center;
     width: 75%;
-}
-
-.answer-button {
-    width: 100%;
 }
 
 .answered {
     align-items: center;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: var(--gap);
     text-align: center;
     width: 75%;
 }
@@ -113,7 +110,7 @@ p {
 section {
     display: flex;
     flex-wrap: wrap;
-    gap: 50px;
+    gap: var(--gap);
     height: 100%;
     justify-content: center;
 }
@@ -137,10 +134,6 @@ section {
 @media only screen and (min-width: 768px) {
     .answers {
         width: 75%;
-    }
-
-    .answer-button {
-        width: calc(50% - (15px / 2));
     }
 
     .answered {
