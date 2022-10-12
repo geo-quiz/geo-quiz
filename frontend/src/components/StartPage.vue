@@ -1,17 +1,28 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import router from '@/router/index';
+
+function toLogin() {
+    router.push('login');
+}
+function toRegister() {
+    router.push('register');
+}
+</script>
 
 <template>
     <section>
+        <div class="container">
         <div class="start background">
             <p>GeoQuiz</p>
             <div class="globeContainer">
-                <img src="../../public/img/planet-5166106_1920.png" alt="Planet" />
+                <img src="/img/planet-5166106_1920.png" alt="Planet" />
             </div>
 
             <div class="buttonContainer">
-                <button class="button button1">Sign in</button>
-                <button class="button button2">Register</button>
+                <button class="button button1" @click="toLogin">Sign in</button>
+                <button class="button button2" @click="toRegister">Register</button>
             </div>
+        </div>
         </div>
     </section>
 </template>
@@ -19,7 +30,7 @@
 <style scoped>
 @font-face {
     font-family: 'Avigea';
-    src: url('avigea.ttf');
+    src: url('../../public/font/Avigea-Font/avigea.ttf');
 }
 
 
@@ -60,16 +71,25 @@ button {
 .button1 {
     background-color: #5bb318;
 }
-
+.button1:hover {
+    background-color: #f9f7f7;
+    color: black;
+}
 .button2 {
     background-color: #008cba;
     margin-top: 20px;
+
+}
+.button2:hover {
+    background-color: #f9f7f7;
+    color: black;
 }
 
 .buttonContainer {
     display: flex;
     flex-direction: column;
 }
+
 
 .globeContainer {
     display: flex;
@@ -98,22 +118,38 @@ p {
     justify-content: center;
     align-items: center;
 }
+.container{
+    display: grid;
 
+}
 @media only screen and (min-width: 768px) {
     .button {
         font-size: 1rem;
+    }
+    .container{
+        display: grid;
+        margin-left: -18px;
     }
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
     .button {
         height: 75px;
+
+    }
+    .container{
+        display: grid;
+        margin-left: -52px;
     }
 }
 
 @media only screen and (min-width: 1024px) {
     .button {
         height: 75px;
+    }
+    .container{
+        display: flex;
+        margin-left: -100px;
     }
 }
 </style>
