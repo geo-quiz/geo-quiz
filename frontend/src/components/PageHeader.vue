@@ -1,98 +1,138 @@
 <script lang="ts" setup>
-import {onBeforeUnmount, onMounted, ref} from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 
 const isTouchScreen = ref(true);
 const TOUCHSCREEN_MAX_WIDTH = 1024;
 
 function onResize() {
-  isTouchScreen.value = isTouchScreen.value === window.innerWidth < TOUCHSCREEN_MAX_WIDTH;
-  console.log(window.innerWidth);
+    isTouchScreen.value = isTouchScreen.value === window.innerWidth < TOUCHSCREEN_MAX_WIDTH;
+    console.log(window.innerWidth);
 }
 
 onMounted(() => {
-  window.addEventListener('resize', onResize);
+    window.addEventListener('resize', onResize);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', onResize);
+    window.removeEventListener('resize', onResize);
 });
 </script>
 
 <template>
-  <section class='header-background'>
-    <div>
-      <button v-if="isTouchScreen" class="hamburger-menu">
-        <span class="line"></span>
-        <span class="line"></span>
-        <span class="line"></span>
-      </button>
+    <section class='header-background'>
+        <div>
+            <img alt='Information icon' src='/images/icons8-information-30.png'>
+        </div>
+        <div class="header-title">
+            <h1>GeoQuiz</h1>
+        </div>
+        <div>
+            <button v-if="isTouchScreen" class="hamburger-menu">
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+            </button>
 
-      <nav v-if="!isTouchScreen">
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/quiz">Quiz</RouterLink>
-        <RouterLink to="/next">Next</RouterLink>
-      </nav>
-    </div>
-    <div class="header-title">
-      <h1>GeoQuiz</h1>
-    </div>
-  </section>
+            <span class="overlay"></span>
+            <nav v-if="!isTouchScreen">
+                <ul class="menu">
+                    <li class="menu-item">
+                        <RouterLink to="/">Home</RouterLink>
+                    </li>
+                    <li class="menu-item">
+                        <RouterLink to="/quiz">Quiz</RouterLink>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </section>
 </template>
 
 <style scoped>
+ul {
+    list-style-type: none;
+}
+
 * {
-  --radius: 5px;
+    --radius: 5px;
+    --padding-button: 10px;
 }
 
 h1 {
-  color: #f9f7f7;
-  font-family: 'Avigea', 'serif';
-  font-size: 35px;
+    color: #f9f7f7;
+    font-family: 'Avigea', 'serif';
+    font-size: 35px;
 }
 
 .hamburger-menu {
-  width: 50px;
-  height: 50px;
-  background: #3f72af;
-  border-radius: 50%;
-  border: #f9f7f7 solid 2px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+    align-items: center;
+    background: #3f72af;
+    border: #f9f7f7 solid 2px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    height: 50px;
+    justify-content: center;
+    width: 50px;
 }
 
 .header-title {
-  width: 34%;
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
+    width: 34%;
 }
 
 .line {
-  display: block;
-  height: 3px;
-  margin: 3px 0;
-  width: 75%;
-  background: #f9f7f7;
-  border-radius: var(--radius);
+    background: #f9f7f7;
+    border-radius: var(--radius);
+    display: block;
+    height: 3px;
+    margin: 3px 0;
+    width: 75%;
 }
 
 .header-background {
-  background: #3f72af;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: 100px;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 9;
-  min-width: 320px;
+    align-items: center;
+    background: #3f72af;
+    display: flex;
+    flex-direction: row;
+    height: 100px;
+    left: 0;
+    min-width: 320px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 9;
+}
+
+.menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 0;
+}
+
+.menu-item a {
+    color: #f9f7f7;
+    display: inline-block;
+    margin: 0;
+    padding: var(--padding-button);
+    position: relative;
+    text-decoration: none;
+}
+
+.menu-item a:hover {
+    background: #f9f7f7;
+    color: #112d4e;
+}
+
+.menu-item:link {
+    color: red;
+    text-decoration: none;
 }
 
 section {
-  display: flex;
-  justify-content: space-evenly;
+    display: flex;
+    justify-content: space-evenly;
 }
 </style>
