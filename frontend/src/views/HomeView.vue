@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
 import GeoLogo from '@/components/GeoLogo.vue';
+import router from '@/router';
+
+function goTo(location: string) {
+    router.push(location);
+}
 </script>
 
 <template>
@@ -8,12 +13,14 @@ import GeoLogo from '@/components/GeoLogo.vue';
         <GeoLogo />
 
         <div class="wrapper">
-            <GeoButton id="play-button" font-size="2rem" height="120px" width="90% + 4px">Play now</GeoButton>
+            <GeoButton id="play-button" font-size="2rem" height="120px" width="90% + 4px" @click="goTo('/quiz')">
+                Play now
+            </GeoButton>
             <div class="buttons">
-                <GeoButton height="75px">Profile</GeoButton>
-                <GeoButton height="75px">Leaderboard</GeoButton>
-                <GeoButton height="75px">Settings</GeoButton>
-                <GeoButton height="75px">Log out</GeoButton>
+                <GeoButton height="75px" @click="goTo('/profile')">Profile</GeoButton>
+                <GeoButton height="75px" @click="goTo('/leaderboard')">Leaderboard</GeoButton>
+                <GeoButton height="75px" @click="goTo('/settings')">Settings</GeoButton>
+                <GeoButton height="75px" @click="goTo('/log-out')">Log out</GeoButton>
             </div>
         </div>
     </main>
