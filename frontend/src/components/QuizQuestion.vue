@@ -44,28 +44,30 @@ function nextQuestion() {
 <template>
     <section>
         <h2 class="heading">Europe</h2>
-        <div class="question-div">
-            <p class="question-text">{{ question }}</p>
-        </div>
-        <div class="answers">
-            <GeoButton
-                v-for="(answer, index) in answers"
-                :key="index"
-                class="button"
-                font-size="1.125rem"
-                height="100px"
-                @click="answerQuestion(answer)">
-                {{ answer }}
-            </GeoButton>
-        </div>
-        <div v-if="isAnswered" class="answered">
-            <div class="answered-message">
-                <p>{{ msg }} answer!</p>
-                <p v-if="isIncorrectAnswer">The correct answer is: {{ answer }}</p>
+        <div class="wrapper">
+            <div class="question-div">
+                <p class="question-text">{{ question }}</p>
             </div>
-            <GeoButton id="next-question-button" class="button" font-size="1.125rem" @click="nextQuestion">
-                Next question
-            </GeoButton>
+            <div class="answers">
+                <GeoButton
+                    v-for="(answer, index) in answers"
+                    :key="index"
+                    class="button"
+                    font-size="1.125rem"
+                    height="100px"
+                    @click="answerQuestion(answer)">
+                    {{ answer }}
+                </GeoButton>
+            </div>
+            <div v-if="isAnswered" class="answered">
+                <div class="answered-message">
+                    <p>{{ msg }} answer!</p>
+                    <p v-if="isIncorrectAnswer">The correct answer is: {{ answer }}</p>
+                </div>
+                <GeoButton id="next-question-button" class="button" font-size="1.125rem" @click="nextQuestion">
+                    Next question
+                </GeoButton>
+            </div>
         </div>
     </section>
 </template>
@@ -110,8 +112,7 @@ p {
 section {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--gap);
-    height: 100%;
+    gap: 50px;
     justify-content: center;
 }
 
@@ -129,6 +130,7 @@ section {
 .question-text {
     margin: 0;
     padding: 5px 10px;
+    color: #111111;
 }
 
 @media only screen and (min-width: 768px) {
