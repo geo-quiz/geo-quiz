@@ -17,8 +17,6 @@ frontend/dist
 frontend/dist-ssr
 frontend/coverage
 frontend/*.local
-
-#Nods.js
 backend/dist
 
 #Cypress
@@ -36,5 +34,7 @@ frontend/*.sln
 frontend/*.sw?
 
 # JetBrains
-
 .idea
+
+# User-specific files
+backend/.env
