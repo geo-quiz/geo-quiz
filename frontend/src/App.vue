@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import PageHeader from './components/PageHeader.vue';</script>
+import PageHeader from './components/TestHeader.vue';</script>
 
 <template>
   <PageHeader/>
@@ -7,8 +7,5 @@ import PageHeader from './components/PageHeader.vue';</script>
 </template>
 
 <style>
-@font-face {
-  font-family: "Avigea";
-  src: local("Avigea"), url('/fonts/Avigea.ttf') format("truetype");
-}
+
 </style>
