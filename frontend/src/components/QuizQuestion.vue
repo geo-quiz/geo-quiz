@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import router from '@/router';
+import {useCurrentQuizStore} from '@/stores/currentQuiz';
+import type {IAnswer} from '../../../utility/interfaces/IAnswer';
 
-const question = 'Vad heter huvudstaden i Frankrike?';
-const answer = 'Paris';
-const answers = ['London', 'Berlin', 'Paris', 'Rom'];
+
 const isCorrect = ref(false);
 const isAnswered = ref(false);
 const isIncorrectAnswer = ref(true);
@@ -14,51 +14,91 @@ const INCORRECT = 'Fel';
 
 const msg = ref(INCORRECT);
 
-function answerQuestion(selectedAnswer: string) {
-    if (!isAnswered.value) {
-        const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
+const currentQuiz = useCurrentQuizStore();
 
-        if (indexOfAnswer === findIndexOfCorrectAnswer()) {
+onMounted(() => {
+    console.log('hej');
+    fetch('http://localhost:3000/quiz/').then(response => response.json()).then(data => {
+        currentQuiz.setQuestions(data);
+    });
+});
+
+function answerQuestion(selectedAnswer: IAnswer) {
+    if (!isAnswered.value) {
+        //const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
+        // const indexOfCorrect = findIndexOfCorrectAnswer();
+        //     console.log("index of answer: " + indexOfAnswer + ", index of correct: " + indexOfCorrect);
+
+        console.log('selectedAnswer id: ' + selectedAnswer.id + ', correct answer: ' + currentQuiz.currentQuestion.correctAnswer);
+
+
+        if (selectedAnswer.id == currentQuiz.currentQuestion.correctAnswer) {
+            //      if (indexOfAnswer === indexOfCorrect) {
             isCorrect.value = true;
             msg.value = CORRECT;
             isIncorrectAnswer.value = false;
         }
+        console.log('isCorrect: ' + isCorrect.value + ', msg ' + msg.value + ', isIncorrectAnswer: ' + isIncorrectAnswer.value);
         isAnswered.value = true;
     }
 }
 
-function findIndexOfAnswer(selectedAnswer: string) {
-    return answers.indexOf(selectedAnswer);
+// function findIndexOfAnswer(selectedAnswer: IAnswer) {
+//     return currentQuiz.currentQuestion.answers.indexOf(selectedAnswer);
+// }
+//
+// function findIndexOfCorrectAnswer() {
+//     console.log("answer0 id: " + currentQuiz.currentQuestion.answers[0].id + "correct answer: " + currentQuiz.currentQuestion.correctAnswer);
+//     return currentQuiz.currentQuestion.answers.findIndex(answer => answer.id == currentQuiz.currentQuestion.correctAnswer);
+// }
+
+function getCorrectAnswer() {
+    const correct = currentQuiz.currentQuestion.answers.find(a => a.id == currentQuiz.currentQuestion.correctAnswer);
+    //console.log("correct answer: " + correct.answer);
+    if (correct != undefined) {
+        return correct.answer;
+    } 
 }
 
-function findIndexOfCorrectAnswer() {
-    return answers.indexOf(answer);
+function resetAnswerResponses() {
+    isCorrect.value = false;
+    isAnswered.value = false;
+    isIncorrectAnswer.value = true;
+    msg.value = INCORRECT;
 }
 
 function nextQuestion() {
-    router.push('next');
+    if (currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
+        router.push('next');
+    } else {
+        resetAnswerResponses();
+        currentQuiz.nextQuestion();
+    }
 }
+
+
 </script>
 
+
 <template>
-    <section>
+    <section v-if="currentQuiz.currentQuestion">
         <h2 class="heading">Europa</h2>
         <div class="question-div">
-            <p class="question-text">{{ question }}</p>
+            <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
         </div>
         <div class="answers">
             <button
-                v-for="(answer, index) in answers"
+                v-for="(answer, index) in currentQuiz.currentQuestion.answers"
                 :key="index"
                 class="answer-button button"
                 @click="answerQuestion(answer)">
-                {{ answer }}
+                {{ answer.answer }}
             </button>
         </div>
         <div v-if="isAnswered" class="answered">
             <div class="answered-message">
                 <p>{{ msg }} svar!</p>
-                <p v-if="isIncorrectAnswer">Rätt svar var: {{ answer }}</p>
+                <p v-if="isIncorrectAnswer">Rätt svar var: {{ getCorrectAnswer() }}</p>
             </div>
             <button id="next-question-button" class="button" @click="nextQuestion">Nästa Fråga</button>
         </div>
@@ -74,8 +114,8 @@ function nextQuestion() {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    width: 75%;
     justify-content: center;
+    width: 75%;
 }
 
 .answer-button {
