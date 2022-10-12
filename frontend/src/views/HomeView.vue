@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
 import GeoLogo from '@/components/GeoLogo.vue';
+import PageFooter from '@/components/PageFooter.vue';
 import router from '@/router';
 
 function goTo(location: string) {
@@ -24,6 +25,7 @@ function goTo(location: string) {
             </div>
         </div>
     </main>
+    <PageFooter />
 </template>
 
 <style scoped>
