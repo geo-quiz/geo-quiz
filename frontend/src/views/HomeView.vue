@@ -45,11 +45,4 @@ main {
 #play-button {
     background: #5bb318;
 }
-
-.wrapper {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap);
-}
 </style>
