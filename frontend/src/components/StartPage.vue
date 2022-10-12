@@ -39,11 +39,10 @@ function toRegister() {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    height: 100vh;
-    width: 100vw;
+    min-height: 100vh;
+    width: 100%;
     top: 0;
     z-index: -1;
-    position: absolute;
 }
 
 
@@ -126,10 +125,6 @@ p {
     .button {
         font-size: 1rem;
     }
-    .container{
-        display: grid;
-        margin-left: -18px;
-    }
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
@@ -137,10 +132,7 @@ p {
         height: 75px;
 
     }
-    .container{
-        display: grid;
-        margin-left: -52px;
-    }
+
 }
 
 @media only screen and (min-width: 1024px) {
