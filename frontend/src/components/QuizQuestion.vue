@@ -25,39 +25,34 @@ onMounted(() => {
 
 function answerQuestion(selectedAnswer: IAnswer) {
     if (!isAnswered.value) {
-        //const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
-        // const indexOfCorrect = findIndexOfCorrectAnswer();
-        //     console.log("index of answer: " + indexOfAnswer + ", index of correct: " + indexOfCorrect);
+        const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
+        const indexOfCorrect = findIndexOfCorrectAnswer();
 
-        console.log('selectedAnswer id: ' + selectedAnswer.id + ', correct answer: ' + currentQuiz.currentQuestion.correctAnswer);
-
-
-        if (selectedAnswer.id == currentQuiz.currentQuestion.correctAnswer) {
-            //      if (indexOfAnswer === indexOfCorrect) {
+        if (indexOfAnswer === indexOfCorrect) {
             isCorrect.value = true;
             msg.value = CORRECT;
             isIncorrectAnswer.value = false;
         }
-        console.log('isCorrect: ' + isCorrect.value + ', msg ' + msg.value + ', isIncorrectAnswer: ' + isIncorrectAnswer.value);
-        isAnswered.value = true;
     }
+    isAnswered.value = true;
 }
 
-// function findIndexOfAnswer(selectedAnswer: IAnswer) {
-//     return currentQuiz.currentQuestion.answers.indexOf(selectedAnswer);
-// }
-//
-// function findIndexOfCorrectAnswer() {
-//     console.log("answer0 id: " + currentQuiz.currentQuestion.answers[0].id + "correct answer: " + currentQuiz.currentQuestion.correctAnswer);
-//     return currentQuiz.currentQuestion.answers.findIndex(answer => answer.id == currentQuiz.currentQuestion.correctAnswer);
-// }
+function findIndexOfAnswer(selectedAnswer: IAnswer) {
+    return currentQuiz.currentQuestion.answers.indexOf(selectedAnswer);
+}
+
+function findIndexOfCorrectAnswer() {
+    return currentQuiz.currentQuestion.answers.findIndex(answer => answer.id == currentQuiz.currentQuestion.correctAnswer);
+}
 
 function getCorrectAnswer() {
-    const correct = currentQuiz.currentQuestion.answers.find(a => a.id == currentQuiz.currentQuestion.correctAnswer);
-    //console.log("correct answer: " + correct.answer);
+    const correct = currentQuiz.currentQuestion.answers[findIndexOfCorrectAnswer()];
     if (correct != undefined) {
         return correct.answer;
-    } 
+    }
+    else {
+        console.error('Correct answer not found');
+    }
 }
 
 function resetAnswerResponses() {
