@@ -1,6 +1,7 @@
 body {
-
-    display: grid;
+    background: #112d4e;
+    display: flex;
+    justify-content: center;
     margin: 0;
     width: 100%;
 }
@@ -9,6 +10,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 100%;
+    width: 90%;
     gap: 20px;
 }
