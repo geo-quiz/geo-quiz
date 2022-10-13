@@ -24,8 +24,8 @@ defineProps({
     background-size: cover;
     z-index: -10;
     position: absolute;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    min-height: 100vh;
 }
 
 main {
