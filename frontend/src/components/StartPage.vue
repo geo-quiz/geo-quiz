@@ -15,7 +15,7 @@ function toRegister() {
         <div class="start background">
             <p>GeoQuiz</p>
             <div class="globeContainer">
-                <img src="/images/background.png" alt="Planet" />
+                <img src="/images/planet.png" alt="Planet" />
             </div>
 
             <div class="buttonContainer">
