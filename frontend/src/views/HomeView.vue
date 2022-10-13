@@ -2,24 +2,19 @@
 import GeoButton from '@/components/GeoButton.vue';
 import PageFooter from '@/components/PageFooter.vue';
 import router from '@/router';
-import MainMenuContainer from '@/components/MainMenuContainer.vue';
-
-function goTo(location: string) {
-    router.push(location);
-}
-</script>
+import MainMenuContainer from '@/components/MainMenuContainer.vue';</script>
 
 <template>
-    <MainMenuContainer noLogo>
+    <MainMenuContainer>
         <div class="wrapper">
-            <GeoButton id="play-button" font-size="2rem" height="120px" width="90% + 4px" @click="goTo('/quiz')">
+            <GeoButton id="play-button" font-size="2rem" height="120px" width="90% + 4px" @click="router.push('/quiz')">
                 Play now
             </GeoButton>
             <div class="buttons">
-                <GeoButton height="75px" @click="goTo('/profile')">Profile</GeoButton>
-                <GeoButton height="75px" @click="goTo('/leaderboard')">Leaderboard</GeoButton>
-                <GeoButton height="75px" @click="goTo('/settings')">Settings</GeoButton>
-                <GeoButton height="75px" @click="goTo('/log-out')">Log out</GeoButton>
+                <GeoButton height="75px" @click="router.push('/profile')">Profile</GeoButton>
+                <GeoButton height="75px" @click="router.push('/leaderboard')">Leaderboard</GeoButton>
+                <GeoButton height="75px" @click="router.push('/settings')">Settings</GeoButton>
+                <GeoButton height="75px" @click="router.push('/log-out')">Log out</GeoButton>
             </div>
         </div>
     </MainMenuContainer>
@@ -37,5 +32,13 @@ function goTo(location: string) {
 
 #play-button {
     background: #5bb318;
+}
+
+.wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    width: 100%;
 }
 </style>

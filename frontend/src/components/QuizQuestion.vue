@@ -133,6 +133,14 @@ section {
     color: #111111;
 }
 
+.wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    width: 100%;
+}
+
 @media only screen and (min-width: 768px) {
     .answers {
         width: 75%;
