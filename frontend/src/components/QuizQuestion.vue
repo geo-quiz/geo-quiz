@@ -3,14 +3,14 @@ import {onMounted, ref} from 'vue';
 import router from '@/router';
 import {useCurrentQuizStore} from '@/stores/currentQuiz';
 import type {IAnswer} from '@/utility/interfaces/IAnswer';
-
+import GeoButton from '@/components/GeoButton.vue';
 
 const isCorrect = ref(false);
 const isAnswered = ref(false);
 const isIncorrectAnswer = ref(true);
 
-const CORRECT = 'Rätt';
-const INCORRECT = 'Fel';
+const CORRECT = 'Correct';
+const INCORRECT = 'Wrong';
 
 const msg = ref(INCORRECT);
 
@@ -47,7 +47,7 @@ function findIndexOfCorrectAnswer() {
 
 function getCorrectAnswer() {
     const correct = currentQuiz.currentQuestion.answers[findIndexOfCorrectAnswer()];
-    if (correct != undefined) {
+    if (correct) {
         return correct.answer;
     }
     else {
@@ -70,58 +70,53 @@ function nextQuestion() {
         currentQuiz.nextQuestion();
     }
 }
-
-
 </script>
-
 
 <template>
     <section v-if="currentQuiz.currentQuestion">
-        <h2 class="heading">Europa</h2>
-        <div class="question-div">
-            <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
-        </div>
-        <div class="answers">
-            <button
-                v-for="(answer, index) in currentQuiz.currentQuestion.answers"
-                :key="index"
-                class="answer-button button"
-                @click="answerQuestion(answer)">
-                {{ answer.answer }}
-            </button>
-        </div>
-        <div v-if="isAnswered" class="answered">
-            <div class="answered-message">
-                <p>{{ msg }} svar!</p>
-                <p v-if="isIncorrectAnswer">Rätt svar var: {{ getCorrectAnswer() }}</p>
+        <h2 class="heading">Europe</h2>
+        <div class="wrapper">
+            <div class="question-div">
+                <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
             </div>
-            <button id="next-question-button" class="button" @click="nextQuestion">Nästa Fråga</button>
+            <div class="answers">
+                <GeoButton
+                    v-for="(answer, index) in currentQuiz.currentQuestion.answers"
+                    :key="index"
+                    class="button"
+                    font-size="1.125rem"
+                    height="100px"
+                    @click="answerQuestion(answer)">
+                    {{ answer.answer }}
+                </GeoButton>
+            </div>
+            <div v-if="isAnswered" class="answered">
+                <div class="answered-message">
+                    <p>{{ msg }} answer!</p>
+                    <p v-if="isIncorrectAnswer">The correct answer is: {{ getCorrectAnswer()}}</p>
+                </div>
+                <GeoButton id="next-question-button" class="button" font-size="1.125rem" @click="nextQuestion">
+                    Next question
+                </GeoButton>
+            </div>
         </div>
     </section>
 </template>
 
 <style scoped>
-* {
-    --radius: 5px;
-}
-
 .answers {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: var(--gap);
     justify-content: center;
     width: 75%;
-}
-
-.answer-button {
-    width: 100%;
 }
 
 .answered {
     align-items: center;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: var(--gap);
     text-align: center;
     width: 75%;
 }
@@ -131,14 +126,6 @@ function nextQuestion() {
     border-radius: var(--radius);
     color: #f9f7f7;
     padding: 5px;
-}
-
-.button {
-    background: #3f72af;
-    border: none;
-    border-radius: var(--radius);
-    color: #f9f7f7;
-    height: 40px;
 }
 
 .heading {
@@ -157,7 +144,6 @@ section {
     display: flex;
     flex-wrap: wrap;
     gap: 50px;
-    height: 100%;
     justify-content: center;
 }
 
@@ -175,6 +161,7 @@ section {
 .question-text {
     margin: 0;
     padding: 5px 10px;
+    color: #111111;
 }
 
 @media only screen and (min-width: 768px) {
@@ -182,20 +169,8 @@ section {
         width: 75%;
     }
 
-    .answer-button {
-        width: calc(50% - (15px / 2));
-    }
-
     .answered {
         width: 75%;
-    }
-
-    .answered-message {
-        font-size: 1.125rem;
-    }
-
-    .button {
-        font-size: 1rem;
     }
 
     #next-question-button {
@@ -214,13 +189,13 @@ section {
 
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
     .button {
-        height: 50px;
+        font-size: 1.5rem;
     }
 }
 
 @media only screen and (min-width: 1024px) {
     .button {
-        height: 75px;
+        font-size: 1.75rem;
     }
 }
 </style>
