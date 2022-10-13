@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
-import GeoLogo from '@/components/GeoLogo.vue';
 import PageFooter from '@/components/PageFooter.vue';
 import router from '@/router';
+import MainMenuContainer from '@/components/MainMenuContainer.vue';
 
 function goTo(location: string) {
     router.push(location);
@@ -10,9 +10,7 @@ function goTo(location: string) {
 </script>
 
 <template>
-    <main>
-        <GeoLogo />
-
+    <MainMenuContainer noLogo>
         <div class="wrapper">
             <GeoButton id="play-button" font-size="2rem" height="120px" width="90% + 4px" @click="goTo('/quiz')">
                 Play now
@@ -24,7 +22,7 @@ function goTo(location: string) {
                 <GeoButton height="75px" @click="goTo('/log-out')">Log out</GeoButton>
             </div>
         </div>
-    </main>
+    </MainMenuContainer>
     <PageFooter />
 </template>
 
@@ -35,13 +33,6 @@ function goTo(location: string) {
     gap: var(--gap);
     justify-content: space-between;
     width: 90%;
-}
-
-main {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: 100px;
 }
 
 #play-button {
