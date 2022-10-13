@@ -23,11 +23,16 @@ onUnmounted(() => {
 <template>
     <section class="header-background">
         <div class="image-container">
-            <ArrowLeftCircleOutlineIcon :size="48" class="return-button" fillColor="var(--color-white)"
-                                        @click="$router.back()" />
+            <ArrowLeftCircleOutlineIcon
+                :size="48"
+                class="return-button"
+                fillColor="var(--color-white)"
+                @click="$router.back()" />
         </div>
         <div class="logo-container">
-            <h1 class="logo-text">GeoQuiz</h1>
+            <h1>
+                <RouterLink class="logo-text" to="/home">GeoQuiz</RouterLink>
+            </h1>
         </div>
         <div v-if="isTouchScreen" class="hamburger-container">
             <input id="hamburger-toggle" aria-label="Toggle Navigation" class="checkbox" type="checkbox" />
@@ -96,6 +101,7 @@ section {
 }
 
 .logo-text {
+    border: none;
     color: var(--color-white);
     font-family: 'Avigea', 'serif';
     font-size: 3rem;
