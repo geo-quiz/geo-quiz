@@ -1,7 +1,7 @@
 import express from 'express';
 import { defaultRoute } from './defaultRoute';
-import {quizRoute} from './quiz';
-import {userRoute} from './user';
+import { quizRoute } from './quiz';
+import { userRoute } from './user';
 
 export const routes = express.Router();
 

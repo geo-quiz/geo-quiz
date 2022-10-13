@@ -1,11 +1,7 @@
-<script lang="ts" setup>
-import PageHeader from './components/TestHeader.vue';</script>
+<script lang="ts" setup></script>
 
 <template>
-  <PageHeader/>
-  <RouterView/>
+    <RouterView />
 </template>
 
-<style>
-
-</style>
+<style scoped></style>
