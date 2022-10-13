@@ -121,9 +121,9 @@ function nextQuestion() {
 }
 
 .answered-message {
-    background: #3f72af;
+    background: var(--color-light-blue);
     border-radius: var(--radius);
-    color: #f9f7f7;
+    color: var(--color-white);
     padding: 5px;
 }
 
@@ -132,7 +132,7 @@ function nextQuestion() {
 }
 
 .heading {
-    color: #f9f7f7;
+    color: var(--color-white);
     font-size: 2rem;
     margin: 0;
     text-align: center;
@@ -145,7 +145,7 @@ p {
 
 .question-div {
     align-items: center;
-    background: #f9f7f7;
+    background: var(--color-white);
     border-radius: var(--radius);
     display: flex;
     justify-content: center;
@@ -155,7 +155,7 @@ p {
 }
 
 .question-text {
-    color: #111111;
+    color: var(--color-black);
     margin: 0;
     padding: 5px 10px;
 }

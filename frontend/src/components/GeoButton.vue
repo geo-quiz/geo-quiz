@@ -40,7 +40,7 @@ const { size = 'medium', color = 'default' } = defineProps<Props>();
 
 const buttonHeight = button[size].height;
 const buttonFontSize = button[size].fontSize;
-const buttonColor = color === 'green' ? '#5bb318' : '#3f72af';
+const buttonColor = color === 'green' ? 'var(--color-green)' : 'var(--color-light-blue)';
 </script>
 
 <template>
@@ -54,7 +54,7 @@ const buttonColor = color === 'green' ? '#5bb318' : '#3f72af';
     background: v-bind(buttonColor);
     border: none;
     border-radius: var(--radius);
-    color: #f9f7f7;
+    color: var(--color-white);
     font-size: v-bind(buttonFontSize);
     height: v-bind(buttonHeight);
     padding: 3px 6px;
@@ -62,8 +62,8 @@ const buttonColor = color === 'green' ? '#5bb318' : '#3f72af';
 }
 
 button:hover {
-    background: #f9f7f7;
-    color: #111111;
+    background: var(--color-white);
+    color: var(--color-black);
     cursor: pointer;
 }
 </style>
