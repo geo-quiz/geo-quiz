@@ -23,10 +23,16 @@ onUnmounted(() => {
 <template>
     <section class="header-background">
         <div class="image-container">
-            <ArrowLeftCircleOutlineIcon :size="48" class="return-button" fillColor="#f9f7f7" @click="$router.back()" />
+            <ArrowLeftCircleOutlineIcon
+                :size="48"
+                class="return-button"
+                fillColor="var(--color-white)"
+                @click="$router.back()" />
         </div>
         <div class="logo-container">
-            <h1 class="logo-text">GeoQuiz</h1>
+            <h1>
+                <RouterLink class="logo-text" to="/home">GeoQuiz</RouterLink>
+            </h1>
         </div>
         <div v-if="isTouchScreen" class="hamburger-container">
             <input id="hamburger-toggle" aria-label="Toggle Navigation" class="checkbox" type="checkbox" />
@@ -61,7 +67,7 @@ section {
 
 .header-background {
     align-items: center;
-    background: #3f72af;
+    background: var(--color-light-blue);
     display: flex;
     flex-direction: row;
     height: 100px;
@@ -95,7 +101,8 @@ section {
 }
 
 .logo-text {
-    color: #f9f7f7;
+    border: none;
+    color: var(--color-white);
     font-family: 'Avigea', 'serif';
     font-size: 3rem;
     font-weight: normal;
@@ -110,7 +117,7 @@ section {
 }
 
 .hamburger-container {
-    color: #f9f7f7;
+    color: var(--color-white);
     display: flex;
     justify-content: flex-end;
     left: 0;
@@ -125,7 +132,7 @@ section {
 }
 
 .hamburger-container .checkbox:focus ~ .hamburger {
-    outline: 2px solid #f9f7f7;
+    outline: 2px solid var(--color-white);
     outline: auto;
     outline-offset: 4px;
 }
@@ -165,7 +172,7 @@ section {
 }
 
 .hamburger .slice {
-    background-color: #f9f7f7;
+    background-color: var(--color-white);
     display: block;
     height: 2px;
     transition: all 0.5s ease;
@@ -178,7 +185,7 @@ section {
 
 .drawer {
     align-content: flex-end;
-    background: #3f72af;
+    background: var(--color-light-blue);
     border-radius: 0 0 0 8px;
     max-width: 150px;
     position: fixed;
@@ -197,8 +204,8 @@ section {
 }
 
 a {
-    border-top: 2px solid #f9f7f7;
-    color: #f9f7f7;
+    border-top: 2px solid var(--color-white);
+    color: var(--color-white);
     padding: 12px 0;
     position: relative;
     text-align: center;

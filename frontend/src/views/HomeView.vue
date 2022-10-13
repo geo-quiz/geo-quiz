@@ -1,30 +1,29 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
-import GeoLogo from '@/components/GeoLogo.vue';
 import PageFooter from '@/components/PageFooter.vue';
 import router from '@/router';
-
-function goTo(location: string) {
-    router.push(location);
-}
-</script>
+import MainMenuContainer from '@/components/MainMenuContainer.vue';</script>
 
 <template>
-    <main>
-        <GeoLogo />
-
+    <MainMenuContainer>
         <div class="wrapper">
-            <GeoButton id="play-button" font-size="2rem" height="120px" width="90% + 4px" @click="goTo('/quiz')">
-                Play now
-            </GeoButton>
+            <GeoButton color="green" size="large" @click="router.push('/quiz')"> Play now</GeoButton>
             <div class="buttons">
-                <GeoButton height="75px" @click="goTo('/profile')">Profile</GeoButton>
-                <GeoButton height="75px" @click="goTo('/leaderboard')">Leaderboard</GeoButton>
-                <GeoButton height="75px" @click="goTo('/settings')">Settings</GeoButton>
-                <GeoButton height="75px" @click="goTo('/log-out')">Log out</GeoButton>
+                <div class="button-wrapper">
+                    <GeoButton @click="router.push('/profile')">Profile</GeoButton>
+                </div>
+                <div class="button-wrapper">
+                    <GeoButton @click="router.push('/leaderboard')">Leaderboard</GeoButton>
+                </div>
+                <div class="button-wrapper">
+                    <GeoButton @click="router.push('/settings')">Settings</GeoButton>
+                </div>
+                <div class="button-wrapper">
+                    <GeoButton @click="router.push('/log-out')">Log out</GeoButton>
+                </div>
             </div>
         </div>
-    </main>
+    </MainMenuContainer>
     <PageFooter />
 </template>
 
@@ -34,17 +33,18 @@ function goTo(location: string) {
     flex-wrap: wrap;
     gap: var(--gap);
     justify-content: space-between;
-    width: 90%;
+    width: 100%;
 }
 
-main {
+.button-wrapper {
+    width: calc(50% - var(--gap) / 2);
+}
+
+.wrapper {
     align-items: center;
     display: flex;
     flex-direction: column;
-    gap: 100px;
-}
-
-#play-button {
-    background: #5bb318;
+    gap: var(--gap);
+    width: 100%;
 }
 </style>
