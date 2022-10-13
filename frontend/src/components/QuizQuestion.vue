@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
-import router from '@/router';
-import {useCurrentQuizStore} from '@/stores/currentQuiz';
-import type {IAnswer} from '@/utility/interfaces/IAnswer';
 import GeoButton from '@/components/GeoButton.vue';
+import { onMounted, ref } from 'vue';
+import router from '@/router';
+import { useCurrentQuizStore } from '@/stores/currentQuiz';
+import type { IAnswer } from '@/utility/interfaces/IAnswer';
 
 const isCorrect = ref(false);
 const isAnswered = ref(false);
@@ -18,9 +18,11 @@ const currentQuiz = useCurrentQuizStore();
 
 onMounted(() => {
     console.log('hej');
-    fetch('http://localhost:3000/quiz/').then(response => response.json()).then(data => {
-        currentQuiz.setQuestions(data);
-    });
+    fetch('http://localhost:3000/quiz/')
+        .then((response) => response.json())
+        .then((data) => {
+            currentQuiz.setQuestions(data);
+        });
 });
 
 function answerQuestion(selectedAnswer: IAnswer) {
@@ -42,15 +44,16 @@ function findIndexOfAnswer(selectedAnswer: IAnswer) {
 }
 
 function findIndexOfCorrectAnswer() {
-    return currentQuiz.currentQuestion.answers.findIndex(answer => answer.id == currentQuiz.currentQuestion.correctAnswer);
+    return currentQuiz.currentQuestion.answers.findIndex(
+        (answer) => answer.id == currentQuiz.currentQuestion.correctAnswer,
+    );
 }
 
 function getCorrectAnswer() {
     const correct = currentQuiz.currentQuestion.answers[findIndexOfCorrectAnswer()];
     if (correct) {
         return correct.answer;
-    }
-    else {
+    } else {
         console.error('Correct answer not found');
     }
 }
@@ -80,22 +83,18 @@ function nextQuestion() {
                 <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
             </div>
             <div class="answers">
-                <GeoButton
-                    v-for="(answer, index) in currentQuiz.currentQuestion.answers"
-                    :key="index"
-                    class="button"
-                    font-size="1.125rem"
-                    height="100px"
-                    @click="answerQuestion(answer)">
-                    {{ answer.answer }}
-                </GeoButton>
+                <div v-for="(answer, index) in currentQuiz.currentQuestion.answers" :key="index" class="button-wrapper">
+                    <GeoButton size="answer" @click="answerQuestion(answer)">
+                        {{ answer.answer }}
+                    </GeoButton>
+                </div>
             </div>
             <div v-if="isAnswered" class="answered">
                 <div class="answered-message">
                     <p>{{ msg }} answer!</p>
-                    <p v-if="isIncorrectAnswer">The correct answer is: {{ getCorrectAnswer()}}</p>
+                    <p v-if="isIncorrectAnswer">The correct answer is: {{ getCorrectAnswer() }}</p>
                 </div>
-                <GeoButton id="next-question-button" class="button" font-size="1.125rem" @click="nextQuestion">
+                <GeoButton id="next-question-button" font-size="1.125rem" @click="nextQuestion">
                     Next question
                 </GeoButton>
             </div>
@@ -128,6 +127,10 @@ function nextQuestion() {
     padding: 5px;
 }
 
+.button-wrapper {
+    width: calc(50% - var(--gap) / 2);
+}
+
 .heading {
     color: #f9f7f7;
     font-size: 2rem;
@@ -138,13 +141,6 @@ function nextQuestion() {
 
 p {
     margin: 0;
-}
-
-section {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 50px;
-    justify-content: center;
 }
 
 .question-div {
@@ -159,9 +155,16 @@ section {
 }
 
 .question-text {
+    color: #111111;
     margin: 0;
     padding: 5px 10px;
-    color: #111111;
+}
+
+section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 50px;
+    justify-content: center;
 }
 
 .wrapper {
@@ -192,18 +195,6 @@ section {
 
     .question-text {
         font-size: 1.5rem;
-    }
-}
-
-@media only screen and (min-width: 768px) and (max-width: 1024px) {
-    .button {
-        font-size: 1.5rem;
-    }
-}
-
-@media only screen and (min-width: 1024px) {
-    .button {
-        font-size: 1.75rem;
     }
 }
 </style>
