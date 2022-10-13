@@ -125,10 +125,6 @@ section {
     margin: 0 0 20px 0;
 }
 
-.hamburger:hover {
-    background: #112d4e;
-}
-
 .hamburger-container .checkbox {
     opacity: 0;
     position: absolute;
