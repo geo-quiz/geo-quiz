@@ -2,7 +2,7 @@
 import {onMounted, ref} from 'vue';
 import router from '@/router';
 import {useCurrentQuizStore} from '@/stores/currentQuiz';
-import type {IAnswer} from '../../../utility/interfaces/IAnswer';
+import type {IAnswer} from '@/utility/interfaces/IAnswer';
 
 
 const isCorrect = ref(false);

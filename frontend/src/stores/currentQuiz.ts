@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
-import type { IQuestion } from '../../../utility/interfaces/IQuestion';
+import type { IQuestion } from '@/utility/interfaces/IQuestion';
 
 export const useCurrentQuizStore = defineStore('currentQuiz', () => {
     const questions = ref<IQuestion[]>([]);
