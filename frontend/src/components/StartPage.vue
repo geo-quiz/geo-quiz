@@ -28,27 +28,28 @@ function toRegister() {
 </template>
 
 <style scoped>
-@font-face {
-    font-family: 'Avigea';
-    src: url('../../public/font/Avigea-Font/avigea.ttf');
-}
+
+/*@font-face {*/
+/*    font-family: 'Avigea';*/
+/*    src: url('../../public/font/Avigea-Font/avigea.ttf');*/
+/*}*/
 
 
-.background {
-    background-image: url('/img/MoreStars.svg');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    min-height: 100vh;
-    width: 100%;
-    top: 0;
-    z-index: -1;
-}
+/*.background {*/
+/*    background-image: url('/img/MoreStars.svg');*/
+/*    background-position: center;*/
+/*    background-repeat: no-repeat;*/
+/*    background-size: cover;*/
+/*    min-height: 100vh;*/
+/*    width: 100%;*/
+/*    top: 0;*/
+/*    z-index: -1;*/
+/*}*/
 
 
 section {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    justify-content: center;
 
 }
 
