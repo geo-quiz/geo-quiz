@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import router from '@/router';
+import {useCurrentQuizStore} from '@/stores/currentQuiz';
+import type {IAnswer} from '@/utility/interfaces/IAnswer';
 import GeoButton from '@/components/GeoButton.vue';
 
-const question = 'What is the capital of France?';
-const answer = 'Paris';
-const answers = ['London', 'Berlin', 'Paris', 'Rome'];
 const isCorrect = ref(false);
 const isAnswered = ref(false);
 const isIncorrectAnswer = ref(true);
@@ -15,54 +14,86 @@ const INCORRECT = 'Wrong';
 
 const msg = ref(INCORRECT);
 
-function answerQuestion(selectedAnswer: string) {
+const currentQuiz = useCurrentQuizStore();
+
+onMounted(() => {
+    console.log('hej');
+    fetch('http://localhost:3000/quiz/').then(response => response.json()).then(data => {
+        currentQuiz.setQuestions(data);
+    });
+});
+
+function answerQuestion(selectedAnswer: IAnswer) {
     if (!isAnswered.value) {
         const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
+        const indexOfCorrect = findIndexOfCorrectAnswer();
 
-        if (indexOfAnswer === findIndexOfCorrectAnswer()) {
+        if (indexOfAnswer === indexOfCorrect) {
             isCorrect.value = true;
             msg.value = CORRECT;
             isIncorrectAnswer.value = false;
         }
-        isAnswered.value = true;
     }
+    isAnswered.value = true;
 }
 
-function findIndexOfAnswer(selectedAnswer: string) {
-    return answers.indexOf(selectedAnswer);
+function findIndexOfAnswer(selectedAnswer: IAnswer) {
+    return currentQuiz.currentQuestion.answers.indexOf(selectedAnswer);
 }
 
 function findIndexOfCorrectAnswer() {
-    return answers.indexOf(answer);
+    return currentQuiz.currentQuestion.answers.findIndex(answer => answer.id == currentQuiz.currentQuestion.correctAnswer);
+}
+
+function getCorrectAnswer() {
+    const correct = currentQuiz.currentQuestion.answers[findIndexOfCorrectAnswer()];
+    if (correct) {
+        return correct.answer;
+    }
+    else {
+        console.error('Correct answer not found');
+    }
+}
+
+function resetAnswerResponses() {
+    isCorrect.value = false;
+    isAnswered.value = false;
+    isIncorrectAnswer.value = true;
+    msg.value = INCORRECT;
 }
 
 function nextQuestion() {
-    router.push('next');
+    if (currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
+        router.push('next');
+    } else {
+        resetAnswerResponses();
+        currentQuiz.nextQuestion();
+    }
 }
 </script>
 
 <template>
-    <section>
+    <section v-if="currentQuiz.currentQuestion">
         <h2 class="heading">Europe</h2>
         <div class="wrapper">
             <div class="question-div">
-                <p class="question-text">{{ question }}</p>
+                <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
             </div>
             <div class="answers">
                 <GeoButton
-                    v-for="(answer, index) in answers"
+                    v-for="(answer, index) in currentQuiz.currentQuestion.answers"
                     :key="index"
                     class="button"
                     font-size="1.125rem"
                     height="100px"
                     @click="answerQuestion(answer)">
-                    {{ answer }}
+                    {{ answer.answer }}
                 </GeoButton>
             </div>
             <div v-if="isAnswered" class="answered">
                 <div class="answered-message">
                     <p>{{ msg }} answer!</p>
-                    <p v-if="isIncorrectAnswer">The correct answer is: {{ answer }}</p>
+                    <p v-if="isIncorrectAnswer">The correct answer is: {{ getCorrectAnswer()}}</p>
                 </div>
                 <GeoButton id="next-question-button" class="button" font-size="1.125rem" @click="nextQuestion">
                     Next question
