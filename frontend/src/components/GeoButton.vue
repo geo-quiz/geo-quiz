@@ -61,7 +61,7 @@ const buttonColor = color === 'green' ? 'var(--color-green)' : 'var(--color-ligh
     width: 100%;
 }
 
-button:hover {
+.button:hover {
     background: var(--color-white);
     color: var(--color-black);
     cursor: pointer;
