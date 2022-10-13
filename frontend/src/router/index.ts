@@ -28,6 +28,11 @@ const router = createRouter({
             name: 'login',
             component: () => import('../views/LoginView.vue'),
         },
+        {
+            path: '/continent',
+            name: 'continent',
+            component: () => import('../views/ContinentView.vue'),
+        },
     ],
 });
 
