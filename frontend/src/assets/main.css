@@ -41,8 +41,3 @@ body {
     gap: var(--gap);
     width: 100%;
 }
-
-@font-face {
-    font-family: "Avigea";
-    src: local("Avigea"), url('/fonts/Avigea.ttf') format("truetype");
-}

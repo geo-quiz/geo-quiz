@@ -10,7 +10,6 @@ function onResize() {
     console.log(window.innerWidth);
 }
 
-
 onMounted(() => {
     window.addEventListener('resize', onResize);
     onResize();
@@ -22,7 +21,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <section class='header-background'>
+    <section class="header-background">
         <div class="image-container">
             <ArrowLeftCircleOutlineIcon :size="48" class="return-button" fillColor="#f9f7f7" @click="$router.back()" />
         </div>
@@ -61,32 +60,28 @@ section {
 }
 
 .header-background {
-    align-content: flex-end;
     align-items: center;
     background: #3f72af;
     display: flex;
     flex-direction: row;
     height: 100px;
     left: 0;
-    min-width: 360px;
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 9;
 }
 
 .image-container {
     display: flex;
     justify-content: flex-start;
-    padding: 0 0 0 20px;
-    width: 33%;
+    width: 30%;
 }
 
 .return-button {
     cursor: pointer;
     height: 48px;
-    width: 48px;
     position: relative;
+    width: 48px;
 }
 
 .return-button:active {
@@ -96,7 +91,7 @@ section {
 .logo-container {
     display: flex;
     justify-content: center;
-    width: 34%;
+    width: 30%;
 }
 
 .logo-text {
@@ -111,7 +106,7 @@ section {
     display: flex;
     justify-content: center;
     padding-right: 20px;
-    width: 33%;
+    width: 30%;
 }
 
 .hamburger-container {
@@ -119,10 +114,9 @@ section {
     display: flex;
     justify-content: flex-end;
     left: 0;
-    padding: 0 30px 0 0;
     top: 0;
     transition: transform 0.5s ease;
-    width: 33%;
+    width: 30%;
 }
 
 .hamburger-container .checkbox {
@@ -206,10 +200,10 @@ a {
     border-top: 2px solid #f9f7f7;
     color: #f9f7f7;
     padding: 12px 0;
+    position: relative;
     text-align: center;
     text-decoration: none;
     width: 100%;
-    position:relative;
 }
 
 a:active {
@@ -217,7 +211,7 @@ a:active {
 }
 
 a:hover {
-    color: #D4D4D4;
+    color: #d4d4d4;
 }
 
 @media only screen and (min-width: 1024px) {
