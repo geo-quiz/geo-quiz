@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 interface Props {
-    size?: 'small' | 'medium' | 'large';
+    size?: 'small' | 'medium' | 'large' | 'answer';
     color?: 'default' | 'green';
 }
 
@@ -8,6 +8,7 @@ interface ButtonStyle {
     small: Style;
     medium: Style;
     large: Style;
+    answer: Style;
 }
 
 interface Style {
@@ -26,6 +27,10 @@ const button: ButtonStyle = {
     },
     large: {
         fontSize: '1.75rem',
+        height: '100px',
+    },
+    answer: {
+        fontSize: '1.25rem',
         height: '100px',
     },
 };
