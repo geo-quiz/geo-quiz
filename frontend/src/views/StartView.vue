@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import router from '@/router/index';
+import PageFooter from '@/components/PageFooter.vue';
 import MainMenuContainer from '@/components/MainMenuContainer.vue';
-import GeoButton from '@/components/GeoButton.vue';</script>
+import GeoButton from '@/components/GeoButton.vue';
+import router from '@/router/index';
+</script>
 
 <template>
     <MainMenuContainer>
@@ -11,6 +13,7 @@ import GeoButton from '@/components/GeoButton.vue';</script>
             </GeoButton>
             <GeoButton height="75px" width="400px" @click="router.push('/register')">Register</GeoButton>
         </div>
+        <PageFooter />
     </MainMenuContainer>
 </template>
 

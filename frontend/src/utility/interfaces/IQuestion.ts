@@ -1,8 +1,8 @@
-import { EContinent } from "../enums/EContinent";
-import { IAnswer } from './IAnswer';
+import type { EContinent } from '../enums/EContinent';
+import type { IAnswer } from './IAnswer';
 
 export interface IQuestion {
-    id: number,
+    id: number;
     question: string;
     answers: IAnswer[];
     correctAnswer: number;

@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { routes } from './routes';
 import bodyParser from 'body-parser';
 import 'reflect-metadata';
@@ -6,6 +7,7 @@ import 'reflect-metadata';
 const app = express();
 
 // routes
+app.use(cors());
 app.use(bodyParser.json());
 app.use('/', routes);
 
