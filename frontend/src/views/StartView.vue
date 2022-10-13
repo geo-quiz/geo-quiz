@@ -6,7 +6,9 @@ import GeoButton from '@/components/GeoButton.vue';</script>
 <template>
     <MainMenuContainer>
         <div class="buttonContainer">
-            <GeoButton id="login-button" height="75px" width="400px" @click="router.push('/login')">Sign in</GeoButton>
+            <GeoButton size="large" color="green" id="login-button" height="75px" width="400px"
+                       @click="router.push('/login')">Sign in
+            </GeoButton>
             <GeoButton height="75px" width="400px" @click="router.push('/register')">Register</GeoButton>
         </div>
     </MainMenuContainer>
@@ -17,9 +19,6 @@ import GeoButton from '@/components/GeoButton.vue';</script>
     display: flex;
     flex-direction: column;
     gap: var(--gap);
-}
-
-#login-button {
-    background: #5bb318;
+    width: 100%;
 }
 </style>
