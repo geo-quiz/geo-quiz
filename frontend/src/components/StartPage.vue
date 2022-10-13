@@ -15,7 +15,7 @@ function toRegister() {
         <div class="start background">
             <p>GeoQuiz</p>
             <div class="globeContainer">
-                <img src="/img/planet-5166106_1920.png" alt="Planet" />
+                <img src="/images/background.png" alt="Planet" />
             </div>
 
             <div class="buttonContainer">
@@ -28,23 +28,6 @@ function toRegister() {
 </template>
 
 <style scoped>
-
-/*@font-face {*/
-/*    font-family: 'Avigea';*/
-/*    src: url('../../public/font/Avigea-Font/avigea.ttf');*/
-/*}*/
-
-
-/*.background {*/
-/*    background-image: url('/img/MoreStars.svg');*/
-/*    background-position: center;*/
-/*    background-repeat: no-repeat;*/
-/*    background-size: cover;*/
-/*    min-height: 100vh;*/
-/*    width: 100%;*/
-/*    top: 0;*/
-/*    z-index: -1;*/
-/*}*/
 
 
 section {
@@ -142,7 +125,6 @@ p {
     }
     .container{
         display: flex;
-        margin-left: -100px;
     }
 }
 </style>
