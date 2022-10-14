@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class account {
+export class Account {
     constructor(email: string, passwordHash: string) {
         this.email = email;
         this.passwordHash = passwordHash;
