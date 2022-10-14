@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { Question } from './entities/Question';
 import { Continent } from './entities/Continent';
 import { Answer } from './entities/Answer';
+import { Account } from './entities/Account';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -19,7 +20,7 @@ export const AppDataSource = new DataSource({
     username: username,
     password: password,
     database: database,
-    entities: [Question, Continent, Answer],
+    entities: [Question, Continent, Answer, Account],
     synchronize: true,
     logging: false,
 });
