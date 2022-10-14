@@ -1,14 +1,11 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import ContinentMap from '@/components/ContinentMap.vue';
 import PageHeader from '@/components/PageHeader.vue';
-
 </script>
 
 <template>
-  <ContinentMap />
-  <PageHeader />
+    <PageHeader />
+    <ContinentMap />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
