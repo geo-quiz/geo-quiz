@@ -10,7 +10,7 @@ function goTo(location: string) {
 
 onMounted(() => {
     // The svg
-    const svg = d3.select('svg'),
+    const svg = d3.select('#my_dataviz'),
         width = +svg.attr('width'),
         height = +svg.attr('height');
 
