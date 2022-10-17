@@ -17,7 +17,6 @@ const msg = ref(INCORRECT);
 const currentQuiz = useCurrentQuizStore();
 
 onMounted(() => {
-    console.log('hej');
     fetch('http://localhost:3000/quiz/')
         .then((response) => response.json())
         .then((data) => {
