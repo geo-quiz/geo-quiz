@@ -7,7 +7,6 @@ const TOUCHSCREEN_MAX_WIDTH = 1024;
 
 function onResize() {
     isTouchScreen.value = window.innerWidth < TOUCHSCREEN_MAX_WIDTH;
-    console.log(window.innerWidth);
 }
 
 onMounted(() => {
