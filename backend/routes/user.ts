@@ -22,7 +22,7 @@ userRoute.post('/register', (req, res) => {
         if (!passwordPattern.test(password)) {
             res.status(400).json({
                 errorMessage: 'Password does not meet the requirements',
-                error: 'Password must contain at least 8 characters, one lowercase letter, one uppercase letter and one number.',
+                error: 'Password must contain at least 8 characters, one lowercase letter, one uppercase letter and one number. No punctuation.',
             });
             return;
         }
