@@ -67,7 +67,7 @@ section {
 
 .header-background {
     align-items: center;
-    background: var(--color-light-blue);
+    background: var(--color-blue);
     display: flex;
     flex-direction: row;
     height: 100px;
@@ -185,7 +185,7 @@ section {
 
 .drawer {
     align-content: flex-end;
-    background: var(--color-light-blue);
+    background: var(--color-blue);
     border-radius: 0 0 0 8px;
     max-width: 150px;
     position: fixed;

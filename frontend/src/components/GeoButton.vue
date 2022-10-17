@@ -40,7 +40,7 @@ const { size = 'medium', color = 'default' } = defineProps<Props>();
 
 const buttonHeight = button[size].height;
 const buttonFontSize = button[size].fontSize;
-const buttonColor = color === 'green' ? 'var(--color-green)' : 'var(--color-light-blue)';
+const buttonColor = color === 'green' ? 'var(--color-green)' : 'var(--color-blue)';
 </script>
 
 <template>
@@ -62,7 +62,7 @@ const buttonColor = color === 'green' ? 'var(--color-green)' : 'var(--color-ligh
 }
 
 .button:hover {
-    background: var(--color-white);
+    background: var(--color-light-blue);
     color: var(--color-black);
     cursor: pointer;
 }
