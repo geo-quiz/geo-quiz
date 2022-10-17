@@ -193,4 +193,16 @@ a {
         transform: scale(0.9);
     }
 }
+
+@media only screen and (min-width: 768px) {
+    .login-form {
+        width: 75%;
+    }
+}
+
+@media only screen and (min-width: 1024px) {
+    .login-form {
+        width: 50%;
+    }
+}
 </style>
