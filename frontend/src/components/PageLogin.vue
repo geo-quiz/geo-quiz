@@ -33,12 +33,14 @@ import GeoButton from '@/components/GeoButton.vue';</script>
         <div class="login">
             <div class="item">
                 <input id="cbx" class="inp-cbx" style="display: none" type="checkbox" />
-                <label class="cbx" for="cbx"
-                    ><span>
+                <label class="cbx" for="cbx">
+                    <span>
                         <svg height="10px" viewbox="0 0 12 10" width="12px">
-                            <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
-                    ><span>Remember me?</span></label
-                >
+                            <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                        </svg>
+                    </span>
+                    <span>Remember me?</span>
+                </label>
             </div>
             <GeoButton id="login-button" color="green">Login</GeoButton>
             <div class="new-user">
