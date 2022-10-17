@@ -12,6 +12,4 @@ import PageFooter from '@/components/PageFooter.vue';</script>
     </MainMenuContainer>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
