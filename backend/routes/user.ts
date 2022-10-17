@@ -16,14 +16,15 @@ userRoute.post('/register', (req, res) => {
     let password = '';
     let email = '';
 
-    if (query.password) {
+    if (query.password && query.email) {
         password = query.password as string;
 
         if (!passwordPattern.test(password)) {
             res.status(400).json({
-                errorMessage: 'Password do not meet the requirements',
-                error: 'Password must contain at least 8 characters, including one lowercase letter, one uppercase letter and one number.',
+                errorMessage: 'Password does not meet the requirements',
+                error: 'Password must contain at least 8 characters, one lowercase letter, one uppercase letter and one number.',
             });
+            return;
         }
 
         bcrypt
@@ -34,34 +35,52 @@ userRoute.post('/register', (req, res) => {
             .catch((error) => {
                 res.status(400).json({ errorMessage: 'Something went wrong', error: error });
             });
-    }
 
-    if (query.email) {
         email = query.email as string;
         if (!emailPattern.test(email)) {
             res.status(400).json({
                 errorMessage: 'Email is not valid',
                 error: 'Invalid email address',
             });
+            return;
         }
-    }
 
-    repository.findOneBy({ email: email }).then((account) => {
-        if (account) {
-            res.status(400).json({
-                errorMessage: 'Email already exists',
-                error: `Account with email: ${email} already exists`,
-            });
-        } else {
-            const account = new Account(email, password);
+        repository.findOneBy({ email: email }).then((account) => {
+            if (account) {
+                res.status(400).json({
+                    errorMessage: 'Email already exists',
+                    error: `Account with email: ${email} already exists`,
+                });
+                return;
+            }
+
+            const newAccount = new Account(email, password);
             repository
-                .insert(account)
+                .save(newAccount)
                 .then(() => {
                     res.status(200).json({ msg: 'Account created' });
                 })
                 .catch((error) => {
                     res.status(400).json({ errorMessage: 'Something went wrong', error: error });
                 });
-        }
-    });
+        });
+    } else if (!query.password && query.email) {
+        res.status(400).json({
+            errorMessage: 'Missing parameters',
+            error: 'Query must contain parameters: password',
+        });
+        return;
+    } else if (!query.email && query.password) {
+        res.status(400).json({
+            errorMessage: 'Missing parameters',
+            error: 'Query must contain parameters: email',
+        });
+        return;
+    } else {
+        res.status(400).json({
+            errorMessage: 'Missing parameters',
+            error: 'Query must contain parameters: email and password',
+        });
+        return;
+    }
 });
