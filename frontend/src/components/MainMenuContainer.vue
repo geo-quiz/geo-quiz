@@ -13,8 +13,9 @@ defineProps({
     <div class="background"></div>
     <main>
         <GeoLogo v-if="!noLogo" />
-
-        <slot></slot>
+        <div class="wrapper">
+            <slot></slot>
+        </div>
     </main>
 </template>
 
@@ -22,16 +23,25 @@ defineProps({
 .background {
     background: url('/images/background.png');
     background-size: cover;
-    z-index: -10;
+    min-height: 100vh;
     position: absolute;
     width: 100%;
-    min-height: 100vh;
+    z-index: -10;
 }
 
 main {
+    align-items: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 100px;
+    width: 100%;
+}
+
+.wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    width: 100%;
 }
 </style>

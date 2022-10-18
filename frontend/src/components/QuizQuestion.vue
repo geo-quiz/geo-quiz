@@ -120,7 +120,7 @@ function nextQuestion() {
 }
 
 .answered-message {
-    background: var(--color-light-blue);
+    background: var(--color-blue);
     border-radius: var(--radius);
     color: var(--color-white);
     padding: 5px;
@@ -144,7 +144,7 @@ p {
 
 .question-div {
     align-items: center;
-    background: var(--color-white);
+    background: var(--color-light-blue);
     border-radius: var(--radius);
     display: flex;
     justify-content: center;
