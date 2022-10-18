@@ -22,7 +22,9 @@ userRoute.post('/register', (req, res) => {
         if (!passwordPattern.test(password)) {
             res.status(400).json({
                 errorMessage: 'Password does not meet the requirements',
-                error: 'Password must contain at least 8 characters, one lowercase letter, one uppercase letter and one number. No punctuation.',
+                error:
+                    'Password must contain at least 8 characters, one lowercase letter, one uppercase letter and' +
+                    ' one number. It must NOT contain any symbols',
             });
             return;
         }
@@ -64,6 +66,67 @@ userRoute.post('/register', (req, res) => {
                     res.status(400).json({ errorMessage: 'Something went wrong', error: error });
                 });
         });
+    } else if (!query.password && query.email) {
+        res.status(400).json({
+            errorMessage: 'Missing parameters',
+            error: 'Query must contain parameters: password',
+        });
+        return;
+    } else if (!query.email && query.password) {
+        res.status(400).json({
+            errorMessage: 'Missing parameters',
+            error: 'Query must contain parameters: email',
+        });
+        return;
+    } else {
+        res.status(400).json({
+            errorMessage: 'Missing parameters',
+            error: 'Query must contain parameters: email and password',
+        });
+        return;
+    }
+});
+
+userRoute.post('/login', (req, res) => {
+    const query = req.query;
+
+    if (query.email && query.password) {
+        const email = query.email as string;
+        if (!emailPattern.test(email)) {
+            console.log('Email is wrong');
+            res.status(400).json({
+                errorMessage: 'Invalid email format',
+                error: 'Email is wrong',
+            });
+        } else
+            repository.findOneBy({ email: email }).then((account) => {
+                if (account) {
+                    const password = query.password as string;
+                    const dbHashword = account.passwordHash as string;
+                    if (dbHashword === undefined) {
+                        console.log('Database hashword is wrong');
+                        res.status(400).json({
+                            errorMessage: 'DB password format is wrong',
+                            error: 'Problem with db password',
+                        });
+                    }
+                    bcrypt
+                        .compare(password, account.passwordHash)
+                        .then((validPass) => {
+                            if (validPass) res.status(200).json(validPass);
+                            else {
+                                res.status(401).json(validPass);
+                            }
+                        })
+                        .catch((err) => console.log('error: ' + err));
+                } else {
+                    res.status(400).json({
+                        errorMessage: 'Account does not exist',
+                        error: 'Email not found',
+                    });
+                }
+                return;
+            });
     } else if (!query.password && query.email) {
         res.status(400).json({
             errorMessage: 'Missing parameters',
