@@ -26,7 +26,7 @@ import GeoButton from '@/components/GeoButton.vue';</script>
                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"
                     placeholder="Enter your password..."
                     required
-                    title="Password must contain at least 8 characters, including one lowercase letter, one uppercase letter and one number."
+                    title="Password format invalid."
                     type="password" />
             </div>
             <RouterLink to="/">Forgot your password?</RouterLink>
