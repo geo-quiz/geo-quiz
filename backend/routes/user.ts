@@ -88,7 +88,7 @@ userRoute.post('/register', (req, res) => {
 userRoute.post('/login', (req, res) => {
     const query = req.query;
 
-    if (query.email) {
+    if (query.email && query.password) {
         const email = query.email as string;
         if (!emailPattern.test(email)) {
             console.log('Email is wrong');
@@ -96,22 +96,27 @@ userRoute.post('/login', (req, res) => {
                 errorMessage: 'Invalid email format',
                 error: 'Email is wrong',
             });
-        } else {
+        } else
             repository.findOneBy({ email: email }).then((account) => {
                 if (account) {
                     const password = query.password as string;
-
-                    bcrypt.compare(password, account.passwordHash).then(function (result) {
-                        if (!result)
-                            res.status(400).json({
-                                errorMessage: 'Incorrect password',
-                                error: 'Email is wrong',
-                            });
-                        else {
-                            res.status(200).json;
-                        }
-                    });
-
+                    const dbHashword = account.passwordHash as string;
+                    if (dbHashword === undefined) {
+                        console.log('Database hashword is wrong');
+                        res.status(401).json({
+                            errorMessage: 'DB password format is wrong',
+                            error: 'Problem with db password',
+                        });
+                    }
+                    bcrypt
+                        .compare(password, account.passwordHash)
+                        .then((validPass) => {
+                            if (validPass) res.status(200).json(validPass);
+                            else {
+                                res.status(401).json(validPass);
+                            }
+                        })
+                        .catch((err) => console.log('error: ' + err));
                 } else {
                     res.status(400).json({
                         errorMessage: 'Account does not exist',
@@ -120,6 +125,23 @@ userRoute.post('/login', (req, res) => {
                 }
                 return;
             });
-        }
+    } else if (!query.password && query.email) {
+        res.status(400).json({
+            errorMessage: 'Missing parameters',
+            error: 'Query must contain parameters: password',
+        });
+        return;
+    } else if (!query.email && query.password) {
+        res.status(400).json({
+            errorMessage: 'Missing parameters',
+            error: 'Query must contain parameters: email',
+        });
+        return;
+    } else {
+        res.status(400).json({
+            errorMessage: 'Missing parameters',
+            error: 'Query must contain parameters: email and password',
+        });
+        return;
     }
 });
