@@ -102,23 +102,30 @@ userRoute.post('/login', (req, res) => {
             repository.findOneBy({ email: email }).then((account) => {
                 if (account) {
                     const password = query.password as string;
-                    const dbHashword = account.passwordHash as string;
-                    if (dbHashword === undefined) {
-                        console.log('Database hashword is wrong');
+                    const passwordHash = account.passwordHash as string;
+                    if (passwordHash === undefined) {
+                        console.log('passwordHash is undefined');
                         res.status(400).json({
                             errorMessage: 'DB password format is wrong',
                             error: 'Problem with db password',
                         });
+                    } else {
+                        bcrypt
+                            .compare(password, account.passwordHash)
+                            .then((validPass) => {
+                                if (validPass) res.status(200).json(validPass);
+                                else {
+                                    res.status(401).json(validPass);
+                                }
+                            })
+                            .catch((err) => {
+                                console.log('error: ' + err);
+                                res.status(400).json({
+                                    errorMessage: 'Something went wrong while checking the password',
+                                    error: err,
+                                });
+                            });
                     }
-                    bcrypt
-                        .compare(password, account.passwordHash)
-                        .then((validPass) => {
-                            if (validPass) res.status(200).json(validPass);
-                            else {
-                                res.status(401).json(validPass);
-                            }
-                        })
-                        .catch((err) => console.log('error: ' + err));
                 } else {
                     res.status(400).json({
                         errorMessage: 'Account does not exist',
