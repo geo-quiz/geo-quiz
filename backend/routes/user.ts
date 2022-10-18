@@ -103,7 +103,7 @@ userRoute.post('/login', (req, res) => {
                     const dbHashword = account.passwordHash as string;
                     if (dbHashword === undefined) {
                         console.log('Database hashword is wrong');
-                        res.status(401).json({
+                        res.status(400).json({
                             errorMessage: 'DB password format is wrong',
                             error: 'Problem with db password',
                         });
