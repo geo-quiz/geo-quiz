@@ -6,9 +6,10 @@ import GeoButton from '@/components/GeoButton.vue';</script>
             <div class="field">
                 <label class="register-label" for="email">Email address</label>
                 <input id="email" autocomplete="off" class="input" name="email"
-                       pattern="^[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-]+$"
+                       pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,63}$"
                        placeholder="Enter your email address..."
                        required
+                       title="Must be a valid email address. (Example@email.com)."
                        type="email">
             </div>
             <div class="field">
