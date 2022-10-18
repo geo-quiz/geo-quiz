@@ -118,7 +118,13 @@ userRoute.post('/login', (req, res) => {
                                 res.status(401).json(validPass);
                             }
                         })
-                        .catch((err) => console.log('error: ' + err));
+                        .catch((err) => {
+                            console.log('error: ' + err);
+                            res.status(400).json({
+                                errorMessage: 'Something went wrong while checking the password',
+                                error: err,
+                            });
+                        });
                 } else {
                     res.status(400).json({
                         errorMessage: 'Account does not exist',
