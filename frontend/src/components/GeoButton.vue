@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 interface Props {
     size?: 'small' | 'medium' | 'large' | 'answer';
-    color?: 'default' | 'green';
+    color?: 'default' | 'green' | 'red';
 }
 
 interface ButtonStyle {
@@ -40,7 +40,18 @@ const { size = 'medium', color = 'default' } = defineProps<Props>();
 
 const buttonHeight = button[size].height;
 const buttonFontSize = button[size].fontSize;
-const buttonColor = color === 'green' ? 'var(--color-green)' : 'var(--color-blue)';
+const buttonColor = getColor();
+
+function getColor() {
+    switch (color) {
+        case 'green':
+            return 'var(--color-green)';
+        case 'red':
+            return 'var(--color-red)';
+        default:
+            return 'var(--color-blue)';
+    }
+}
 </script>
 
 <template>
