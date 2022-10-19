@@ -71,7 +71,7 @@ section {
     flex-direction: row;
     height: 100px;
     left: 0;
-    position: absolute;
+    position: fixed;
     top: 0;
     width: 100%;
 }
