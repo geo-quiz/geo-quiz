@@ -81,7 +81,7 @@ function submitIfValid() {
 
 <style scoped>
 a {
-    color: var(--color-green);
+    color: var(--color-light-green);
     text-decoration: none;
 }
 

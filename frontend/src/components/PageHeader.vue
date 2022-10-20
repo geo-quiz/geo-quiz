@@ -74,7 +74,7 @@ header {
     left: 0;
     position: fixed;
     top: 0;
-    width: 100%;
+    width: 100vw;
 }
 
 .image-container {

@@ -5,11 +5,13 @@ import PageRegister from '@/components/PageRegister.vue';
 import PageFooter from '@/components/PageFooter.vue';</script>
 
 <template>
-    <MainMenuContainer noLogo>
-        <PageHeader />
-        <PageRegister />
-        <PageFooter />
-    </MainMenuContainer>
+    <div class="center-vertical">
+        <MainMenuContainer noLogo>
+            <PageHeader />
+            <PageRegister />
+            <PageFooter />
+        </MainMenuContainer>
+    </div>
 </template>
 
 <style scoped></style>

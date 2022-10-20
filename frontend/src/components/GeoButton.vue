@@ -45,7 +45,7 @@ const buttonColor = getColor();
 function getColor() {
     switch (color) {
         case 'green':
-            return 'var(--color-green)';
+            return 'var(--color-light-green)';
         case 'red':
             return 'var(--color-red)';
         default:

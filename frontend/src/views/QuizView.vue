@@ -1,13 +1,12 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import QuizQuestion from '@/components/QuizQuestion.vue';
-import PageHeader from '@/components/PageHeader.vue';
-</script>
+import PageHeader from '@/components/PageHeader.vue';</script>
 
 <template>
-    <PageHeader />
-    <QuizQuestion />
+    <div class="center-vertical">
+        <PageHeader />
+        <QuizQuestion />
+    </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
