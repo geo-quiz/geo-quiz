@@ -4,10 +4,6 @@ import router from '@/router';
 
 import { onMounted } from 'vue';
 
-function goTo(location: string) {
-    router.push(location);
-}
-
 onMounted(() => {
     // The svg
     const svg = d3.select('#my_dataviz'),
@@ -52,8 +48,31 @@ onMounted(() => {
                 const target = event.target as Element;
                 console.log('clicked', target.id);
 
-                if (target.id == 'Europe') {
-                    goTo('/quiz');
+                switch (target.id) {
+                    case 'Africa':
+                        router.replace({ name: 'quiz-question', params: { id: 'africa' } });
+                        break;
+                    case 'Asia':
+                        router.replace({ name: 'quiz-question', params: { id: 'asia' } });
+                        break;
+                    case 'Europe':
+                        router.replace({ name: 'quiz-question', params: { id: 'europe' } });
+                        break;
+                    case 'North America':
+                        router.replace({ name: 'quiz-question', params: { id: 'north-america' } });
+                        break;
+                    case 'South America':
+                        router.replace({ name: 'quiz-question', params: { id: 'south-america' } });
+                        break;
+                    case 'Oceania':
+                        router.replace({ name: 'quiz-question', params: { id: 'oceania' } });
+                        break;
+                    case 'World':
+                        router.replace({ name: 'quiz-question', params: { id: 'world' } });
+                        break;
+                    default:
+                        router.replace('/quiz');
+                        break;
                 }
             }
         }
