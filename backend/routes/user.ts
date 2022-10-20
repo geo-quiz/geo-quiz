@@ -3,6 +3,8 @@ import express, { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { AppDataSource } from '../AppDataSource';
 import { Account } from '../entities/Account';
+import { configs } from '@typescript-eslint/eslint-plugin';
+import { config } from 'dotenv';
 
 dotenv.config();
 const repository = AppDataSource.getRepository(Account);
@@ -117,7 +119,10 @@ userRoute.post('/login', (req, res) => {
                         .compare(password, account.passwordHash)
                         .then((validPass) => {
                             if (validPass) {
-                                const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRETS);
+                                // const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRETS);
+                                const accessToken = jwt.sign({id: account.id, email: account.email, hashedPassword: validPass}, process.env.ACCESS_TOKEN_SECRETS, {
+                                    expiresIn: 86400,
+                                });
                                 res.json({ accessToken: accessToken });
                                 //    res.status(200).json(validPass);
                             }
