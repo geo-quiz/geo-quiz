@@ -5,6 +5,13 @@ import router from '@/router';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
 import type { IAnswer } from '@/utility/interfaces/IAnswer';
 
+const props = defineProps({
+    id: {
+        type: String,
+        required: true,
+    },
+});
+
 const isCorrect = ref(false);
 const isAnswered = ref(false);
 const isIncorrectAnswer = ref(true);
@@ -17,10 +24,13 @@ const msg = ref(INCORRECT);
 const currentQuiz = useCurrentQuizStore();
 
 onMounted(() => {
-    fetch('http://localhost:3000/quiz/')
+    fetch(`http://localhost:3000/quiz/continent/${props.id}`)
         .then((response) => response.json())
         .then((data) => {
             currentQuiz.setQuestions(data);
+        })
+        .catch(() => {
+            router.replace('/');
         });
 });
 
@@ -66,17 +76,38 @@ function resetAnswerResponses() {
 
 function nextQuestion() {
     if (currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
-        router.push('next');
+        router.replace('/result');
     } else {
         resetAnswerResponses();
         currentQuiz.nextQuestion();
+    }
+}
+
+function getTitle() {
+    switch (props.id) {
+        case 'europe':
+            return 'Europe';
+        case 'asia':
+            return 'Asia';
+        case 'africa':
+            return 'Africa';
+        case 'north-america':
+            return 'North America';
+        case 'south-america':
+            return 'South America';
+        case 'oceania':
+            return 'Oceania';
+        case 'world':
+            return 'World';
+        default:
+            return 'Unknown';
     }
 }
 </script>
 
 <template>
     <section v-if="currentQuiz.currentQuestion">
-        <h2 class="heading">Europe</h2>
+        <h2 class="heading"> {{ getTitle() }}</h2>
         <div class="wrapper">
             <div class="question-div">
                 <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
