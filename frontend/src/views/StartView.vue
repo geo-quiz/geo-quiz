@@ -9,9 +9,9 @@ import router from '@/router/index';
     <MainMenuContainer>
         <div class="buttonContainer">
             <GeoButton size="large" color="green" id="login-button" height="75px" width="400px"
-                       @click="router.push('/login')">Sign in
+                       @click="router.replace('/login')">Sign in
             </GeoButton>
-            <GeoButton height="75px" width="400px" @click="router.push('/register')">Register</GeoButton>
+            <GeoButton height="75px" width="400px" @click="router.replace('/register')">Register</GeoButton>
         </div>
         <PageFooter />
     </MainMenuContainer>
