@@ -50,28 +50,28 @@ onMounted(() => {
 
                 switch (target.id) {
                     case 'Africa':
-                        router.replace({ name: 'quiz-question', params: { id: 'africa' } });
+                        router.push({ name: 'quiz-question', params: { id: 'africa' } });
                         break;
                     case 'Asia':
-                        router.replace({ name: 'quiz-question', params: { id: 'asia' } });
+                        router.push({ name: 'quiz-question', params: { id: 'asia' } });
                         break;
                     case 'Europe':
-                        router.replace({ name: 'quiz-question', params: { id: 'europe' } });
+                        router.push({ name: 'quiz-question', params: { id: 'europe' } });
                         break;
                     case 'North America':
-                        router.replace({ name: 'quiz-question', params: { id: 'north-america' } });
+                        router.push({ name: 'quiz-question', params: { id: 'north-america' } });
                         break;
                     case 'South America':
-                        router.replace({ name: 'quiz-question', params: { id: 'south-america' } });
+                        router.push({ name: 'quiz-question', params: { id: 'south-america' } });
                         break;
                     case 'Oceania':
-                        router.replace({ name: 'quiz-question', params: { id: 'oceania' } });
+                        router.push({ name: 'quiz-question', params: { id: 'oceania' } });
                         break;
                     case 'World':
-                        router.replace({ name: 'quiz-question', params: { id: 'world' } });
+                        router.push({ name: 'quiz-question', params: { id: 'world' } });
                         break;
                     default:
-                        router.replace('/quiz');
+                        router.push('/quiz');
                         break;
                 }
             }

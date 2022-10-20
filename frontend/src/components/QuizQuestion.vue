@@ -30,7 +30,8 @@ onMounted(() => {
             currentQuiz.setQuestions(data);
         })
         .catch(() => {
-            router.replace('/');
+            router.back();
+            alert('Something went wrong, please try again');
         });
 });
 
@@ -76,7 +77,7 @@ function resetAnswerResponses() {
 
 function nextQuestion() {
     if (currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
-        router.replace('/result');
+        router.push('/result');
     } else {
         resetAnswerResponses();
         currentQuiz.nextQuestion();
