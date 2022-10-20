@@ -37,7 +37,7 @@ quizRoute.get('/quiz/:id', (req, res) => {
 });
 
 quizRoute.get('/quiz/continent/:continent/', (req, res) => {
-    const continentParam = req.params.continent as string;
+    const continentParam = (req.params.continent as string).toLowerCase();
 
     repository
         .find({
