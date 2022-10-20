@@ -3,8 +3,8 @@ import express, { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { AppDataSource } from '../AppDataSource';
 import { Account } from '../entities/Account';
-import { configs } from '@typescript-eslint/eslint-plugin';
-import { config } from 'dotenv';
+/*import { configs } from '@typescript-eslint/eslint-plugin';
+import { config } from 'dotenv';*/
 
 dotenv.config();
 const repository = AppDataSource.getRepository(Account);
