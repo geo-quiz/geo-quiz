@@ -1,17 +1,16 @@
 import * as dotenv from 'dotenv';
-import express, { Router } from 'express';
+import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { AppDataSource } from '../AppDataSource';
 import { Account } from '../entities/Account';
-/*import { configs } from '@typescript-eslint/eslint-plugin';
-import { config } from 'dotenv';*/
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 const repository = AppDataSource.getRepository(Account);
-const jwt = require('jsonwebtoken');
 
-//userRoute.use(express.json())
 export const userRoute = Router();
+
+const secretToken = process.env.SECRET_TOKEN_SECRETS as string;
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 const emailPattern = /^[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+$/;
@@ -119,15 +118,15 @@ userRoute.post('/login', (req, res) => {
                         .compare(password, account.passwordHash)
                         .then((validPass) => {
                             if (validPass) {
-                                // const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRETS);
-                                const accessToken = jwt.sign({id: account.id, email: account.email, hashedPassword: validPass}, process.env.ACCESS_TOKEN_SECRETS, {
-                                    expiresIn: 86400,
-                                });
+                                const accessToken = jwt.sign(
+                                    { id: account.id, email: account.email, hashedPassword: validPass },
+                                    secretToken,
+                                    {
+                                        expiresIn: 86400,
+                                    },
+                                );
                                 res.json({ accessToken: accessToken });
-                                //    res.status(200).json(validPass);
-                            }
-                            //}
-                            else {
+                            } else {
                                 res.status(401).json(validPass);
                             }
                         })
@@ -160,4 +159,3 @@ userRoute.post('/login', (req, res) => {
         return;
     }
 });
-
