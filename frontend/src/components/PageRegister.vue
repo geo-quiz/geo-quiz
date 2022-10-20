@@ -9,7 +9,6 @@ const isButtonClicked = ref(false);
 
 function checkPassword() {
     isEqualPassword.value = password.value === confirmPassword.value && password.value.length >= 8;
-    console.log(isEqualPassword.value);
 }
 
 function submitIfValid() {
