@@ -1,10 +1,14 @@
-import { Router } from 'express';
+import * as dotenv from 'dotenv';
+import express, { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { AppDataSource } from '../AppDataSource';
 import { Account } from '../entities/Account';
 
+dotenv.config();
 const repository = AppDataSource.getRepository(Account);
+const jwt = require('jsonwebtoken');
 
+//userRoute.use(express.json())
 export const userRoute = Router();
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
@@ -88,10 +92,9 @@ userRoute.post('/register', (req, res) => {
 });
 
 userRoute.post('/login', (req, res) => {
-    const query = req.query;
-
-    if (query.email && query.password) {
-        const email = query.email as string;
+    const body = req.body;
+    if (body.email && body.password) {
+        const email = body.email as string;
         if (!emailPattern.test(email)) {
             console.log('Email is wrong');
             res.status(400).json({
@@ -101,7 +104,7 @@ userRoute.post('/login', (req, res) => {
         } else
             repository.findOneBy({ email: email }).then((account) => {
                 if (account) {
-                    const password = query.password as string;
+                    const password = body.password as string;
                     const dbHashword = account.passwordHash as string;
                     if (dbHashword === undefined) {
                         console.log('Database hashword is wrong');
@@ -113,7 +116,12 @@ userRoute.post('/login', (req, res) => {
                     bcrypt
                         .compare(password, account.passwordHash)
                         .then((validPass) => {
-                            if (validPass) res.status(200).json(validPass);
+                            if (validPass) {
+                                const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRETS);
+                                res.json({ accessToken: accessToken });
+                                //    res.status(200).json(validPass);
+                            }
+                            //}
                             else {
                                 res.status(401).json(validPass);
                             }
@@ -127,13 +135,13 @@ userRoute.post('/login', (req, res) => {
                 }
                 return;
             });
-    } else if (!query.password && query.email) {
+    } else if (!body.password && body.email) {
         res.status(400).json({
             errorMessage: 'Missing parameters',
             error: 'Query must contain parameters: password',
         });
         return;
-    } else if (!query.email && query.password) {
+    } else if (!body.email && body.password) {
         res.status(400).json({
             errorMessage: 'Missing parameters',
             error: 'Query must contain parameters: email',
@@ -147,3 +155,4 @@ userRoute.post('/login', (req, res) => {
         return;
     }
 });
+
