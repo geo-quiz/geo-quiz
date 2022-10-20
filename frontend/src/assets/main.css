@@ -42,3 +42,11 @@ body {
     justify-content: center;
     width: 90%;
 }
+
+.center-vertical {
+    align-content: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+}
