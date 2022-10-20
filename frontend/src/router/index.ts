@@ -33,6 +33,11 @@ const router = createRouter({
             name: 'continent',
             component: () => import('../views/ContinentView.vue'),
         },
+        {
+            path: '/register',
+            name: 'register',
+            component: () => import('../views/RegisterView.vue'),
+        },
     ],
 });
 
