@@ -118,16 +118,14 @@ userRoute.post('/login', (req, res) => {
                             .compare(password, account.passwordHash)
                             .then((validPass) => {
                                 if (validPass) {
-                                    const accessToken = jwt.sign(
-                                        { id: account.id, email: account.email, hashedPassword: validPass },
-                                        secretToken,
-                                        {
-                                            expiresIn: 86400,
-                                        },
-                                    );
+                                    const accessToken = jwt.sign({ email: account.email }, secretToken, {
+                                        expiresIn: 2629800000,
+                                    });
                                     res.json({ accessToken: accessToken });
                                 } else {
-                                    res.status(401).json(validPass);
+                                    res.status(400).json({
+                                        errorMessage: 'Invalid password or email',
+                                    });
                                 }
                             })
                             .catch((err) => {
@@ -140,8 +138,7 @@ userRoute.post('/login', (req, res) => {
                     }
                 } else {
                     res.status(400).json({
-                        errorMessage: 'Account does not exist',
-                        error: 'Email not found',
+                        errorMessage: 'Invalid password or email',
                     });
                 }
                 return;
