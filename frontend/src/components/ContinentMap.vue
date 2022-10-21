@@ -4,10 +4,6 @@ import router from '@/router';
 
 import { onMounted } from 'vue';
 
-function goTo(location: string) {
-    router.push(location);
-}
-
 onMounted(() => {
     // The svg
     const svg = d3.select('#my_dataviz'),
@@ -31,7 +27,7 @@ onMounted(() => {
     // Load external data and boot
     Promise.all([
         d3.json(
-            'https://gist.githubusercontent.com/Yuriks1/2d8d2e716008eb7fce62f238f190fb87/raw/40a891fb79a775f31a5b3cb6043ccc87a24a0968/continents.json',
+            'https://gist.githubusercontent.com/Yuriks1/84639021cb64c3482f2b0a883629f01c/raw/6690efa23ed46f042124f09a46f763c2ea656bbd/continents10.json',
         ),
     ]).then(function (loadData) {
         let topo: any = loadData[0];
@@ -52,8 +48,31 @@ onMounted(() => {
                 const target = event.target as Element;
                 console.log('clicked', target.id);
 
-                if (target.id == 'Europe') {
-                    goTo('/quiz');
+                switch (target.id) {
+                    case 'Africa':
+                        router.push({ name: 'quiz-question', params: { id: 'africa' } });
+                        break;
+                    case 'Asia':
+                        router.push({ name: 'quiz-question', params: { id: 'asia' } });
+                        break;
+                    case 'Europe':
+                        router.push({ name: 'quiz-question', params: { id: 'europe' } });
+                        break;
+                    case 'North America':
+                        router.push({ name: 'quiz-question', params: { id: 'north-america' } });
+                        break;
+                    case 'South America':
+                        router.push({ name: 'quiz-question', params: { id: 'south-america' } });
+                        break;
+                    case 'Oceania':
+                        router.push({ name: 'quiz-question', params: { id: 'oceania' } });
+                        break;
+                    case 'World':
+                        router.push({ name: 'quiz-question', params: { id: 'world' } });
+                        break;
+                    default:
+                        router.push('/quiz');
+                        break;
                 }
             }
         }

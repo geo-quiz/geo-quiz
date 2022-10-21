@@ -14,13 +14,8 @@ const router = createRouter({
             component: () => import('../views/HomeView.vue'),
         },
         {
-            path: '/quiz',
-            name: 'quiz',
-            component: () => import('../views/QuizView.vue'),
-        },
-        {
-            path: '/next',
-            name: 'next',
+            path: '/result',
+            name: 'result',
             component: () => import('../views/NextView.vue'),
         },
         {
@@ -29,9 +24,15 @@ const router = createRouter({
             component: () => import('../views/LoginView.vue'),
         },
         {
-            path: '/continent',
+            path: '/quiz',
             name: 'continent',
             component: () => import('../views/ContinentView.vue'),
+        },
+        {
+            path: '/quiz/:id',
+            name: 'quiz-question',
+            props: true,
+            component: () => import('../views/QuizView.vue'),
         },
         {
             path: '/register',
