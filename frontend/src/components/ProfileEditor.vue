@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
+import PageNotification from '@/components/PageNotification.vue';
 import { onMounted, ref } from 'vue';
 
 const user = {
@@ -172,7 +173,7 @@ onMounted(() => {
             <small id="delete-account" @click="deleteAccount">Delete account</small>
         </form>
 
-        <div v-if="showConfirmDeleteAccount" id="background">
+        <PageNotification v-if="showConfirmDeleteAccount">
             <form id="deletion-form">
                 <div id="deletion-field" class="field">
                     <label for="display-name">Enter your password to confirm deletion of your account</label>
@@ -191,25 +192,11 @@ onMounted(() => {
                     </div>
                 </div>
             </form>
-        </div>
+        </PageNotification>
     </main>
 </template>
 
 <style scoped>
-#background {
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    justify-content: center;
-    left: 0;
-    position: fixed;
-    top: 0;
-    width: 100vw;
-    z-index: 10;
-}
-
 .button-wrapper {
     width: calc(50% - var(--gap) / 2);
 }
