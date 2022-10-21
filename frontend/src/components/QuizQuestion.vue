@@ -194,9 +194,9 @@ function resetCountdown() {
 
 .timer-and-level {
     align-items: center;
-    background: #ffffff;
+    background: var(--color-light-blue);
     border-radius: var(--radius);
-    color: #000000;
+    color: var(--color-black);
     display: flex;
     height: 40px;
     justify-content: right;
