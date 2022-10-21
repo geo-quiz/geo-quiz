@@ -14,6 +14,7 @@ const INCORRECT = 'Wrong answer!';
 const noANSWER = 'No answer was given!';
 
 const msg = ref(INCORRECT);
+const timeLeft = ref(15);
 
 const currentQuiz = useCurrentQuizStore();
 
@@ -22,6 +23,7 @@ onMounted(() => {
         .then((response) => response.json())
         .then((data) => {
             currentQuiz.setQuestions(data);
+            countdown();
         });
 });
 
@@ -71,23 +73,27 @@ function nextQuestion() {
     } else {
         resetAnswerResponses();
         currentQuiz.nextQuestion();
+        resetCountdown();
     }
 }
 
 function countdown() {
-    let timeLeft = 15;
     const downloadTimer = setInterval(function () {
-        if (timeLeft < 0 || isAnswered.value === true) {
-            clearInterval(downloadTimer);
-            isAnswered.value = true;
-            if (timeLeft < 0) {
+        if (!isAnswered.value) {
+            timeLeft.value -= 1;
+            if (timeLeft.value <= 0) {
+                isAnswered.value = true;
                 msg.value = noANSWER;
             }
         } else {
-            document.getElementById('countdown')!.innerHTML = timeLeft + '';
+            clearInterval(downloadTimer);
         }
-        timeLeft -= 1;
     }, 1000);
+}
+
+function resetCountdown() {
+    timeLeft.value = 15;
+    countdown();
 }
 </script>
 
@@ -98,7 +104,7 @@ function countdown() {
             <div class="timer-and-level">
                 <div id="timer">
                     <img id="clock" alt="clock icon" src="/images/icons8-clock.svg">
-                    <p id="countdown"> {{ countdown() }}</p>
+                    <p id="countdown"> {{ timeLeft }}</p>
                 </div>
             </div>
             <div class="question-div">
