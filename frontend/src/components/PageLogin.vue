@@ -1,13 +1,49 @@
 <script lang="ts" setup>
-import GeoButton from '@/components/GeoButton.vue';</script>
+import GeoButton from '@/components/GeoButton.vue';
+import {ref} from 'vue';
+
+const email = ref('');
+const password = ref('');
+const loginError = ref(false);
+const rememberMe = ref(false);
+const awaitingResponse = ref(false);
+
+const login = () => {
+    awaitingResponse.value = true;
+    setTimeout(() => {
+        fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email.value,
+                password: password.value,
+                rememberMe: rememberMe.value,
+            }),
+        }).then(res => res.json()).then((data: any) => {
+            console.log('Data from fetch ', data);
+            awaitingResponse.value = false;
+        }
+        ).catch(error => {
+            awaitingResponse.value = false;
+            loginError.value = true;
+            console.error(error);
+        });
+
+    }
+    , 2000);
+};
+</script>
 
 <template>
-    <form class="login-form">
+    <form class="login-form" @submit.prevent="login">
         <div class="fields">
             <div class="field">
                 <label class="login-label" for="email">Email address</label>
                 <input
                     id="email"
+                    v-model="email"
                     autocomplete="off"
                     class="input"
                     name="email"
@@ -43,7 +79,8 @@ import GeoButton from '@/components/GeoButton.vue';</script>
                     <span>Remember me?</span>
                 </label>
             </div>
-            <GeoButton id="login-button" color="green">Login</GeoButton>
+            <!--            Add disabled functionality to GeoButton, lägg i knapp i geobutton mörkare -->
+            <GeoButton id="login-button" color="green">{{ awaitingResponse ? "Loading" : "Login" }}</GeoButton>
             <div class="new-user">
                 <p>
                     New user?
