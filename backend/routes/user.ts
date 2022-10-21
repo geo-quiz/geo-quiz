@@ -12,12 +12,22 @@ const emailPattern = /^[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9
 
 //routes
 userRoute.post('/register', (req, res) => {
-    const query = req.query;
+    const body = req.body;
     let password = '';
     let email = '';
 
-    if (query.password && query.email) {
-        password = query.password as string;
+    if (body.password && body.email) {
+        if (!passwordPattern.test(body.password) && !emailPattern.test(body.email)) {
+            res.status(400).json({
+                errorMessage: 'Password & Email do not meet the requirements',
+                error:
+                    'Invalid email address & password. Password must contain at least 8 characters, one lowercase' +
+                    ' letter, one uppercase letter and one number. It must NOT contain any symbols',
+            });
+            return;
+        }
+
+        password = body.password as string;
 
         if (!passwordPattern.test(password)) {
             res.status(400).json({
@@ -32,47 +42,46 @@ userRoute.post('/register', (req, res) => {
         bcrypt
             .hash(password, 10)
             .then((hashedPassword: string) => {
-                password = hashedPassword;
+                email = body.email as string;
+                if (!emailPattern.test(email)) {
+                    res.status(400).json({
+                        errorMessage: 'Email is not valid',
+                        error: 'Invalid email address',
+                    });
+                    return;
+                }
+
+                repository.findOneBy({ email: email }).then((account) => {
+                    if (account) {
+                        res.status(400).json({
+                            errorMessage: 'Email already exists',
+                            error: `Account with email: ${email} already exists`,
+                        });
+                        return;
+                    }
+
+                    const newAccount = new Account(email, hashedPassword);
+                    repository
+                        .save(newAccount)
+                        .then(() => {
+                            res.status(200).json({ msg: 'Account created' });
+                        })
+                        .catch((error) => {
+                            res.status(400).json({ errorMessage: 'Something went wrong', error: error });
+                        });
+                });
             })
             .catch((error) => {
                 res.status(400).json({ errorMessage: 'Something went wrong', error: error });
-            });
-
-        email = query.email as string;
-        if (!emailPattern.test(email)) {
-            res.status(400).json({
-                errorMessage: 'Email is not valid',
-                error: 'Invalid email address',
-            });
-            return;
-        }
-
-        repository.findOneBy({ email: email }).then((account) => {
-            if (account) {
-                res.status(400).json({
-                    errorMessage: 'Email already exists',
-                    error: `Account with email: ${email} already exists`,
-                });
                 return;
-            }
-
-            const newAccount = new Account(email, password);
-            repository
-                .save(newAccount)
-                .then(() => {
-                    res.status(200).json({ msg: 'Account created' });
-                })
-                .catch((error) => {
-                    res.status(400).json({ errorMessage: 'Something went wrong', error: error });
-                });
-        });
-    } else if (!query.password && query.email) {
+            });
+    } else if (!body.password && body.email) {
         res.status(400).json({
             errorMessage: 'Missing parameters',
             error: 'Query must contain parameters: password',
         });
         return;
-    } else if (!query.email && query.password) {
+    } else if (!body.email && body.password) {
         res.status(400).json({
             errorMessage: 'Missing parameters',
             error: 'Query must contain parameters: email',
