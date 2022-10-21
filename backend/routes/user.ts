@@ -1,11 +1,16 @@
+import * as dotenv from 'dotenv';
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { AppDataSource } from '../AppDataSource';
 import { Account } from '../entities/Account';
+import jwt from 'jsonwebtoken';
 
+dotenv.config();
 const repository = AppDataSource.getRepository(Account);
 
 export const userRoute = Router();
+
+const secretToken = process.env.SECRET_TOKEN_SECRETS as string;
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 const emailPattern = /^[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+$/;
@@ -88,10 +93,9 @@ userRoute.post('/register', (req, res) => {
 });
 
 userRoute.post('/login', (req, res) => {
-    const query = req.query;
-
-    if (query.email && query.password) {
-        const email = query.email as string;
+    const body = req.body;
+    if (body.email && body.password) {
+        const email = body.email as string;
         if (!emailPattern.test(email)) {
             console.log('Email is wrong');
             res.status(400).json({
@@ -101,7 +105,7 @@ userRoute.post('/login', (req, res) => {
         } else
             repository.findOneBy({ email: email }).then((account) => {
                 if (account) {
-                    const password = query.password as string;
+                    const password = body.password as string;
                     const passwordHash = account.passwordHash as string;
                     if (passwordHash === undefined) {
                         console.log('passwordHash is undefined');
@@ -113,9 +117,15 @@ userRoute.post('/login', (req, res) => {
                         bcrypt
                             .compare(password, account.passwordHash)
                             .then((validPass) => {
-                                if (validPass) res.status(200).json(validPass);
-                                else {
-                                    res.status(401).json(validPass);
+                                if (validPass) {
+                                    const accessToken = jwt.sign({ email: account.email }, secretToken, {
+                                        expiresIn: 2629800000,
+                                    });
+                                    res.json({ accessToken: accessToken });
+                                } else {
+                                    res.status(400).json({
+                                        errorMessage: 'Invalid password or email',
+                                    });
                                 }
                             })
                             .catch((err) => {
@@ -128,19 +138,18 @@ userRoute.post('/login', (req, res) => {
                     }
                 } else {
                     res.status(400).json({
-                        errorMessage: 'Account does not exist',
-                        error: 'Email not found',
+                        errorMessage: 'Invalid password or email',
                     });
                 }
                 return;
             });
-    } else if (!query.password && query.email) {
+    } else if (!body.password && body.email) {
         res.status(400).json({
             errorMessage: 'Missing parameters',
             error: 'Query must contain parameters: password',
         });
         return;
-    } else if (!query.email && query.password) {
+    } else if (!body.email && body.password) {
         res.status(400).json({
             errorMessage: 'Missing parameters',
             error: 'Query must contain parameters: email',
