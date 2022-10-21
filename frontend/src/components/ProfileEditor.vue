@@ -119,6 +119,7 @@ onMounted(() => {
                         id="new-password"
                         v-model="newPassword"
                         name="new-password"
+                        autocomplete="off"
                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$"
                         placeholder="Enter a new password..."
                         title="Password must contain at least 8 characters, including one lowercase letter, one uppercase letter and one number. Password must not contain any symbols."
@@ -130,6 +131,7 @@ onMounted(() => {
                     <input
                         id="confirm-password"
                         v-model="confirmNewPassword"
+                        autocomplete="off"
                         name="confirm-new-password"
                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$"
                         placeholder="Confirm new password.."
