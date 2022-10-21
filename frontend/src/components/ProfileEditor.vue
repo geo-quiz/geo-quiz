@@ -63,7 +63,6 @@ function confirmDeletion() {
 function checkPassword() {
     isPasswordChanging.value = true;
     isPasswordValid.value = newPassword.value === confirmNewPassword.value;
-    console.log(isPasswordValid.value);
 }
 
 function submitIfValid() {
@@ -267,6 +266,7 @@ main {
     display: flex;
     flex-direction: column;
     margin-top: 120px;
+    width: 100%;
 }
 
 .password {
