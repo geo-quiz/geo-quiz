@@ -5,26 +5,28 @@ import router from '@/router';
 import MainMenuContainer from '@/components/MainMenuContainer.vue';</script>
 
 <template>
-    <MainMenuContainer>
-        <div class="wrapper">
-            <GeoButton color="green" size="large" @click="router.push('/continent')"> Play now</GeoButton>
-            <div class="buttons">
-                <div class="button-wrapper">
-                    <GeoButton @click="router.push('/profile')">Profile</GeoButton>
-                </div>
-                <div class="button-wrapper">
-                    <GeoButton @click="router.push('/leaderboard')">Leaderboard</GeoButton>
-                </div>
-                <div class="button-wrapper">
-                    <GeoButton @click="router.push('/settings')">Settings</GeoButton>
-                </div>
-                <div class="button-wrapper">
-                    <GeoButton @click="router.push('/log-out')">Log out</GeoButton>
+    <div class="center-vertical">
+        <MainMenuContainer>
+            <div class="wrapper">
+                <GeoButton color="green" size="large" @click="router.push('/quiz')"> Play now</GeoButton>
+                <div class="buttons">
+                    <div class="button-wrapper">
+                        <GeoButton @click="router.push('/profile')">Profile</GeoButton>
+                    </div>
+                    <div class="button-wrapper">
+                        <GeoButton @click="router.push('/leaderboard')">Leaderboard</GeoButton>
+                    </div>
+                    <div class="button-wrapper">
+                        <GeoButton @click="router.push('/settings')">Settings</GeoButton>
+                    </div>
+                    <div class="button-wrapper">
+                        <GeoButton @click="router.push('/log-out')">Log out</GeoButton>
+                    </div>
                 </div>
             </div>
-        </div>
-    </MainMenuContainer>
-    <PageFooter />
+        </MainMenuContainer>
+        <PageFooter />
+    </div>
 </template>
 
 <style scoped>

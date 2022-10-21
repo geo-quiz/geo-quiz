@@ -4,7 +4,7 @@
 
 <template>
     <footer>
-        <p>Made by: Marcus, Toni, Oscar, Christian, Madde & Juris</p>
+        <p>Made by: Christian, Juris, Marcus, Madde, Oscar and Toni</p>
         <p>&COPY; Copyright 2022</p>
     </footer>
 </template>

@@ -23,8 +23,10 @@ defineProps({
 .background {
     background: url('/images/background.png');
     background-size: cover;
+    left: 0;
     min-height: 100vh;
     position: absolute;
+    top: 0;
     width: 100%;
     z-index: -10;
 }

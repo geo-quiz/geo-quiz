@@ -1,4 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import StartView from '@/views/StartView.vue';
+import HomeView from '@/views/HomeView.vue';
+import QuizView from '@/views/QuizView.vue';
+import NextView from '@/views/NextView.vue';
+import LoginView from '@/views/LoginView.vue';
+import ContinentView from '@/views/ContinentView.vue';
+import ProfileView from '@/views/ProfileView.vue';
+import RegisterView from '@/views/RegisterView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -6,37 +14,43 @@ const router = createRouter({
         {
             path: '/',
             name: 'start',
-            component: () => import('../views/StartView.vue'),
+            component: StartView,
         },
         {
             path: '/home',
             name: 'home',
-            component: () => import('../views/HomeView.vue'),
+            component: HomeView,
         },
         {
-            path: '/quiz',
-            name: 'quiz',
-            component: () => import('../views/QuizView.vue'),
-        },
-        {
-            path: '/next',
-            name: 'next',
-            component: () => import('../views/NextView.vue'),
+            path: '/result',
+            name: 'result',
+            component: NextView,
         },
         {
             path: '/login',
             name: 'login',
-            component: () => import('../views/LoginView.vue'),
+            component: LoginView,
         },
         {
-            path: '/continent',
+            path: '/quiz',
             name: 'continent',
-            component: () => import('../views/ContinentView.vue'),
+            component: ContinentView,
+        },
+        {
+            path: '/profile',
+            name: 'profile',
+            component: ProfileView,
+        },
+        {
+            path: '/quiz/:id',
+            name: 'quiz-question',
+            props: true,
+            component: QuizView,
         },
         {
             path: '/register',
             name: 'register',
-            component: () => import('../views/RegisterView.vue'),
+            component: RegisterView,
         },
     ],
 });

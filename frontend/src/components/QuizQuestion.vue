@@ -5,6 +5,13 @@ import router from '@/router';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
 import type { IAnswer } from '@/utility/interfaces/IAnswer';
 
+const props = defineProps({
+    id: {
+        type: String,
+        required: true,
+    },
+});
+
 const isCorrect = ref(false);
 const isAnswered = ref(false);
 const isIncorrectAnswer = ref(true);
@@ -19,11 +26,15 @@ const timeLeft = ref(15);
 const currentQuiz = useCurrentQuizStore();
 
 onMounted(() => {
-    fetch('http://localhost:3000/quiz/')
+    fetch(`http://localhost:3000/quiz/continent/${props.id}`)
         .then((response) => response.json())
         .then((data) => {
             currentQuiz.setQuestions(data);
             countdown();
+        })
+        .catch(() => {
+            router.back();
+            alert('Something went wrong, please try again');
         });
 });
 
@@ -69,11 +80,32 @@ function resetAnswerResponses() {
 
 function nextQuestion() {
     if (currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
-        router.push('next');
+        router.push('/result');
     } else {
         resetAnswerResponses();
         currentQuiz.nextQuestion();
         resetCountdown();
+    }
+}
+
+function getTitle() {
+    switch (props.id) {
+        case 'europe':
+            return 'Europe';
+        case 'asia':
+            return 'Asia';
+        case 'africa':
+            return 'Africa';
+        case 'north-america':
+            return 'North America';
+        case 'south-america':
+            return 'South America';
+        case 'oceania':
+            return 'Oceania';
+        case 'world':
+            return 'World';
+        default:
+            return 'Unknown';
     }
 }
 
@@ -99,7 +131,7 @@ function resetCountdown() {
 
 <template>
     <section v-if="currentQuiz.currentQuestion">
-        <h2 class="heading">Europe</h2>
+        <h2 class="heading"> {{ getTitle() }}</h2>
         <div class="wrapper">
             <div class="timer-and-level">
                 <div id="timer">
