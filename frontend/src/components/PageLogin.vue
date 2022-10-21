@@ -56,7 +56,7 @@ import GeoButton from '@/components/GeoButton.vue';</script>
 
 <style scoped>
 a {
-    color: var(--color-green);
+    color: var(--color-light-green);
     text-decoration: none;
 }
 
@@ -129,7 +129,7 @@ a {
 }
 
 .cbx span:first-child {
-    border: 2px solid var(--color-green);
+    border: 2px solid var(--color-light-green);
     border-radius: 4px;
     height: 24px;
     position: relative;
@@ -156,7 +156,7 @@ a {
 }
 
 .cbx span:first-child:before {
-    background: var(--color-green);
+    background: var(--color-light-green);
     border-radius: 50%;
     content: '';
     display: block;
@@ -171,14 +171,14 @@ a {
 }
 
 .cbx:hover span:first-child {
-    border-color: var(--color-green);
+    border-color: var(--color-light-green);
 }
 
 .inp-cbx:checked + .cbx span:first-child {
     animation: wave 0.4s ease;
 
-    background: var(--color-green);
-    border-color: var(--color-green);
+    background: var(--color-light-green);
+    border-color: var(--color-light-green);
 }
 
 .inp-cbx:checked + .cbx span:first-child svg {

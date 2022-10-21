@@ -20,7 +20,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <section class="header-background">
+    <header class="header-background">
         <div class="image-container">
             <ArrowLeftCircleOutlineIcon
                 :size="48"
@@ -55,11 +55,12 @@ onUnmounted(() => {
                 <RouterLink to="/settings">Settings</RouterLink>
             </nav>
         </div>
-    </section>
+    </header>
 </template>
 
 <style scoped>
-section {
+header {
+    z-index: 1000;
     display: flex;
     justify-content: space-evenly;
 }
@@ -71,9 +72,9 @@ section {
     flex-direction: row;
     height: 100px;
     left: 0;
-    position: absolute;
+    position: fixed;
     top: 0;
-    width: 100%;
+    width: 100vw;
 }
 
 .image-container {
