@@ -8,7 +8,7 @@ import MainMenuContainer from '@/components/MainMenuContainer.vue';</script>
     <div class="center-vertical">
         <MainMenuContainer>
             <div class="wrapper">
-                <GeoButton color="green" size="large" @click="router.push('/continent')"> Play now</GeoButton>
+                <GeoButton color="green" size="large" @click="router.push('/quiz')"> Play now</GeoButton>
                 <div class="buttons">
                     <div class="button-wrapper">
                         <GeoButton @click="router.push('/profile')">Profile</GeoButton>

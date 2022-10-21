@@ -3,7 +3,7 @@
 </script>
 
 <template>
-<p>Next question would appear here</p>
+<p>Scoreboard will appear here</p>
 </template>
 
 <style scoped>
