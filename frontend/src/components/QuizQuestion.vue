@@ -16,10 +16,12 @@ const isCorrect = ref(false);
 const isAnswered = ref(false);
 const isIncorrectAnswer = ref(true);
 
-const CORRECT = 'Correct';
-const INCORRECT = 'Wrong';
+const CORRECT = 'Correct answer!';
+const INCORRECT = 'Wrong answer!';
+const noANSWER = 'No answer was given!';
 
 const msg = ref(INCORRECT);
+const timeLeft = ref(15);
 
 const currentQuiz = useCurrentQuizStore();
 
@@ -28,6 +30,7 @@ onMounted(() => {
         .then((response) => response.json())
         .then((data) => {
             currentQuiz.setQuestions(data);
+            countdown();
         })
         .catch(() => {
             router.back();
@@ -81,6 +84,7 @@ function nextQuestion() {
     } else {
         resetAnswerResponses();
         currentQuiz.nextQuestion();
+        resetCountdown();
     }
 }
 
@@ -104,12 +108,37 @@ function getTitle() {
             return 'Unknown';
     }
 }
+
+function countdown() {
+    const downloadTimer = setInterval(function () {
+        if (!isAnswered.value) {
+            timeLeft.value -= 1;
+            if (timeLeft.value <= 0) {
+                isAnswered.value = true;
+                msg.value = noANSWER;
+            }
+        } else {
+            clearInterval(downloadTimer);
+        }
+    }, 1000);
+}
+
+function resetCountdown() {
+    timeLeft.value = 15;
+    countdown();
+}
 </script>
 
 <template>
     <section v-if="currentQuiz.currentQuestion">
         <h2 class="heading"> {{ getTitle() }}</h2>
         <div class="wrapper">
+            <div class="timer-and-level">
+                <div id="timer">
+                    <img id="clock" alt="clock icon" src="/images/icons8-clock.svg">
+                    <p id="countdown"> {{ timeLeft }}</p>
+                </div>
+            </div>
             <div class="question-div">
                 <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
             </div>
@@ -121,8 +150,8 @@ function getTitle() {
                 </div>
             </div>
             <div v-if="isAnswered" class="answered">
-                <div class="answered-message">
-                    <p>{{ msg }} answer!</p>
+                <div>
+                    <p>{{ msg }}</p>
                     <p v-if="isIncorrectAnswer">The correct answer is: {{ getCorrectAnswer() }}</p>
                 </div>
                 <GeoButton id="next-question-button" font-size="1.125rem" @click="nextQuestion">
@@ -151,13 +180,6 @@ function getTitle() {
     width: 75%;
 }
 
-.answered-message {
-    background: var(--color-blue);
-    border-radius: var(--radius);
-    color: var(--color-white);
-    padding: 5px;
-}
-
 .button-wrapper {
     width: calc(50% - var(--gap) / 2);
 }
@@ -168,6 +190,36 @@ function getTitle() {
     margin: 0;
     text-align: center;
     width: 100%;
+}
+
+.timer-and-level {
+    align-items: center;
+    background: var(--color-light-blue);
+    border-radius: var(--radius);
+    color: var(--color-black);
+    display: flex;
+    height: 40px;
+    justify-content: right;
+    width: 75%;
+}
+
+#timer {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    justify-content: flex-end;
+    width: 50%;
+}
+
+#clock {
+    padding-right: 6vw;
+    position: fixed;
+}
+
+#countdown {
+    font-size: 1.5rem;
+    margin-right: 3vw;
 }
 
 p {
