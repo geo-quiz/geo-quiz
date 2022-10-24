@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
+import QuizQuestionBoxes from '@/components/QuizQuestionBoxes.vue';
 import { onMounted, ref } from 'vue';
 import router from '@/router';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
@@ -16,6 +17,8 @@ const isCorrect = ref(false);
 const isAnswered = ref(false);
 const isIncorrectAnswer = ref(true);
 
+const nrOfQuestions = ref(0);
+
 const CORRECT = 'Correct answer!';
 const INCORRECT = 'Wrong answer!';
 const noANSWER = 'No answer was given!';
@@ -30,6 +33,7 @@ onMounted(() => {
         .then((response) => response.json())
         .then((data) => {
             currentQuiz.setQuestions(data);
+            nrOfQuestions.value = currentQuiz.questions.length;
             countdown();
         })
         .catch(() => {
@@ -40,6 +44,7 @@ onMounted(() => {
 
 function answerQuestion(selectedAnswer: IAnswer) {
     if (!isAnswered.value) {
+        currentQuiz.setAnswer(selectedAnswer);
         const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
         const indexOfCorrect = findIndexOfCorrectAnswer();
 
@@ -133,7 +138,8 @@ function resetCountdown() {
     <section v-if="currentQuiz.currentQuestion">
         <h2 class="heading"> {{ getTitle() }}</h2>
         <div class="wrapper">
-            <div class="timer-and-level">
+            <QuizQuestionBoxes :nrOfQuestions="nrOfQuestions" />
+            <div class="timer-and-points">
                 <div id="timer">
                     <img id="clock" alt="clock icon" src="/images/icons8-clock.svg">
                     <p id="countdown"> {{ timeLeft }}</p>
@@ -192,7 +198,7 @@ function resetCountdown() {
     width: 100%;
 }
 
-.timer-and-level {
+.timer-and-points {
     align-items: center;
     background: var(--color-light-blue);
     border-radius: var(--radius);
