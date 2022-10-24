@@ -44,6 +44,10 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    function setToken(newToken: string) {
+        token.value = newToken;
+    }
+
     function logout() {
         token.value = '';
         sessionStorage.removeItem('token');
@@ -51,5 +55,13 @@ export const useAuthStore = defineStore('auth', () => {
         router.push('/');
     }
 
-    return { token, login, logout };
+    //    function validateToken(token) {
+    //    s
+
+    //    validToken = Check backend?
+    //    if (validToken) {
+    //         token.value = token;
+    //    }
+
+    return { token, login, logout, setToken };
 });

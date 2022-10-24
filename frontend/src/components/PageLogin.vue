@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
-import { ref } from 'vue';
+import {ref} from 'vue';
 import {useAuthStore} from "@/stores/auth";
 
 const email = ref('');
@@ -9,10 +9,10 @@ const loginError = ref(false);
 const rememberMe = ref(false);
 const awaitingResponse = ref(false);
 const response = ref('');
-const authStore = useAuthStore();
 
 
 const login = () => {
+    const authStore = useAuthStore();
     awaitingResponse.value = true;
     authStore.login(email.value, password.value, rememberMe.value)
         .catch((error) => {
@@ -38,7 +38,7 @@ const login = () => {
                     placeholder="Enter your email address..."
                     required
                     title="Must be a valid email address. (Example@email.com)."
-                    type="email" />
+                    type="email"/>
             </div>
             <div class="field">
                 <label class="login-label" for="password">Password</label>
@@ -51,13 +51,13 @@ const login = () => {
                     placeholder="Enter your password..."
                     required
                     title="Password format invalid."
-                    type="password" />
+                    type="password"/>
             </div>
             <RouterLink to="/">Forgot your password?</RouterLink>
         </div>
         <div class="login">
             <div class="item">
-                <input id="cbx" v-model="rememberMe" class="inp-cbx" style="display: none" type="checkbox" />
+                <input id="cbx" v-model="rememberMe" class="inp-cbx" style="display: none" type="checkbox"/>
                 <label class="cbx" for="cbx">
                     <span>
                         <svg height="10px" viewbox="0 0 12 10" width="12px">
