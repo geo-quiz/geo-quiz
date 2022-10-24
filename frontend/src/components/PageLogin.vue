@@ -1,38 +1,25 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
-import {ref} from 'vue';
+import { ref } from 'vue';
+import {useAuthStore} from "@/stores/auth";
 
 const email = ref('');
 const password = ref('');
 const loginError = ref(false);
 const rememberMe = ref(false);
 const awaitingResponse = ref(false);
+const response = ref('');
+const authStore = useAuthStore();
+
 
 const login = () => {
     awaitingResponse.value = true;
-    setTimeout(() => {
-        fetch('http://localhost:3000/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: email.value,
-                password: password.value,
-                rememberMe: rememberMe.value,
-            }),
-        }).then(res => res.json()).then((data: any) => {
-            console.log('Data from fetch ', data);
-            awaitingResponse.value = false;
-        }
-        ).catch(error => {
-            awaitingResponse.value = false;
+    authStore.login(email.value, password.value, rememberMe.value)
+        .catch((error) => {
+            response.value = error;
+            console.log(response.value);
             loginError.value = true;
-            console.error(error);
         });
-
-    }
-    , 2000);
 };
 </script>
 
@@ -57,6 +44,7 @@ const login = () => {
                 <label class="login-label" for="password">Password</label>
                 <input
                     id="password"
+                    v-model="password"
                     class="input"
                     name="password"
                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"
@@ -69,7 +57,7 @@ const login = () => {
         </div>
         <div class="login">
             <div class="item">
-                <input id="cbx" class="inp-cbx" style="display: none" type="checkbox" />
+                <input id="cbx" v-model="rememberMe" class="inp-cbx" style="display: none" type="checkbox" />
                 <label class="cbx" for="cbx">
                     <span>
                         <svg height="10px" viewbox="0 0 12 10" width="12px">
@@ -80,7 +68,7 @@ const login = () => {
                 </label>
             </div>
             <!--            Add disabled functionality to GeoButton, lägg i knapp i geobutton mörkare -->
-            <GeoButton id="login-button" color="green">{{ awaitingResponse ? "Loading" : "Login" }}</GeoButton>
+            <GeoButton id="login-button" color="green">{{ awaitingResponse ? 'Loading...' : 'Login' }}</GeoButton>
             <div class="new-user">
                 <p>
                     New user?
