@@ -19,9 +19,7 @@ onMounted(() => {
 
     // Data and color scale
     const data = new Map();
-    const colorScale = d3
-        .scaleThreshold()
-        .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000]);
+    const colorScale = d3.scaleThreshold().domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000]);
 
     // Load external data and boot
     Promise.all([
@@ -34,12 +32,12 @@ onMounted(() => {
 
         function mouseOver() {
             d3.selectAll('.Continent').transition().duration(50).style('opacity', 0.5);
-            d3.select(this).transition().duration(50).style('opacity', 1).style('fill', 'var(--color-light-blue)');
+            d3.select(this).transition().duration(50).style('opacity', 1).style('fill', 'var(--color-light-green)');
         }
 
         function mouseLeave() {
-            d3.selectAll('.Continent').transition().duration(50).style('opacity', 0.8);
-            d3.select(this).transition().duration(50).style('fill', 'var(--color-green)');
+            d3.selectAll('.Continent').transition().duration(50).style('opacity', 1);
+            d3.select(this).transition().duration(50).style('fill', 'var(--color-blue)');
         }
 
         function mouseClick(event: PointerEvent) {
@@ -48,30 +46,30 @@ onMounted(() => {
                 console.log('clicked', target.id);
 
                 switch (target.id) {
-                case 'Africa':
-                    router.push({ name: 'quiz-question', params: { id: 'africa' } });
-                    break;
-                case 'Asia':
-                    router.push({ name: 'quiz-question', params: { id: 'asia' } });
-                    break;
-                case 'Europe':
-                    router.push({ name: 'quiz-question', params: { id: 'europe' } });
-                    break;
-                case 'North America':
-                    router.push({ name: 'quiz-question', params: { id: 'north-america' } });
-                    break;
-                case 'South America':
-                    router.push({ name: 'quiz-question', params: { id: 'south-america' } });
-                    break;
-                case 'Oceania':
-                    router.push({ name: 'quiz-question', params: { id: 'oceania' } });
-                    break;
-                case 'World':
-                    router.push({ name: 'quiz-question', params: { id: 'world' } });
-                    break;
-                default:
-                    router.push('/quiz');
-                    break;
+                    case 'Africa':
+                        router.push({ name: 'quiz-question', params: { id: 'africa' } });
+                        break;
+                    case 'Asia':
+                        router.push({ name: 'quiz-question', params: { id: 'asia' } });
+                        break;
+                    case 'Europe':
+                        router.push({ name: 'quiz-question', params: { id: 'europe' } });
+                        break;
+                    case 'North America':
+                        router.push({ name: 'quiz-question', params: { id: 'north-america' } });
+                        break;
+                    case 'South America':
+                        router.push({ name: 'quiz-question', params: { id: 'south-america' } });
+                        break;
+                    case 'Oceania':
+                        router.push({ name: 'quiz-question', params: { id: 'oceania' } });
+                        break;
+                    case 'World':
+                        router.push({ name: 'quiz-question', params: { id: 'world' } });
+                        break;
+                    default:
+                        router.push('/quiz');
+                        break;
                 }
             }
         }
@@ -82,14 +80,14 @@ onMounted(() => {
             .data(topo.features)
             .enter()
             .append('path')
-        // draw each country
+            // draw each country
             .attr('d', d3.geoPath().projection(projection))
-        // set the color of each country
+            // set the color of each country
             .attr('fill', function (d: any) {
                 d.total = data.get(d.id) || 0;
                 return colorScale(d.total);
             })
-            .style('fill', 'var(--color-green)')
+            .style('fill', 'var(--color-blue)')
             .attr('id', function (d: any) {
                 return d.properties.CONTINENT;
             })
@@ -106,19 +104,15 @@ onMounted(() => {
 </script>
 
 <template>
-
-  <div class="map" >
-    <svg id="my_dataviz" width="900" height="700"></svg>
-  </div>
-
+    <div class="map">
+        <svg id="my_dataviz" width="900" height="700"></svg>
+    </div>
 </template>
 
 <style scoped>
-
 .map {
-
-  align-items: center;
-  display: flex;
-  flex-direction: column;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
 }
 </style>
