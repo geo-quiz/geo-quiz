@@ -39,7 +39,8 @@ function isValidPassword() {
     isPasswordValid.value = passwordPattern.test(password.value);
 
     if (!isPasswordValid.value) {
-        errorPassword.value = 'Invalid password';
+        errorPassword.value =
+            'Password must contain at least 8 characters, including one lowercase letter, one uppercase letter and one number. Password must NOT contain any symbols.';
         return;
     }
 }
