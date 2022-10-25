@@ -3,6 +3,7 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { AppDataSource } from '../AppDataSource';
 import { Account } from '../entities/Account';
+
 import jwt from 'jsonwebtoken';
 
 dotenv.config();
@@ -20,6 +21,7 @@ userRoute.post('/register', (req, res) => {
     const body = req.body;
     let password = '';
     let email = '';
+
 
     if (body.password && body.email) {
         if (!passwordPattern.test(body.password) && !emailPattern.test(body.email)) {

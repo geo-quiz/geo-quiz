@@ -4,7 +4,7 @@ import { Role } from './Role';
 
 @Entity()
 export class Account {
-    constructor(email: string, passwordHash: string) {
+    constructor(email: string, passwordHash: string, ) {
         this.email = email;
         this.passwordHash = passwordHash;
         this.displayName = '';
