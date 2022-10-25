@@ -24,7 +24,7 @@ onMounted(() => {
     // Load external data and boot
     Promise.all([
         d3.json(
-            'https://gist.githubusercontent.com/Yuriks1/84639021cb64c3482f2b0a883629f01c/raw/6690efa23ed46f042124f09a46f763c2ea656bbd/continents10.json',
+            'https://gist.githubusercontent.com/Yuriks1/1e32c9f0d06a92b6e07b17c94327a144/raw/866e587065ccae308c71f0c549da4f575745024f/continents12.json',
         ),
     ]).then(function (loadData) {
         let topo: any = loadData[0];
