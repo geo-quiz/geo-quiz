@@ -107,10 +107,8 @@ userRoute.post('/login', (req, res) => {
         const email = body.email as string;
         if (!emailPattern.test(email)) {
             console.log('Email is wrong');
-            res.status(400).json({
-                errorMessage: 'Invalid email format',
-                error: 'Email is wrong',
-            });
+            res.statusMessage = 'Invalid email format';
+            res.status(400).end();
         } else
             repository.findOneBy({ email: email }).then((account) => {
                 if (account) {
@@ -165,10 +163,7 @@ userRoute.post('/login', (req, res) => {
         });
         return;
     } else {
-        res.status(400).json({
-            errorMessage: 'Missing parameters',
-            error: 'Query must contain parameters: email and password',
-        });
+        res.status(400).send('Query must contain parameters: email and password');
         return;
     }
 });

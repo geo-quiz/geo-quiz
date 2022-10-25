@@ -4,29 +4,74 @@ import PageLoad from '@/components/PageLoad.vue';
 import PageNotification from '@/components/PageNotification.vue';
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import router from '@/router/index';
 
 const email = ref('');
 const password = ref('');
 const loginError = ref(false);
 const rememberMe = ref(false);
 const awaitingResponse = ref(false);
-const response = ref('');
+const errorResponse = ref('');
 
 function login() {
     const authStore = useAuthStore();
     awaitingResponse.value = true;
 
-    authStore.login(email.value, password.value, rememberMe.value).catch((error) => {
-        response.value = error;
-        console.log(response.value);
-        loginError.value = true;
-    });
-    awaitingResponse.value = false;
+    fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: email,
+            password: password,
+        }),
+    })
+        .then((res) => {
+            if (!res.ok) {
+                console.log(res);
+                throw Error(res.statusText);
+            }
+            return res.json();
+        })
+        .then((data: any) => {
+            //            console.log('data ', data);
+            console.log('Data from fetch ', data);
+            if (rememberMe.value) {
+                localStorage.setItem('token', data.accessToken);
+                sessionStorage.removeItem('token');
+            } else {
+                sessionStorage.setItem('token', data.accessToken);
+                localStorage.removeItem('token');
+            }
+            router.push('/home');
+            awaitingResponse.value = false;
+        })
+        .catch((error) => {
+            errorResponse.value = error;
+            console.error('errorResponse value ', errorResponse.value);
+            loginError.value = true;
+            awaitingResponse.value = false;
+        });
+
+    let possibleToken = localStorage.getItem('token');
+    if (possibleToken) {
+        authStore.setToken(possibleToken);
+    }
+    possibleToken = sessionStorage.getItem('token');
+    if (possibleToken) {
+        authStore.setToken(possibleToken);
+    }
 }
 </script>
 
 <template>
     <form class="login-form" @submit.prevent="login">
+        <p>
+            <label v-if="loginError" class="error">
+                {{ errorResponse }}
+            </label>
+        </p>
         <div class="fields">
             <div class="field">
                 <label class="login-label" for="email">Email address</label>
@@ -95,6 +140,10 @@ a {
 #email.input {
     background: #dbe2ef;
     color: var(--color-black);
+}
+
+.error {
+    color: var(--color-red);
 }
 
 .field {
