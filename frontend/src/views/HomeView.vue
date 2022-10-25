@@ -2,7 +2,8 @@
 import GeoButton from '@/components/GeoButton.vue';
 import PageFooter from '@/components/PageFooter.vue';
 import router from '@/router';
-import MainMenuContainer from '@/components/MainMenuContainer.vue';</script>
+import MainMenuContainer from '@/components/MainMenuContainer.vue';
+</script>
 
 <template>
     <div class="center-vertical">
@@ -20,7 +21,7 @@ import MainMenuContainer from '@/components/MainMenuContainer.vue';</script>
                         <GeoButton @click="router.push('/settings')">Settings</GeoButton>
                     </div>
                     <div class="button-wrapper">
-                        <GeoButton @click="router.push('/log-out')">Log out</GeoButton>
+                        <GeoButton @click="router.push('/')">Log out</GeoButton>
                     </div>
                 </div>
             </div>

@@ -83,19 +83,19 @@ userRoute.post('/register', (req, res) => {
     } else if (!body.password && body.email) {
         res.status(400).json({
             errorMessage: 'Missing parameters',
-            error: 'Query must contain parameters: password',
+            error: 'Request must contain parameters: password',
         });
         return;
     } else if (!body.email && body.password) {
         res.status(400).json({
             errorMessage: 'Missing parameters',
-            error: 'Query must contain parameters: email',
+            error: 'Request must contain parameters: email',
         });
         return;
     } else {
         res.status(400).json({
             errorMessage: 'Missing parameters',
-            error: 'Query must contain parameters: email and password',
+            error: 'Request must contain parameters: email and password',
         });
         return;
     }
