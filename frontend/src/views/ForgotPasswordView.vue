@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import PageHeader from '@/components/PageHeader.vue';
 import ForgotPassword from '@/components/ForgotPassword.vue';
-import PageFooter from '@/components/PageFooter.vue';</script>
+import PageFooter from '@/components/PageFooter.vue';
+</script>
 
 <template>
     <div class="center-vertical">
@@ -11,6 +12,4 @@ import PageFooter from '@/components/PageFooter.vue';</script>
     </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

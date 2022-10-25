@@ -26,6 +26,7 @@ function sendEmail() {
                 <label class="reset-password-label" for="email">Email address</label>
                 <input
                     id="email"
+                    v-model="email"
                     autocomplete="off"
                     class="input"
                     name="email"
@@ -34,7 +35,7 @@ function sendEmail() {
                     required
                     title="Must be a valid email address. (Example@email.com)."
                     type="email"
-                    v-model="email" />
+                    @input="isInvalidEmail = false" />
                 <label v-if="isInvalidEmail" id="email-error">Invalid email</label>
             </div>
             <GeoButton color="green" @click.prevent="sendEmail">Reset password</GeoButton>
@@ -42,7 +43,10 @@ function sendEmail() {
     </div>
 
     <div v-else class="wrapper">
-        <p id="sent-text">Email has been sent to the provided email</p>
+        <p id="sent-text">
+            Email would have been sent to the provided email <br />
+            if we had implemented it...
+        </p>
     </div>
 </template>
 
@@ -57,9 +61,9 @@ a {
 }
 
 #email-error {
-    width: 100%;
-    text-align: center;
     color: var(--color-red);
+    text-align: center;
+    width: 100%;
 }
 
 .field {
@@ -70,7 +74,7 @@ a {
 
 .input {
     background: #dbe2ef;
-    border: 0;
+    border: none;
     border-radius: 10px;
     color: var(--color-black);
     font-size: 1rem;
@@ -88,13 +92,14 @@ a {
 
 #sent-text {
     margin-bottom: calc(var(--gap) * 3);
+    text-align: center;
 }
 
 .wrapper {
-    width: 100%;
+    align-items: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    width: 100%;
 }
 
 @media only screen and (min-width: 768px) {
