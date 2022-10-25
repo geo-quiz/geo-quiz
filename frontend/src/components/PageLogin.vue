@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
+import PageLoad from '@/components/PageLoad.vue';
+import PageNotification from '@/components/PageNotification.vue';
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 
@@ -10,16 +12,16 @@ const rememberMe = ref(false);
 const awaitingResponse = ref(false);
 const response = ref('');
 
-
 function login() {
     const authStore = useAuthStore();
     awaitingResponse.value = true;
-    authStore.login(email.value, password.value, rememberMe.value)
-        .catch((error) => {
-            response.value = error;
-            console.log(response.value);
-            loginError.value = true;
-        });
+
+    authStore.login(email.value, password.value, rememberMe.value).catch((error) => {
+        response.value = error;
+        console.log(response.value);
+        loginError.value = true;
+    });
+    awaitingResponse.value = false;
 }
 </script>
 
@@ -67,7 +69,7 @@ function login() {
                     <span>Remember me?</span>
                 </label>
             </div>
-            <GeoButton id="login-button" color="green">{{ awaitingResponse ? 'Loading...' : 'Login' }}</GeoButton>
+            <GeoButton id="login-button" color="green">Login</GeoButton>
             <div class="new-user">
                 <p>
                     New user?
@@ -76,6 +78,12 @@ function login() {
             </div>
         </div>
     </form>
+
+    <PageNotification v-if="awaitingResponse">
+        <div id="notification-wrapper">
+            <PageLoad />
+        </div>
+    </PageNotification>
 </template>
 
 <style scoped>
@@ -132,6 +140,16 @@ a {
 .new-user {
     display: flex;
     justify-content: center;
+}
+
+#notification-wrapper {
+    align-items: center;
+    background: var(--color-dark-blue);
+    border-radius: var(--radius);
+    display: flex;
+    height: 175px;
+    justify-content: center;
+    width: 80%;
 }
 
 #password.input {
