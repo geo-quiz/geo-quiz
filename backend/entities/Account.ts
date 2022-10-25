@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import { Role } from './Role';
+
 
 @Entity()
 export class Account {
@@ -6,8 +8,10 @@ export class Account {
         this.email = email;
         this.passwordHash = passwordHash;
         this.displayName = '';
-    }
+        this.role = 1;
 
+
+    }
     @PrimaryGeneratedColumn()
         id: number | undefined;
 
@@ -19,4 +23,8 @@ export class Account {
     
     @Column() 
         displayName: string;
+
+    @ManyToOne(() => Role, ((role) => role.id))
+        role: Role| 1;
 }
+
