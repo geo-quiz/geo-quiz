@@ -3,7 +3,6 @@ import router from '@/router';
 import { ref } from 'vue';
 
 export const useAuthStore = defineStore('auth', () => {
-    // initialize state from local storage to enable user to stay logged in
     const token = ref('');
 
     async function login(email: string, password: string, rememberMe: boolean) {
@@ -28,12 +27,10 @@ export const useAuthStore = defineStore('auth', () => {
                         sessionStorage.setItem('token', data.accessToken);
                         localStorage.removeItem('token');
                     }
-                    // redirect to previous url or default to home page
                     router.push('/home');
                 }
             });
 
-        // update pinia state
         let possibleToken = localStorage.getItem('token');
         if (possibleToken) {
             token.value = possibleToken;
@@ -54,14 +51,6 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.removeItem('token');
         router.push('/');
     }
-
-    //    function validateToken(token) {
-    //    s
-
-    //    validToken = Check backend?
-    //    if (validToken) {
-    //         token.value = token;
-    //    }
 
     return { token, login, logout, setToken };
 });

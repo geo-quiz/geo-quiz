@@ -67,7 +67,6 @@ function login() {
                     <span>Remember me?</span>
                 </label>
             </div>
-            <!--            Add disabled functionality to GeoButton, lägg i knapp i geobutton mörkare -->
             <GeoButton id="login-button" color="green">{{ awaitingResponse ? 'Loading...' : 'Login' }}</GeoButton>
             <div class="new-user">
                 <p>
