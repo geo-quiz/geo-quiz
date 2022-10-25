@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
 import {ref} from 'vue';
-import {useAuthStore} from "@/stores/auth";
+import {useAuthStore} from '@/stores/auth';
 
 const email = ref('');
 const password = ref('');
@@ -67,7 +67,6 @@ const login = () => {
                     <span>Remember me?</span>
                 </label>
             </div>
-            <!--            Add disabled functionality to GeoButton, lägg i knapp i geobutton mörkare -->
             <GeoButton id="login-button" color="green">{{ awaitingResponse ? 'Loading...' : 'Login' }}</GeoButton>
             <div class="new-user">
                 <p>
