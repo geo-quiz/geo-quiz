@@ -9,6 +9,10 @@ const props = defineProps({
     index: {
         type: Number,
         required: true,
+    },
+    size: {
+        type: String,
+        required: true,
     }
 });
 
@@ -21,55 +25,57 @@ const quizStore = useCurrentQuizStore();
 let timer: number;
 
 onMounted(() => {
+    quizStore.resetAnswers();
     console.log('Store Length: ', quizStore.answers.length);
     console.log('props.index value:', props.index);
 
-    timer = setInterval(() => {a();}, 1000);
+    checkAnswer();
+    timer = setInterval(() => {checkAnswer();}, 10);
 });
 
 onUnmounted(() => {
     clearInterval(timer);
 });
 
-function a() {
-    if (quizStore.answers.length + 1 === props.index) {
+function checkAnswer() {
+    if (quizStore.currentQuestionIndex === props.index) {
         isCurrentQuestion.value = true;
-    } else if ((quizStore.answers[props.index - 1]).id == quizStore.currentQuestion.correctAnswer) {
-        isCorrect.value = true;
-    } else if (quizStore.answers.length < props.index) {
-        isIncorrect.value = true;
+    }
+    if (quizStore.answers[props.index]) {
+        if ((quizStore.answers[props.index]).id == quizStore.currentQuestion.correctAnswer) {
+            isCorrect.value = true;
+        } else if ((quizStore.answers[props.index]).id != quizStore.currentQuestion.correctAnswer) {
+            isIncorrect.value = true;
+        }
     }
 }
+
+
+const sizeAsNumber: number = Number.parseInt(props.size.slice(0, 2));
 </script>
 
 <template>
     <div class="box">
-        <CheckIcon v-if="isCorrect" :size="32" fillColor="#f9f7f7" class="symbol correct" />
-        <CloseIcon v-else-if="isIncorrect" :size="32" fillColor="#f9f7f7" class="symbol incorrect" />
-        <HelpIcon v-else-if="isCurrentQuestion" :size="32" fillColor="#f9f7f7" class="symbol current-question" />
-        <span v-else class="symbol">X</span>
+        <CheckIcon v-if="isCorrect" :size="sizeAsNumber" class="symbol correct" fillColor="#f9f7f7" />
+        <CloseIcon v-else-if="isIncorrect" :size="sizeAsNumber" class="symbol incorrect" fillColor="#f9f7f7" />
+        <HelpIcon v-else-if="isCurrentQuestion" :size="sizeAsNumber" class="symbol current-question"
+                  fillColor="#f9f7f7" />
+        <span v-else class="symbol"></span>
     </div>
 </template>
 
 <style scoped>
 
-.box {
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius);
-    background: var(--color-light-blue);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .symbol {
-    width: 32px;
-    height: 32px;
+    align-items: center;
+    background: var(--color-light-blue);
     border-radius: var(--radius);
-    display: block;
-    text-align: center;
     color: #111111;
+    display: flex;
+    height: v-bind(size);
+    justify-content: center;
+    text-align: center;
+    width: v-bind(size);
 }
 
 .correct {
