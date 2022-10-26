@@ -64,7 +64,7 @@ function login() {
 
 <template>
     <main>
-        <h2>Login</h2>
+        <h2>Sign in</h2>
         <form class="login-form" @submit.prevent="login">
             <p v-if="loginError" class="error">{{ errorResponse }}</p>
             <div class="fields">
@@ -102,11 +102,11 @@ function login() {
                 <div class="item">
                     <input id="cbx" v-model="rememberMe" class="inp-cbx" style="display: none" type="checkbox" />
                     <label class="cbx" for="cbx">
-                    <span>
-                        <svg height="10px" viewbox="0 0 12 10" width="12px">
-                            <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                        </svg>
-                    </span>
+                        <span>
+                            <svg height="10px" viewbox="0 0 12 10" width="12px">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
                         <span>Remember me?</span>
                     </label>
                 </div>
@@ -156,6 +156,14 @@ a {
     width: 100%;
 }
 
+h2 {
+    color: var(--color-white);
+    font-size: 2rem;
+    text-align: center;
+    width: 100%;
+    margin: -8px 0;
+}
+
 .input {
     border: 0;
     border-radius: 10px;
@@ -163,14 +171,6 @@ a {
     height: 50px;
     margin: 0.5% 0;
     padding-left: 10px;
-}
-
-h2 {
-    color: var(--color-white);
-    font-size: 2rem;
-    text-align: center;
-    width: 100%;
-    margin: -8px 0;
 }
 
 .login {
