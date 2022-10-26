@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity,ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Leaderboard } from './Leaderboard';
+
 
 @Entity()
 export class Account {
@@ -6,6 +8,7 @@ export class Account {
         this.email = email;
         this.passwordHash = passwordHash;
         this.displayName = '';
+        this.leaderboard= undefined;
     }
 
     @PrimaryGeneratedColumn()
@@ -19,4 +22,7 @@ export class Account {
     
     @Column() 
         displayName: string;
+
+    @ManyToOne(() => Leaderboard, (leaderboard) => leaderboard.id)
+    leaderboard: Leaderboard| undefined;
 }

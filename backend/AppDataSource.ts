@@ -4,6 +4,7 @@ import { Continent } from './entities/Continent';
 import { Answer } from './entities/Answer';
 import { Account } from './entities/Account';
 import dotenv from 'dotenv';
+import { Leaderboard } from './entities/Leaderboard';
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ export const AppDataSource = new DataSource({
     username: username,
     password: password,
     database: database,
-    entities: [Question, Continent, Answer, Account],
+    entities: [Question, Continent, Answer, Account,Leaderboard],
     synchronize: true,
     logging: false,
 });
