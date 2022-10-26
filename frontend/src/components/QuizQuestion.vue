@@ -42,18 +42,24 @@ onMounted(() => {
         });
 });
 
-function answerQuestion(selectedAnswer: IAnswer) {
+function answerQuestion(selectedAnswer: IAnswer | undefined) {
     if (!isAnswered.value) {
-        currentQuiz.setAnswer(selectedAnswer);
-        const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
-        const indexOfCorrect = findIndexOfCorrectAnswer();
+        if (!selectedAnswer) {
+            msg.value = noANSWER;
+            currentQuiz.setAnswer({ id: 0, answer: 'No answer was given' });
+        } else {
+            currentQuiz.setAnswer(selectedAnswer);
+            const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
+            const indexOfCorrect = findIndexOfCorrectAnswer();
 
-        if (indexOfAnswer === indexOfCorrect) {
-            isCorrect.value = true;
-            msg.value = CORRECT;
-            isIncorrectAnswer.value = false;
+            if (indexOfAnswer === indexOfCorrect) {
+                isCorrect.value = true;
+                msg.value = CORRECT;
+                isIncorrectAnswer.value = false;
+            }
         }
     }
+
     isAnswered.value = true;
 }
 
@@ -119,8 +125,7 @@ function countdown() {
         if (!isAnswered.value) {
             timeLeft.value -= 1;
             if (timeLeft.value <= 0) {
-                isAnswered.value = true;
-                msg.value = noANSWER;
+                answerQuestion(undefined);
             }
         } else {
             clearInterval(downloadTimer);
@@ -139,14 +144,16 @@ function resetCountdown() {
         <h2 class="heading"> {{ getTitle() }}</h2>
         <div class="wrapper">
             <QuizQuestionBoxes :nrOfQuestions="nrOfQuestions" />
-            <div class="timer-and-points">
-                <div id="timer">
-                    <img id="clock" alt="clock icon" src="/images/icons8-clock.svg">
-                    <p id="countdown"> {{ timeLeft }}</p>
+            <div class="also-wrapper">
+                <div class="timer-and-points">
+                    <div id="timer">
+                        <img alt="clock icon" src="/images/icons8-clock.svg">
+                        <p id="countdown"> {{ timeLeft }}</p>
+                    </div>
                 </div>
-            </div>
-            <div class="question-div">
-                <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
+                <div class="question-div">
+                    <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
+                </div>
             </div>
             <div class="answers">
                 <div v-for="(answer, index) in currentQuiz.currentQuestion.answers" :key="index" class="button-wrapper">
@@ -174,7 +181,7 @@ function resetCountdown() {
     flex-wrap: wrap;
     gap: var(--gap);
     justify-content: center;
-    width: 75%;
+    width: 100%;
 }
 
 .answered {
@@ -183,7 +190,7 @@ function resetCountdown() {
     flex-direction: column;
     gap: var(--gap);
     text-align: center;
-    width: 75%;
+    width: 100%;
 }
 
 .button-wrapper {
@@ -193,9 +200,9 @@ function resetCountdown() {
 .heading {
     color: var(--color-white);
     font-size: 2rem;
-    margin: 0;
     text-align: center;
     width: 100%;
+    margin: -8px 0;
 }
 
 .timer-and-points {
@@ -206,26 +213,21 @@ function resetCountdown() {
     display: flex;
     height: 40px;
     justify-content: right;
-    width: 75%;
+    width: 100%;
 }
 
 #timer {
     align-items: center;
     display: flex;
     flex-direction: row;
-    gap: 4px;
+    gap: var(--gap);
     justify-content: flex-end;
     width: 50%;
 }
 
-#clock {
-    padding-right: 6vw;
-    position: fixed;
-}
-
 #countdown {
     font-size: 1.5rem;
-    margin-right: 3vw;
+    margin-right: var(--gap);
 }
 
 p {
@@ -238,9 +240,9 @@ p {
     border-radius: var(--radius);
     display: flex;
     justify-content: center;
-    min-height: 100px;
+    min-height: 300px;
     overflow-wrap: anywhere;
-    width: 75%;
+    width: 100%;
 }
 
 .question-text {
@@ -252,11 +254,13 @@ p {
 section {
     display: flex;
     flex-wrap: wrap;
-    gap: 50px;
+    gap: calc(var(--gap) * 2);
     justify-content: center;
+    min-width: 300px;
+    width: 75%;
 }
 
-.wrapper {
+.also-wrapper {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -264,22 +268,17 @@ section {
     width: 100%;
 }
 
+.wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--gap) * 2);
+    width: 100%;
+}
+
 @media only screen and (min-width: 768px) {
-    .answers {
-        width: 75%;
-    }
-
-    .answered {
-        width: 75%;
-    }
-
-    #next-question-button {
-        width: 30%;
-    }
-
     .question-div {
         min-height: 150px;
-        width: 75%;
     }
 
     .question-text {
