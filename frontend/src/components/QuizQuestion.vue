@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
 import QuizQuestionBoxes from '@/components/QuizQuestionBoxes.vue';
+import CheckIcon from 'vue-material-design-icons/CheckCircleOutline.vue';
+import CloseIcon from 'vue-material-design-icons/CloseCircleOutline.vue';
+import ClockIcon from 'vue-material-design-icons/ClockTimeFourOutline.vue';
+import GlobeIcon from 'vue-material-design-icons/Earth.vue';
 import { onMounted, onUnmounted, ref } from 'vue';
 import router from '@/router';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
@@ -23,6 +27,10 @@ const nrOfQuestions = ref(0);
 const answers = ref(new Map<number, boolean>());
 
 const timeLeft = ref(15);
+const timeLeftAsString = ref('15');
+
+const points = ref(0);
+const pointsAsString = ref('00');
 
 const currentQuiz = useCurrentQuizStore();
 
@@ -65,6 +73,10 @@ function countdown() {
     timer = setInterval(() => {
         if (!isAnswered.value) {
             timeLeft.value--;
+            timeLeftAsString.value = timeLeft.value.toString();
+            if (timeLeft.value < 10) {
+                timeLeftAsString.value = '0' + timeLeftAsString.value;
+            }
             if (timeLeft.value <= 0) {
                 answerQuestion(undefined);
             }
@@ -90,6 +102,8 @@ function answerQuestion(selectedAnswer: IAnswer | undefined) {
             if (indexOfAnswer === indexOfCorrect) {
                 isCorrect.value = true;
                 isIncorrect.value = false;
+                points.value++;
+                pointsAsString.value = 0 + points.value.toString();
             }
         }
     }
@@ -158,9 +172,13 @@ function getTitle() {
             <QuizQuestionBoxes :nrOfQuestions="nrOfQuestions" />
             <div class="also-wrapper">
                 <div class="timer-and-points">
+                    <div id="points">
+                        <GlobeIcon :size="32" class="icon" />
+                        <p class="score-text">{{ pointsAsString }}</p>
+                    </div>
                     <div id="timer">
-                        <img alt="clock icon" src="/images/icons8-clock.svg" />
-                        <p id="countdown">{{ timeLeft }}</p>
+                        <ClockIcon :size="32" class="icon" />
+                        <p class="score-text">{{ timeLeftAsString }}</p>
                     </div>
                 </div>
                 <div class="question-div">
@@ -198,15 +216,6 @@ function getTitle() {
     width: 100%;
 }
 
-.answered {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap);
-    text-align: center;
-    width: 100%;
-}
-
 .button-wrapper {
     width: calc(50% - var(--gap) / 2);
 }
@@ -218,6 +227,12 @@ function getTitle() {
     top: 100px;
     width: 100vw;
     z-index: 1;
+}
+
+.icon {
+    align-items: center;
+    display: flex;
+    justify-content: center;
 }
 
 .correct,
@@ -273,14 +288,20 @@ function getTitle() {
     align-items: center;
     display: flex;
     flex-direction: row;
-    gap: var(--gap);
+    gap: calc((var(--gap) / 3) * 2);
     justify-content: flex-end;
+    padding-right: var(--gap);
     width: 50%;
 }
 
-#countdown {
-    font-size: 1.5rem;
-    margin-right: var(--gap);
+#points {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: calc((var(--gap) / 3) * 2);
+    justify-content: flex-start;
+    padding-left: var(--gap);
+    width: 50%;
 }
 
 p {
@@ -293,7 +314,7 @@ p {
     border-radius: var(--radius);
     display: flex;
     justify-content: center;
-    min-height: 300px;
+    min-height: 250px;
     overflow-wrap: anywhere;
     width: 100%;
 }
