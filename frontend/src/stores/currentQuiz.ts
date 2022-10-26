@@ -24,5 +24,18 @@ export const useCurrentQuizStore = defineStore('currentQuiz', () => {
         answers.value.push(selectedAnswer);
     }
 
-    return { questions, currentQuestionIndex, currentQuestion, setQuestions, nextQuestion, answers, setAnswer };
+    function resetAnswers() {
+        answers.value = [];
+    }
+
+    return {
+        questions,
+        currentQuestionIndex,
+        currentQuestion,
+        setQuestions,
+        nextQuestion,
+        answers,
+        setAnswer,
+        resetAnswers,
+    };
 });
