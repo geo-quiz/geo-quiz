@@ -45,6 +45,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+    currentQuiz.resetQuestions();
     clearInterval(timer);
 });
 
@@ -171,9 +172,7 @@ function getTitle() {
                     <p>{{ msg }}</p>
                     <p v-if="isIncorrectAnswer">The correct answer is: {{ getCorrectAnswer() }}</p>
                 </div>
-                <GeoButton id="next-question-button" font-size="1.125rem" @click="nextQuestion">
-                    Next question
-                </GeoButton>
+                <GeoButton id="next-question-button" @click="nextQuestion"> Next question</GeoButton>
             </div>
         </div>
     </section>

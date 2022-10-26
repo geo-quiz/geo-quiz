@@ -37,6 +37,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     clearInterval(timer);
+    quizStore.resetAnswers();
 });
 
 function checkAnswer() {
