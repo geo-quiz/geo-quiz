@@ -60,9 +60,10 @@ onUnmounted(() => {
 
 <style scoped>
 header {
-    z-index: 1000;
     display: flex;
     justify-content: space-evenly;
+    min-width: 350px;
+    z-index: 1000;
 }
 
 .header-background {

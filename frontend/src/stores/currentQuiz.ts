@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import type { IQuestion } from '@/utility/interfaces/IQuestion';
+import type { IAnswer } from '@/utility/interfaces/IAnswer';
 
 export const useCurrentQuizStore = defineStore('currentQuiz', () => {
     const questions = ref<IQuestion[]>([]);
@@ -16,5 +17,25 @@ export const useCurrentQuizStore = defineStore('currentQuiz', () => {
     function nextQuestion() {
         currentQuestionIndex.value++;
     }
-    return { questions, currentQuestionIndex, currentQuestion, setQuestions, nextQuestion };
+
+    const answers = ref<IAnswer[]>([]);
+
+    function setAnswer(selectedAnswer: IAnswer) {
+        answers.value.push(selectedAnswer);
+    }
+
+    function resetAnswers() {
+        answers.value = [];
+    }
+
+    return {
+        questions,
+        currentQuestionIndex,
+        currentQuestion,
+        setQuestions,
+        nextQuestion,
+        answers,
+        setAnswer,
+        resetAnswers,
+    };
 });
