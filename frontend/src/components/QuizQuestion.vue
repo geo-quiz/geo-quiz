@@ -198,8 +198,10 @@ function getTitle() {
                         size="answer"
                         @click="answerQuestion(answer)">
                         <div v-if="isAnswered">
-                            <CheckIcon v-if="answers.get(answer.id)" />
-                            <CloseIcon v-else-if="!answers.get(answer.id) && selectedAnswerId === answer.id" />
+                            <CheckIcon :size="32" v-if="answers.get(answer.id)" />
+                            <CloseIcon
+                                :size="32"
+                                v-else-if="!answers.get(answer.id) && selectedAnswerId === answer.id" />
                         </div>
                         {{ answer.answer }}
                     </GeoButton>
