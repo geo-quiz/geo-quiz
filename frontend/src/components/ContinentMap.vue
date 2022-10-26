@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import * as d3 from 'd3';
 import router from '@/router';
-
-import {onMounted} from 'vue';
+import { onMounted } from 'vue';
 
 onMounted(() => {
     // The svg
@@ -104,34 +103,32 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="header_under__title">
-    <h1>Click on a continent to start the quiz</h1>
-    <div class="header_under__map">
-      <svg id="my_dataviz" width="1000" height="500"></svg>
+    <div class="header_under__title">
+        <h1>Click on a continent to start the quiz</h1>
+        <div class="header_under__map">
+            <svg id="my_dataviz" width="1000" height="500"></svg>
+        </div>
     </div>
-  </div>
-
-
 </template>
 
 <style scoped>
 
 h1 {
-  margin: 0
+    margin: 0
 }
 
 .header_under__title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 116px;
-  gap: calc(var(--gap) * 2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 116px;
+    gap: calc(var(--gap) * 2);
 }
 
 .header_under__map {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
 }
 </style>
