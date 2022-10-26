@@ -31,7 +31,7 @@ import GeoButton from '@/components/GeoButton.vue';</script>
                         title="Password format invalid."
                         type="password" />
                 </div>
-                <RouterLink to="/">Forgot your password?</RouterLink>
+                <RouterLink to="/forgot-password">Forgot your password?</RouterLink>
             </div>
             <div class="login">
                 <div class="item">
