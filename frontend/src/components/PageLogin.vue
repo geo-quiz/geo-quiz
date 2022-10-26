@@ -1,15 +1,78 @@
 <script lang="ts" setup>
-import GeoButton from '@/components/GeoButton.vue';</script>
+import GeoButton from '@/components/GeoButton.vue';
+import PageLoad from '@/components/PageLoad.vue';
+import PageNotification from '@/components/PageNotification.vue';
+import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import router from '@/router/index';
+
+const email = ref('');
+const password = ref('');
+const loginError = ref(false);
+const rememberMe = ref(false);
+const awaitingResponse = ref(false);
+const errorResponse = ref('');
+
+function login() {
+    const authStore = useAuthStore();
+    awaitingResponse.value = true;
+
+    fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: email.value,
+            password: password.value,
+        }),
+    })
+        .then((res) => {
+            if (!res.ok) {
+                console.log('statusText ', res);
+                throw Error(res.statusText);
+            }
+            return res.json();
+        })
+        .then((data: any) => {
+            if (rememberMe.value) {
+                localStorage.setItem('token', data.accessToken);
+                sessionStorage.removeItem('token');
+            } else {
+                sessionStorage.setItem('token', data.accessToken);
+                localStorage.removeItem('token');
+            }
+            router.push('/home');
+            awaitingResponse.value = false;
+        })
+        .catch((error) => {
+            errorResponse.value = error;
+            loginError.value = true;
+            awaitingResponse.value = false;
+        });
+
+    let possibleToken = localStorage.getItem('token');
+    if (possibleToken) {
+        authStore.setToken(possibleToken);
+    }
+    possibleToken = sessionStorage.getItem('token');
+    if (possibleToken) {
+        authStore.setToken(possibleToken);
+    }
+}
+</script>
 
 <template>
     <main>
-        <h2>Login</h2>
-        <form class="login-form">
+        <h2>Sign in</h2>
+        <form class="login-form" @submit.prevent="login">
+            <p v-if="loginError" class="error">{{ errorResponse }}</p>
             <div class="fields">
                 <div class="field">
                     <label class="login-label" for="email">Email address</label>
                     <input
                         id="email"
+                        v-model="email"
                         autocomplete="off"
                         class="input"
                         name="email"
@@ -23,25 +86,27 @@ import GeoButton from '@/components/GeoButton.vue';</script>
                     <label class="login-label" for="password">Password</label>
                     <input
                         id="password"
+                        v-model="password"
                         class="input"
                         name="password"
                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"
                         placeholder="Enter your password..."
                         required
                         title="Password format invalid."
-                        type="password" />
+                        type="password"
+                        autocomplete="off" />
                 </div>
                 <RouterLink to="/forgot-password">Forgot your password?</RouterLink>
             </div>
             <div class="login">
                 <div class="item">
-                    <input id="cbx" class="inp-cbx" style="display: none" type="checkbox" />
+                    <input id="cbx" v-model="rememberMe" class="inp-cbx" style="display: none" type="checkbox" />
                     <label class="cbx" for="cbx">
-                    <span>
-                        <svg height="10px" viewbox="0 0 12 10" width="12px">
-                            <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                        </svg>
-                    </span>
+                        <span>
+                            <svg height="10px" viewbox="0 0 12 10" width="12px">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
                         <span>Remember me?</span>
                     </label>
                 </div>
@@ -55,6 +120,11 @@ import GeoButton from '@/components/GeoButton.vue';</script>
             </div>
         </form>
     </main>
+    <PageNotification v-if="awaitingResponse">
+        <div id="notification-wrapper">
+            <PageLoad />
+        </div>
+    </PageNotification>
 </template>
 
 <style scoped>
@@ -66,6 +136,10 @@ a {
 #email.input {
     background: #dbe2ef;
     color: var(--color-black);
+}
+
+.error {
+    color: var(--color-red);
 }
 
 .field {
@@ -82,6 +156,14 @@ a {
     width: 100%;
 }
 
+h2 {
+    color: var(--color-white);
+    font-size: 2rem;
+    text-align: center;
+    width: 100%;
+    margin: -8px 0;
+}
+
 .input {
     border: 0;
     border-radius: 10px;
@@ -89,14 +171,6 @@ a {
     height: 50px;
     margin: 0.5% 0;
     padding-left: 10px;
-}
-
-h2 {
-    color: var(--color-white);
-    font-size: 2rem;
-    text-align: center;
-    width: 100%;
-    margin: -8px 0;
 }
 
 .login {
@@ -117,11 +191,6 @@ h2 {
     width: 100%;
 }
 
-.new-user {
-    display: flex;
-    justify-content: center;
-}
-
 main {
     align-items: center;
     display: flex;
@@ -129,6 +198,21 @@ main {
     gap: calc(var(--gap) * 2);
     justify-content: center;
     width: 90%;
+}
+
+.new-user {
+    display: flex;
+    justify-content: center;
+}
+
+#notification-wrapper {
+    align-items: center;
+    background: var(--color-dark-blue);
+    border-radius: var(--radius);
+    display: flex;
+    height: 175px;
+    justify-content: center;
+    width: 80%;
 }
 
 #password.input {

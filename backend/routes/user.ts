@@ -107,10 +107,8 @@ userRoute.post('/login', (req, res) => {
         const email = body.email as string;
         if (!emailPattern.test(email)) {
             console.log('Email is wrong');
-            res.status(400).json({
-                errorMessage: 'Invalid email format',
-                error: 'Email is wrong',
-            });
+            res.statusMessage = 'Invalid email format';
+            res.status(400).end();
         } else
             repository.findOneBy({ email: email }).then((account) => {
                 if (account) {
@@ -118,10 +116,8 @@ userRoute.post('/login', (req, res) => {
                     const passwordHash = account.passwordHash as string;
                     if (passwordHash === undefined) {
                         console.log('passwordHash is undefined');
-                        res.status(400).json({
-                            errorMessage: 'DB password format is wrong',
-                            error: 'Problem with db password',
-                        });
+                        res.statusMessage = 'Problem with database password';
+                        res.status(400).end();
                     } else {
                         bcrypt
                             .compare(password, account.passwordHash)
@@ -132,43 +128,33 @@ userRoute.post('/login', (req, res) => {
                                     });
                                     res.json({ accessToken: accessToken });
                                 } else {
-                                    res.status(400).json({
-                                        errorMessage: 'Invalid password or email',
-                                    });
+                                    res.statusMessage = 'Invalid password or email';
+                                    res.status(400).end();
                                 }
                             })
                             .catch((err) => {
                                 console.log('error: ' + err);
-                                res.status(400).json({
-                                    errorMessage: 'Something went wrong while checking the password',
-                                    error: err,
-                                });
+                                res.statusMessage = 'Something went wrong while checking the password';
+                                res.status(400).end();
                             });
                     }
                 } else {
-                    res.status(400).json({
-                        errorMessage: 'Invalid password or email',
-                    });
+                    res.statusMessage = 'Invalid password or email';
+                    res.status(400).end();
                 }
                 return;
             });
     } else if (!body.password && body.email) {
-        res.status(400).json({
-            errorMessage: 'Missing parameters',
-            error: 'Query must contain parameters: password',
-        });
+        res.statusMessage = 'Missing password';
+        res.status(400).end();
         return;
     } else if (!body.email && body.password) {
-        res.status(400).json({
-            errorMessage: 'Missing parameters',
-            error: 'Query must contain parameters: email',
-        });
+        res.statusMessage = 'Missing email';
+        res.status(400).end();
         return;
     } else {
-        res.status(400).json({
-            errorMessage: 'Missing parameters',
-            error: 'Query must contain parameters: email and password',
-        });
+        res.statusMessage = 'Missing email and password';
+        res.status(400).end();
         return;
     }
 });
