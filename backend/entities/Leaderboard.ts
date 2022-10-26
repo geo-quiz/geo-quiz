@@ -11,11 +11,12 @@ export class Leaderboard {
 
     @PrimaryGeneratedColumn()
     id: number | undefined;
+
     @Column()
     score: number;
+
     @Column()
     time: number;
-
 
     @OneToMany(() => Account, ((account) => account.id))
     leaderboard: Account | undefined;
