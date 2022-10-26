@@ -123,7 +123,7 @@ userRoute.post('/login', (req, res) => {
                             .compare(password, account.passwordHash)
                             .then((validPass) => {
                                 if (validPass) {
-                                    const accessToken = jwt.sign({ email: account.email }, secretToken, {
+                                    const accessToken = jwt.sign({ email: account.email , role: account.role}, secretToken, {
                                         expiresIn: 2629800000,
                                     });
                                     res.json({ accessToken: accessToken });
