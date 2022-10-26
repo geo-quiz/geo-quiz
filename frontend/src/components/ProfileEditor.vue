@@ -215,7 +215,6 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 40px;
-    margin-top: 120px;
     padding: 25px;
     text-align: center;
     width: 75%;
@@ -254,7 +253,6 @@ main {
     align-items: center;
     display: flex;
     flex-direction: column;
-    margin-top: 120px;
     width: 100%;
 }
 

@@ -63,61 +63,63 @@ function login() {
 </script>
 
 <template>
-    <form class="login-form" @submit.prevent="login">
-        <p v-if="loginError" class="error">{{ errorResponse }}</p>
-        <div class="fields">
-            <div class="field">
-                <label class="login-label" for="email">Email address</label>
-                <input
-                    id="email"
-                    v-model="email"
-                    autocomplete="off"
-                    class="input"
-                    name="email"
-                    pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,63}$"
-                    placeholder="Enter your email address..."
-                    required
-                    title="Must be a valid email address. (Example@email.com)."
-                    type="email" />
+    <main>
+        <h2>Login</h2>
+        <form class="login-form" @submit.prevent="login">
+            <p v-if="loginError" class="error">{{ errorResponse }}</p>
+            <div class="fields">
+                <div class="field">
+                    <label class="login-label" for="email">Email address</label>
+                    <input
+                        id="email"
+                        v-model="email"
+                        autocomplete="off"
+                        class="input"
+                        name="email"
+                        pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,63}$"
+                        placeholder="Enter your email address..."
+                        required
+                        title="Must be a valid email address. (Example@email.com)."
+                        type="email" />
+                </div>
+                <div class="field">
+                    <label class="login-label" for="password">Password</label>
+                    <input
+                        id="password"
+                        v-model="password"
+                        class="input"
+                        name="password"
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"
+                        placeholder="Enter your password..."
+                        required
+                        title="Password format invalid."
+                        type="password"
+                        autocomplete="off" />
+                </div>
+                <RouterLink to="/forgot-password">Forgot your password?</RouterLink>
             </div>
-            <div class="field">
-                <label class="login-label" for="password">Password</label>
-                <input
-                    id="password"
-                    v-model="password"
-                    class="input"
-                    name="password"
-                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"
-                    placeholder="Enter your password..."
-                    required
-                    title="Password format invalid."
-                    type="password"
-                    autocomplete="off" />
-            </div>
-            <RouterLink to="/">Forgot your password?</RouterLink>
-        </div>
-        <div class="login">
-            <div class="item">
-                <input id="cbx" v-model="rememberMe" class="inp-cbx" style="display: none" type="checkbox" />
-                <label class="cbx" for="cbx">
+            <div class="login">
+                <div class="item">
+                    <input id="cbx" v-model="rememberMe" class="inp-cbx" style="display: none" type="checkbox" />
+                    <label class="cbx" for="cbx">
                     <span>
                         <svg height="10px" viewbox="0 0 12 10" width="12px">
                             <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
                         </svg>
                     </span>
-                    <span>Remember me?</span>
-                </label>
+                        <span>Remember me?</span>
+                    </label>
+                </div>
+                <GeoButton id="login-button" color="green">Login</GeoButton>
+                <div class="new-user">
+                    <p>
+                        New user?
+                        <RouterLink to="/register">Create an account.</RouterLink>
+                    </p>
+                </div>
             </div>
-            <GeoButton id="login-button" color="green">Login</GeoButton>
-            <div class="new-user">
-                <p>
-                    New user?
-                    <RouterLink to="/register">Create an account.</RouterLink>
-                </p>
-            </div>
-        </div>
-    </form>
-
+        </form>
+    </main>
     <PageNotification v-if="awaitingResponse">
         <div id="notification-wrapper">
             <PageLoad />
@@ -144,12 +146,14 @@ a {
     display: flex;
     flex-direction: column;
     gap: calc(var(--gap) / 2);
+    width: 100%;
 }
 
 .fields {
     display: flex;
     flex-direction: column;
     gap: calc(var(--gap) * 3);
+    width: 100%;
 }
 
 .input {
@@ -159,6 +163,14 @@ a {
     height: 50px;
     margin: 0.5% 0;
     padding-left: 10px;
+}
+
+h2 {
+    color: var(--color-white);
+    font-size: 2rem;
+    text-align: center;
+    width: 100%;
+    margin: -8px 0;
 }
 
 .login {
@@ -176,7 +188,15 @@ a {
     display: flex;
     flex-direction: column;
     gap: calc(var(--gap) * 2);
-    margin-top: 100px;
+    width: 100%;
+}
+
+main {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--gap) * 2);
+    justify-content: center;
     width: 90%;
 }
 
@@ -279,18 +299,6 @@ a {
 @keyframes wave {
     50% {
         transform: scale(0.9);
-    }
-}
-
-@media only screen and (min-width: 768px) {
-    .login-form {
-        width: 75%;
-    }
-}
-
-@media only screen and (min-width: 1024px) {
-    .login-form {
-        width: 50%;
     }
 }
 </style>
