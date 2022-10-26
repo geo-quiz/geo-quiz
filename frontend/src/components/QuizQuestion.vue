@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
 import QuizQuestionBoxes from '@/components/QuizQuestionBoxes.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import router from '@/router';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
 import type { IAnswer } from '@/utility/interfaces/IAnswer';
@@ -28,6 +28,8 @@ const timeLeft = ref(15);
 
 const currentQuiz = useCurrentQuizStore();
 
+let timer: number;
+
 onMounted(() => {
     fetch(`http://localhost:3000/quiz/continent/${props.id}`)
         .then((response) => response.json())
@@ -41,6 +43,26 @@ onMounted(() => {
             alert('Something went wrong, please try again');
         });
 });
+
+onUnmounted(() => {
+    clearInterval(timer);
+});
+
+function countdown() {
+    timer = setInterval(() => {
+        if (!isAnswered.value) {
+            timeLeft.value--;
+            if (timeLeft.value <= 0) {
+                answerQuestion(undefined);
+            }
+        }
+    }, 1000);
+}
+
+function resetCountdown() {
+    timeLeft.value = 15;
+    isAnswered.value = false;
+}
 
 function answerQuestion(selectedAnswer: IAnswer | undefined) {
     if (!isAnswered.value) {
@@ -119,36 +141,18 @@ function getTitle() {
             return 'Unknown';
     }
 }
-
-function countdown() {
-    const downloadTimer = setInterval(function () {
-        if (!isAnswered.value) {
-            timeLeft.value -= 1;
-            if (timeLeft.value <= 0) {
-                answerQuestion(undefined);
-            }
-        } else {
-            clearInterval(downloadTimer);
-        }
-    }, 1000);
-}
-
-function resetCountdown() {
-    timeLeft.value = 15;
-    countdown();
-}
 </script>
 
 <template>
     <section v-if="currentQuiz.currentQuestion">
-        <h2 class="heading"> {{ getTitle() }}</h2>
+        <h2 class="heading">{{ getTitle() }}</h2>
         <div class="wrapper">
             <QuizQuestionBoxes :nrOfQuestions="nrOfQuestions" />
             <div class="also-wrapper">
                 <div class="timer-and-points">
                     <div id="timer">
-                        <img alt="clock icon" src="/images/icons8-clock.svg">
-                        <p id="countdown"> {{ timeLeft }}</p>
+                        <img alt="clock icon" src="/images/icons8-clock.svg" />
+                        <p id="countdown">{{ timeLeft }}</p>
                     </div>
                 </div>
                 <div class="question-div">
@@ -200,9 +204,9 @@ function resetCountdown() {
 .heading {
     color: var(--color-white);
     font-size: 2rem;
+    margin: -8px 0;
     text-align: center;
     width: 100%;
-    margin: -8px 0;
 }
 
 .timer-and-points {
