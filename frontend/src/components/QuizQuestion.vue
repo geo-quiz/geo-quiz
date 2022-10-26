@@ -46,6 +46,7 @@ onMounted(() => {
             nrOfQuestions.value = currentQuiz.questions.length;
             countdown();
             resetAnswerResponses();
+            currentQuiz.resetAnswers();
         })
         .catch(() => {
             router.back();
@@ -55,6 +56,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     currentQuiz.resetQuestions();
+    currentQuiz.resetAnswers();
     clearInterval(timer);
 });
 
