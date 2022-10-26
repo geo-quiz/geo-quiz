@@ -23,20 +23,18 @@ function login() {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            email: email,
-            password: password,
+            email: email.value,
+            password: password.value,
         }),
     })
         .then((res) => {
             if (!res.ok) {
-                console.log(res);
+                console.log('statusText ', res);
                 throw Error(res.statusText);
             }
             return res.json();
         })
         .then((data: any) => {
-            //            console.log('data ', data);
-            console.log('Data from fetch ', data);
             if (rememberMe.value) {
                 localStorage.setItem('token', data.accessToken);
                 sessionStorage.removeItem('token');
@@ -49,7 +47,6 @@ function login() {
         })
         .catch((error) => {
             errorResponse.value = error;
-            console.error('errorResponse value ', errorResponse.value);
             loginError.value = true;
             awaitingResponse.value = false;
         });
@@ -67,11 +64,7 @@ function login() {
 
 <template>
     <form class="login-form" @submit.prevent="login">
-        <p>
-            <label v-if="loginError" class="error">
-                {{ errorResponse }}
-            </label>
-        </p>
+        <p v-if="loginError" class="error">{{ errorResponse }}</p>
         <div class="fields">
             <div class="field">
                 <label class="login-label" for="email">Email address</label>
@@ -98,7 +91,8 @@ function login() {
                     placeholder="Enter your password..."
                     required
                     title="Password format invalid."
-                    type="password" />
+                    type="password"
+                    autocomplete="off" />
             </div>
             <RouterLink to="/">Forgot your password?</RouterLink>
         </div>
