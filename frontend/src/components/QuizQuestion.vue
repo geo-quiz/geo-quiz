@@ -15,20 +15,20 @@ const props = defineProps({
 
 const isCorrect = ref(false);
 const isAnswered = ref(false);
-const isIncorrectAnswer = ref(true);
+const isIncorrect = ref(false);
+const selectedAnswerId = ref(0);
 
 const nrOfQuestions = ref(0);
 
-const CORRECT = 'Correct answer!';
-const INCORRECT = 'Wrong answer!';
-const noANSWER = 'No answer was given!';
+const answers = ref(new Map<number, boolean>());
 
-const msg = ref(INCORRECT);
 const timeLeft = ref(15);
 
 const currentQuiz = useCurrentQuizStore();
 
 let timer: number;
+
+let nextQuestionTimer: number;
 
 onMounted(() => {
     fetch(`http://localhost:3000/quiz/continent/${props.id}`)
@@ -37,6 +37,7 @@ onMounted(() => {
             currentQuiz.setQuestions(data);
             nrOfQuestions.value = currentQuiz.questions.length;
             countdown();
+            resetAnswerResponses();
         })
         .catch(() => {
             router.back();
@@ -48,6 +49,17 @@ onUnmounted(() => {
     currentQuiz.resetQuestions();
     clearInterval(timer);
 });
+
+function setAnswers() {
+    answers.value = new Map<number, boolean>();
+    for (const answer of currentQuiz.currentQuestion.answers) {
+        if (answer.id == currentQuiz.currentQuestion.correctAnswer) {
+            answers.value.set(answer.id, true);
+        } else {
+            answers.value.set(answer.id, false);
+        }
+    }
+}
 
 function countdown() {
     timer = setInterval(() => {
@@ -68,22 +80,24 @@ function resetCountdown() {
 function answerQuestion(selectedAnswer: IAnswer | undefined) {
     if (!isAnswered.value) {
         if (!selectedAnswer) {
-            msg.value = noANSWER;
             currentQuiz.setAnswer({ id: 0, answer: 'No answer was given' });
         } else {
+            selectedAnswerId.value = selectedAnswer.id;
             currentQuiz.setAnswer(selectedAnswer);
             const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
             const indexOfCorrect = findIndexOfCorrectAnswer();
 
             if (indexOfAnswer === indexOfCorrect) {
                 isCorrect.value = true;
-                msg.value = CORRECT;
-                isIncorrectAnswer.value = false;
+                isIncorrect.value = false;
             }
         }
     }
 
     isAnswered.value = true;
+    nextQuestionTimer = setTimeout(() => {
+        nextQuestion();
+    }, 5000);
 }
 
 function findIndexOfAnswer(selectedAnswer: IAnswer) {
@@ -96,28 +110,20 @@ function findIndexOfCorrectAnswer() {
     );
 }
 
-function getCorrectAnswer() {
-    const correct = currentQuiz.currentQuestion.answers[findIndexOfCorrectAnswer()];
-    if (correct) {
-        return correct.answer;
-    } else {
-        console.error('Correct answer not found');
-    }
-}
-
 function resetAnswerResponses() {
     isCorrect.value = false;
     isAnswered.value = false;
-    isIncorrectAnswer.value = true;
-    msg.value = INCORRECT;
+    isIncorrect.value = true;
+    setAnswers();
 }
 
 function nextQuestion() {
+    clearTimeout(nextQuestionTimer);
     if (currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
         router.push('/result');
     } else {
-        resetAnswerResponses();
         currentQuiz.nextQuestion();
+        resetAnswerResponses();
         resetCountdown();
     }
 }
@@ -145,7 +151,8 @@ function getTitle() {
 </script>
 
 <template>
-    <section v-if="currentQuiz.currentQuestion">
+    <div v-if="isAnswered" class="clickable" @click="nextQuestion"></div>
+    <main v-if="currentQuiz.currentQuestion">
         <h2 class="heading">{{ getTitle() }}</h2>
         <div class="wrapper">
             <QuizQuestionBoxes :nrOfQuestions="nrOfQuestions" />
@@ -161,21 +168,25 @@ function getTitle() {
                 </div>
             </div>
             <div class="answers">
-                <div v-for="(answer, index) in currentQuiz.currentQuestion.answers" :key="index" class="button-wrapper">
-                    <GeoButton size="answer" @click="answerQuestion(answer)">
+                <div v-for="answer in currentQuiz.currentQuestion.answers" :key="answer.id" class="button-wrapper">
+                    <GeoButton
+                        :class="[
+                            { correct: answers.get(answer.id) && isAnswered },
+                            { incorrect: !answers.get(answer.id) && isAnswered && selectedAnswerId === answer.id },
+                            { 'not-selected': !answers.get(answer.id) && isAnswered && selectedAnswerId !== answer.id },
+                        ]"
+                        size="answer"
+                        @click="answerQuestion(answer)">
+                        <div v-if="isAnswered">
+                            <CheckIcon v-if="answers.get(answer.id)" />
+                            <CloseIcon v-else-if="!answers.get(answer.id) && selectedAnswerId === answer.id" />
+                        </div>
                         {{ answer.answer }}
                     </GeoButton>
                 </div>
             </div>
-            <div v-if="isAnswered" class="answered">
-                <div>
-                    <p>{{ msg }}</p>
-                    <p v-if="isIncorrectAnswer">The correct answer is: {{ getCorrectAnswer() }}</p>
-                </div>
-                <GeoButton id="next-question-button" @click="nextQuestion"> Next question</GeoButton>
-            </div>
         </div>
-    </section>
+    </main>
 </template>
 
 <style scoped>
@@ -200,12 +211,51 @@ function getTitle() {
     width: calc(50% - var(--gap) / 2);
 }
 
+.clickable {
+    height: calc(100vh - 100px);
+    left: 0;
+    position: fixed;
+    top: 100px;
+    width: 100vw;
+    z-index: 1;
+}
+
+.correct,
+.correct:hover {
+    background: var(--color-green) !important;
+    color: white !important;
+    cursor: default;
+    opacity: 1 !important;
+}
+
+.score-text {
+    font-size: 1.5rem;
+    text-align: right;
+    width: 1.75rem;
+}
+
 .heading {
     color: var(--color-white);
     font-size: 2rem;
     margin: -8px 0;
     text-align: center;
     width: 100%;
+}
+
+.incorrect,
+.incorrect:hover {
+    background: var(--color-red) !important;
+    color: white !important;
+    cursor: default;
+    opacity: 1 !important;
+}
+
+.not-selected,
+.not-selected:hover {
+    background: var(--color-blue) !important;
+    color: var(--color-white) !important;
+    cursor: default;
+    opacity: 0.75;
 }
 
 .timer-and-points {
@@ -254,7 +304,7 @@ p {
     padding: 5px 10px;
 }
 
-section {
+main {
     display: flex;
     flex-wrap: wrap;
     gap: calc(var(--gap) * 2);
@@ -280,10 +330,6 @@ section {
 }
 
 @media only screen and (min-width: 768px) {
-    .question-div {
-        min-height: 150px;
-    }
-
     .question-text {
         font-size: 1.5rem;
     }
