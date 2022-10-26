@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import QuizQuestionBox from '@/components/QuizQuestionBox.vue';
-import { ref, onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 const props = defineProps({
     nrOfQuestions: {
         type: Number,
         required: true,
-    }
+    },
 });
 
 const size = ref('26px');
@@ -20,9 +20,9 @@ function setBoxSize(width: number) {
         return '30px';
     } else if (width >= 600 && width < 675) {
         return '32px';
-    }else if (width >= 675 && width < 750) {
+    } else if (width >= 675 && width < 750) {
         return '36px';
-    }else if (width >= 750) {
+    } else if (width >= 750) {
         return '40px';
     } else {
         return '26px';
@@ -45,7 +45,7 @@ onUnmounted(() => {
 
 <template>
     <div class="box-wrapper">
-        <QuizQuestionBox v-for="(index) in props.nrOfQuestions" :key="index" :index="index - 1" :size="size" />
+        <QuizQuestionBox v-for="index in props.nrOfQuestions" :key="index" :index="index - 1" :size="size" />
     </div>
 </template>
 
