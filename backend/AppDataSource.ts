@@ -23,8 +23,6 @@ export const AppDataSource = new DataSource({
     username: username,
     password: password,
     database: database,
-
-    entities: [Question, Continent, Answer, Account,Leaderboard],
     entities: [Question, Continent, Answer, Account, Role, Leaderboard],
     synchronize: true,
     logging: false,
