@@ -8,6 +8,8 @@ import ContinentView from '@/views/ContinentView.vue';
 import ProfileView from '@/views/ProfileView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
+import ContinentViewMobile from '@/views/ContinentViewMobile.vue';
+
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),

@@ -2,6 +2,9 @@
 import * as d3 from 'd3';
 import router from '@/router';
 import { onMounted } from 'vue';
+import ArrowLeftCircleOutlineIcon from 'vue-material-design-icons/ArrowLeftCircleOutline.vue';
+import ArrowRighttCircleOutlineIcon from 'vue-material-design-icons/ArrowRightCircleOutline.vue';
+
 
 onMounted(() => {
   // The svg
@@ -48,26 +51,8 @@ onMounted(() => {
           case 'Africa':
             router.push({ name: 'quiz-question', params: { id: 'africa' } });
             break;
-          case 'Asia':
-            router.push({ name: 'quiz-question', params: { id: 'asia' } });
-            break;
           case 'Europe':
             router.push({ name: 'quiz-question', params: { id: 'europe' } });
-            break;
-          case 'North America':
-            router.push({ name: 'quiz-question', params: { id: 'north-america' } });
-            break;
-          case 'South America':
-            router.push({ name: 'quiz-question', params: { id: 'south-america' } });
-            break;
-          case 'Oceania':
-            router.push({ name: 'quiz-question', params: { id: 'oceania' } });
-            break;
-          case 'World':
-            router.push({ name: 'quiz-question', params: { id: 'world' } });
-            break;
-          default:
-            router.push('/quiz');
             break;
         }
       }
@@ -104,18 +89,33 @@ onMounted(() => {
 
 <template>
   <div class="header_under__title">
-    <h1>Click on a continent to start the quiz</h1>
+    <h1>Europe / Asia</h1>
+    <p>Click to play</p>
     <div class="header_under__map">
-      <svg id="my_dataviz" width="1000" height="500"></svg>
+      <svg id="my_dataviz" width="250" height="300"></svg>
+
     </div>
+    <ArrowLeftCircleOutlineIcon
+        :size="48"
+        class="return-button"
+        fillColor="var(--color-white)"
+        @click="$router.back()" />
+    <ArrowRighttCircleOutlineIcon
+        :size="48"
+        class="return-button"
+        fillColor="var(--color-white)"
+        @click="$router.back()" />
   </div>
 </template>
 
 <style scoped>
 
+
 h1 {
   margin: 0
 }
+
+
 
 .header_under__title {
   display: flex;
