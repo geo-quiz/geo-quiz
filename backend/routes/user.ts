@@ -4,9 +4,11 @@ import bcrypt from 'bcrypt';
 import { AppDataSource } from '../AppDataSource';
 import { Account } from '../entities/Account';
 import jwt from 'jsonwebtoken';
+import { Role } from '../entities/Role';
 
 dotenv.config();
 const repository = AppDataSource.getRepository(Account);
+const roleRepository = AppDataSource.getRepository(Role);
 
 export const userRoute = Router();
 
@@ -66,14 +68,21 @@ userRoute.post('/register', (req, res) => {
                     }
 
                     const newAccount = new Account(email, hashedPassword);
-                    repository
-                        .save(newAccount)
-                        .then(() => {
-                            res.status(200).json({ msg: 'Account created' });
-                        })
-                        .catch((error) => {
-                            res.status(400).json({ errorMessage: 'Something went wrong', error: error });
-                        });
+                    roleRepository.findOneBy({ id: 1 }).then((role) => {
+                        if (role) {
+                            newAccount.role = role;
+                            repository
+                                .save(newAccount)
+                                .then(() => {
+                                    res.status(200).json({ msg: 'Account created' });
+                                })
+                                .catch((error) => {
+                                    res.status(400).json({ errorMessage: 'Something went wrong', error: error });
+                                });
+                        } else {
+                            res.status(400).json({ errorMessage: 'Something went wrong', error: 'Role not found' });
+                        }
+                    });
                 });
             })
             .catch((error) => {
@@ -123,9 +132,11 @@ userRoute.post('/login', (req, res) => {
                             .compare(password, account.passwordHash)
                             .then((validPass) => {
                                 if (validPass) {
-                                    const accessToken = jwt.sign({ email: account.email , role: account.role}, secretToken, {
-                                        expiresIn: 2629800000,
-                                    });
+                                    const accessToken = jwt.sign(
+                                        { email: account.email, role: account.role },
+                                        secretToken,
+                                        { expiresIn: 2629800000 },
+                                    );
                                     res.json({ accessToken: accessToken });
                                 } else {
                                     res.statusMessage = 'Invalid password or email';
