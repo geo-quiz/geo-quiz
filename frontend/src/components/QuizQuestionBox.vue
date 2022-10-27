@@ -26,8 +26,6 @@ let timer: number;
 
 onMounted(() => {
     quizStore.resetAnswers();
-    console.log('Store Length: ', quizStore.answers.length);
-    console.log('props.index value:', props.index);
 
     checkAnswer();
     timer = setInterval(() => {
@@ -37,6 +35,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     clearInterval(timer);
+    quizStore.resetAnswers();
 });
 
 function checkAnswer() {
