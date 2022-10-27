@@ -18,6 +18,9 @@ export class Leaderboard {
     @Column()
     time: number;
 
-    @OneToMany(() => Account, ((account) => account.id))
-    leaderboard: Account | undefined;
+    @ManyToOne(() => Account, ((account) => account.leaderboard))
+    account: Account | undefined;
+
+    @ManyToOne(() => Account, ((account) => account.id))
+    accounts: Account | undefined;
 }

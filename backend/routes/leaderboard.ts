@@ -26,14 +26,14 @@ leaderBoardRoute.get('/leaderboard/:id', (req, res) => {
 });
 
 
-
-leaderBoardRoute.get('/leaderboard/:displayName', (req, res) => {
-    const userName = req.params.displayName;
+leaderBoardRoute.get('/leaderboard/player/:displayName', (req, res) => {
+    const userName = (req.params.displayName as string).toLowerCase();
     console.log(userName);
 
     repository
-        .findOne({
-            where: { displayName: userName },
+        .find({
+            relations: ['accounts'],
+            where: { accounts: { displayName: userName } },
         })
         .then((leaderboard) => {
             res.status(200).json(leaderboard);
