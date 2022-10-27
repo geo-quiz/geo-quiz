@@ -91,24 +91,38 @@ onMounted(() => {
   <div class="header_under__title">
     <h1>Europe / Asia</h1>
     <p>Click to play</p>
+    <ArrowLeftCircleOutlineIcon
+      :size="60"
+      class="left-button"
+      fillColor="var(--color-white)"
+      @click="$router.back()" />
+    <ArrowRighttCircleOutlineIcon
+        :size="60"
+        class="right-button"
+        fillColor="var(--color-white)"
+        @click="router.push('/profile')" />
     <div class="header_under__map">
       <svg id="my_dataviz" width="250" height="300"></svg>
 
     </div>
-    <ArrowLeftCircleOutlineIcon
-        :size="48"
-        class="return-button"
-        fillColor="var(--color-white)"
-        @click="$router.back()" />
-    <ArrowRighttCircleOutlineIcon
-        :size="48"
-        class="return-button"
-        fillColor="var(--color-white)"
-        @click="$router.back()" />
+
+
   </div>
 </template>
 
 <style scoped>
+
+.left-button{
+  position: absolute;
+  top: 40%;
+  left: 0;
+  transform: translate(-0%, -30%);}
+
+.right-button{
+  position: absolute;
+  top: 40%;
+  right: 0;
+  transform: translate(0%, -30%);}
 
 
 h1 {
@@ -118,7 +132,7 @@ h1 {
 
 
 .header_under__title {
-  display: flex;
+  display: contents;
   flex-direction: column;
   align-items: center;
   justify-content: center;
