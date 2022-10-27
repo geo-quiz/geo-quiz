@@ -1,7 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Account } from './Account';
 
-
 @Entity()
 export class Leaderboard {
     constructor(score: number, time: number) {
@@ -17,9 +16,6 @@ export class Leaderboard {
 
     @Column()
     time: number;
-
-    @ManyToOne(() => Account, ((account) => account.leaderboard))
-    account: Account | undefined;
 
     @ManyToOne(() => Account, ((account) => account.id))
     accounts: Account | undefined;

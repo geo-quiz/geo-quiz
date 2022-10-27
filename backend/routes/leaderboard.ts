@@ -52,7 +52,6 @@ leaderBoardRoute.get(baseUrl, (_req, res) => {
             take :10,
         })
 
-
         .then((leaderboard) => {
             res.status(200).json(leaderboard);
         })
