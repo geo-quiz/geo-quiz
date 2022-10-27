@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
-import { onMounted, ref } from 'vue';
+import QuizQuestionBoxes from '@/components/QuizQuestionBoxes.vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import router from '@/router';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
 import type { IAnswer } from '@/utility/interfaces/IAnswer';
@@ -16,6 +17,8 @@ const isCorrect = ref(false);
 const isAnswered = ref(false);
 const isIncorrectAnswer = ref(true);
 
+const nrOfQuestions = ref(0);
+
 const CORRECT = 'Correct answer!';
 const INCORRECT = 'Wrong answer!';
 const noANSWER = 'No answer was given!';
@@ -25,11 +28,14 @@ const timeLeft = ref(15);
 
 const currentQuiz = useCurrentQuizStore();
 
+let timer: number;
+
 onMounted(() => {
     fetch(`http://localhost:3000/quiz/continent/${props.id}`)
         .then((response) => response.json())
         .then((data) => {
             currentQuiz.setQuestions(data);
+            nrOfQuestions.value = currentQuiz.questions.length;
             countdown();
         })
         .catch(() => {
@@ -38,17 +44,44 @@ onMounted(() => {
         });
 });
 
-function answerQuestion(selectedAnswer: IAnswer) {
-    if (!isAnswered.value) {
-        const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
-        const indexOfCorrect = findIndexOfCorrectAnswer();
+onUnmounted(() => {
+    clearInterval(timer);
+});
 
-        if (indexOfAnswer === indexOfCorrect) {
-            isCorrect.value = true;
-            msg.value = CORRECT;
-            isIncorrectAnswer.value = false;
+function countdown() {
+    timer = setInterval(() => {
+        if (!isAnswered.value) {
+            timeLeft.value--;
+            if (timeLeft.value <= 0) {
+                answerQuestion(undefined);
+            }
+        }
+    }, 1000);
+}
+
+function resetCountdown() {
+    timeLeft.value = 15;
+    isAnswered.value = false;
+}
+
+function answerQuestion(selectedAnswer: IAnswer | undefined) {
+    if (!isAnswered.value) {
+        if (!selectedAnswer) {
+            msg.value = noANSWER;
+            currentQuiz.setAnswer({ id: 0, answer: 'No answer was given' });
+        } else {
+            currentQuiz.setAnswer(selectedAnswer);
+            const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
+            const indexOfCorrect = findIndexOfCorrectAnswer();
+
+            if (indexOfAnswer === indexOfCorrect) {
+                isCorrect.value = true;
+                msg.value = CORRECT;
+                isIncorrectAnswer.value = false;
+            }
         }
     }
+
     isAnswered.value = true;
 }
 
@@ -108,39 +141,23 @@ function getTitle() {
             return 'Unknown';
     }
 }
-
-function countdown() {
-    const downloadTimer = setInterval(function () {
-        if (!isAnswered.value) {
-            timeLeft.value -= 1;
-            if (timeLeft.value <= 0) {
-                isAnswered.value = true;
-                msg.value = noANSWER;
-            }
-        } else {
-            clearInterval(downloadTimer);
-        }
-    }, 1000);
-}
-
-function resetCountdown() {
-    timeLeft.value = 15;
-    countdown();
-}
 </script>
 
 <template>
     <section v-if="currentQuiz.currentQuestion">
-        <h2 class="heading"> {{ getTitle() }}</h2>
+        <h2 class="heading">{{ getTitle() }}</h2>
         <div class="wrapper">
-            <div class="timer-and-level">
-                <div id="timer">
-                    <img id="clock" alt="clock icon" src="/images/icons8-clock.svg">
-                    <p id="countdown"> {{ timeLeft }}</p>
+            <QuizQuestionBoxes :nrOfQuestions="nrOfQuestions" />
+            <div class="also-wrapper">
+                <div class="timer-and-points">
+                    <div id="timer">
+                        <img alt="clock icon" src="/images/icons8-clock.svg" />
+                        <p id="countdown">{{ timeLeft }}</p>
+                    </div>
                 </div>
-            </div>
-            <div class="question-div">
-                <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
+                <div class="question-div">
+                    <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
+                </div>
             </div>
             <div class="answers">
                 <div v-for="(answer, index) in currentQuiz.currentQuestion.answers" :key="index" class="button-wrapper">
@@ -168,7 +185,7 @@ function resetCountdown() {
     flex-wrap: wrap;
     gap: var(--gap);
     justify-content: center;
-    width: 75%;
+    width: 100%;
 }
 
 .answered {
@@ -177,7 +194,7 @@ function resetCountdown() {
     flex-direction: column;
     gap: var(--gap);
     text-align: center;
-    width: 75%;
+    width: 100%;
 }
 
 .button-wrapper {
@@ -187,12 +204,12 @@ function resetCountdown() {
 .heading {
     color: var(--color-white);
     font-size: 2rem;
-    margin: 0;
+    margin: -8px 0;
     text-align: center;
     width: 100%;
 }
 
-.timer-and-level {
+.timer-and-points {
     align-items: center;
     background: var(--color-light-blue);
     border-radius: var(--radius);
@@ -200,26 +217,21 @@ function resetCountdown() {
     display: flex;
     height: 40px;
     justify-content: right;
-    width: 75%;
+    width: 100%;
 }
 
 #timer {
     align-items: center;
     display: flex;
     flex-direction: row;
-    gap: 4px;
+    gap: var(--gap);
     justify-content: flex-end;
     width: 50%;
 }
 
-#clock {
-    padding-right: 6vw;
-    position: fixed;
-}
-
 #countdown {
     font-size: 1.5rem;
-    margin-right: 3vw;
+    margin-right: var(--gap);
 }
 
 p {
@@ -232,9 +244,9 @@ p {
     border-radius: var(--radius);
     display: flex;
     justify-content: center;
-    min-height: 100px;
+    min-height: 300px;
     overflow-wrap: anywhere;
-    width: 75%;
+    width: 100%;
 }
 
 .question-text {
@@ -246,11 +258,13 @@ p {
 section {
     display: flex;
     flex-wrap: wrap;
-    gap: 50px;
+    gap: calc(var(--gap) * 2);
     justify-content: center;
+    min-width: 300px;
+    width: 75%;
 }
 
-.wrapper {
+.also-wrapper {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -258,22 +272,17 @@ section {
     width: 100%;
 }
 
+.wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--gap) * 2);
+    width: 100%;
+}
+
 @media only screen and (min-width: 768px) {
-    .answers {
-        width: 75%;
-    }
-
-    .answered {
-        width: 75%;
-    }
-
-    #next-question-button {
-        width: 30%;
-    }
-
     .question-div {
         min-height: 150px;
-        width: 75%;
     }
 
     .question-text {

@@ -7,6 +7,7 @@ import LoginView from '@/views/LoginView.vue';
 import ContinentView from '@/views/ContinentView.vue';
 import ProfileView from '@/views/ProfileView.vue';
 import RegisterView from '@/views/RegisterView.vue';
+import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,6 +52,11 @@ const router = createRouter({
             path: '/register',
             name: 'register',
             component: RegisterView,
+        },
+        {
+            path: '/forgot-password',
+            name: 'forgot-password',
+            component: ForgotPasswordView,
         },
     ],
 });

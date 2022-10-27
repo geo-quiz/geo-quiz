@@ -12,10 +12,8 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="center-vertical">
-        <PageHeader />
-        <QuizQuestion :id="props.id"/>
-    </div>
+    <PageHeader />
+    <QuizQuestion :id="props.id" />
 </template>
 
 <style scoped></style>
