@@ -3,7 +3,6 @@ import * as d3 from 'd3';
 import router from '@/router';
 import { onMounted } from 'vue';
 import ArrowLeftIcon from 'vue-material-design-icons/ArrowLeft.vue';
-import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue';
 
 
 onMounted(() => {
@@ -26,7 +25,7 @@ onMounted(() => {
   // Load external data and boot
   Promise.all([
     d3.json(
-        'https://gist.githubusercontent.com/Yuriks1/9a83cade3100b21589e02b864875c384/raw/1a65730048d10e907ff7031916c49de46fe04d3e/continents_afr_eur.json',
+        'https://gist.githubusercontent.com/Yuriks1/73026899d78fdbafd301f035815241f1/raw/b186fd8ea3101c959c459e3e15516ab93abef676/continents_asia_ocean.json',
     ),
   ]).then(function (loadData) {
     let topo: any = loadData[0];
@@ -48,11 +47,11 @@ onMounted(() => {
         console.log('clicked', target.id);
 
         switch (target.id) {
-          case 'Africa':
-            router.push({ name: 'quiz-question', params: { id: 'africa' } });
+          case 'Asia':
+            router.push({ name: 'quiz-question', params: { id: 'asia' } });
             break;
-          case 'Europe':
-            router.push({ name: 'quiz-question', params: { id: 'europe' } });
+          case 'Oceania':
+            router.push({ name: 'quiz-question', params: { id: 'oceania' } });
             break;
           default:
             router.push('/quizMob');
@@ -92,28 +91,26 @@ onMounted(() => {
 
 <template>
   <div class="header_under__title">
-    <h1>Europe / Asia</h1>
+    <h1>Asia / Oceania</h1>
     <p>Click to play</p>
     <ArrowLeftIcon
       :size="60"
       class="left-button"
       fillColor="var(--color-white)"
-      @click="router.push('/mobile-left')" />
-    <ArrowRightIcon
-        :size="60"
-        class="right-button"
-        fillColor="var(--color-white)"
-        @click="router.push('/mobile-right')" />
+      @click="router.push('/quizMob')" />
     <div class="header_under__map">
       <svg id="my_dataviz" width="600" height="490"></svg>
-
     </div>
-
-
   </div>
 </template>
 
 <style scoped>
+
+#my_dataviz{
+  transform: translate(-30%, 0%);
+
+}
+
 
 .left-button{
   position: absolute;
@@ -122,13 +119,6 @@ onMounted(() => {
   transform: translate(-0%, -30%);
   cursor: pointer;
 }
-
-.right-button{
-  position: absolute;
-  top: 40%;
-  right: 0;
-  transform: translate(0%, -30%);
-  cursor: pointer;}
 
 
 h1 {
@@ -145,7 +135,6 @@ h1 {
   margin-top: 116px;
   gap: calc(var(--gap) * 2);
 }
-
 .header_under__map {
   align-items: center;
   display: flex;

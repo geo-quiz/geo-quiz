@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import ContinentMapMobile from '@/components/ContinentMapMobile.vue';
+import ContinentMapMobileRight from '@/components/ContinentMapMobileRight.vue';
 import PageHeader from '@/components/PageHeader.vue';</script>
 
 <template>
   <PageHeader />
-  <ContinentMapMobile />
+  <ContinentMapMobileRight />
 </template>
 
 <style scoped></style>
