@@ -1,7 +1,15 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-const value = ref(false);
+const props = defineProps({
+    startingValue: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+});
+
+const value = ref(props.startingValue);
 </script>
 
 <template>
