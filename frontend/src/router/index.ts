@@ -58,6 +58,11 @@ const router = createRouter({
             name: 'forgot-password',
             component: ForgotPasswordView,
         },
+        {
+            path: '/quizMob',
+            name: 'quiz-mobile',
+            component: ContinentViewMobile,
+        },
     ],
 });
 
