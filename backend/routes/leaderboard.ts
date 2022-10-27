@@ -3,14 +3,13 @@ import { AppDataSource } from '../AppDataSource';
 import { Leaderboard } from '../entities/Leaderboard';
 
 
-
 const baseUrl = '/leaderboard';
 const repository = AppDataSource.getRepository(Leaderboard);
 
 //route
 export const leaderBoardRoute = Router();
 
-/*
+
 leaderBoardRoute.get('/leaderboard/:id', (req, res) => {
     const userId = Number.parseInt(req.params.id);
 
@@ -26,7 +25,6 @@ leaderBoardRoute.get('/leaderboard/:id', (req, res) => {
         );
 });
 
-*/
 
 
 leaderBoardRoute.get('/leaderboard/:displayName', (req, res) => {
@@ -46,12 +44,14 @@ leaderBoardRoute.get('/leaderboard/:displayName', (req, res) => {
 });
 
 
-
-
 leaderBoardRoute.get(baseUrl, (_req, res) => {
-
     repository
-        .find()
+        .find({
+            relations: ['accounts'],
+            order: { score: 'DESC' },
+            take :10,
+        })
+
 
         .then((leaderboard) => {
             res.status(200).json(leaderboard);
