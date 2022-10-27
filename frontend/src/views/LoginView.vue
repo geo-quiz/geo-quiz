@@ -5,13 +5,11 @@ import PageLogin from '@/components/PageLogin.vue';
 import PageFooter from '@/components/PageFooter.vue';</script>
 
 <template>
-    <div class="center-vertical">
         <MainMenuContainer noLogo>
             <PageHeader />
             <PageLogin />
             <PageFooter />
         </MainMenuContainer>
-    </div>
 </template>
 
 <style scoped>
