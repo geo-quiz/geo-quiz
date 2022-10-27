@@ -18,6 +18,11 @@ export const useCurrentQuizStore = defineStore('currentQuiz', () => {
         currentQuestionIndex.value++;
     }
 
+    function resetQuestions() {
+        questions.value = [];
+        currentQuestionIndex.value = 0;
+    }
+
     const answers = ref<IAnswer[]>([]);
 
     function setAnswer(selectedAnswer: IAnswer) {
@@ -34,6 +39,7 @@ export const useCurrentQuizStore = defineStore('currentQuiz', () => {
         currentQuestion,
         setQuestions,
         nextQuestion,
+        resetQuestions,
         answers,
         setAnswer,
         resetAnswers,
