@@ -2,8 +2,8 @@
 import * as d3 from 'd3';
 import router from '@/router';
 import { onMounted } from 'vue';
-import ArrowLeftCircleOutlineIcon from 'vue-material-design-icons/ArrowLeftCircleOutline.vue';
-import ArrowRighttCircleOutlineIcon from 'vue-material-design-icons/ArrowRightCircleOutline.vue';
+import ArrowLeftIcon from 'vue-material-design-icons/ArrowLeft.vue';
+import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue';
 
 
 onMounted(() => {
@@ -91,16 +91,16 @@ onMounted(() => {
   <div class="header_under__title">
     <h1>Europe / Asia</h1>
     <p>Click to play</p>
-    <ArrowLeftCircleOutlineIcon
+    <ArrowLeftIcon
       :size="60"
       class="left-button"
       fillColor="var(--color-white)"
-      @click="$router.back()" />
-    <ArrowRighttCircleOutlineIcon
+      @click="router.push('/mobile-left')" />
+    <ArrowRightIcon
         :size="60"
         class="right-button"
         fillColor="var(--color-white)"
-        @click="router.push('/profile')" />
+        @click="router.push('/mobile-right')" />
     <div class="header_under__map">
       <svg id="my_dataviz" width="250" height="300"></svg>
 

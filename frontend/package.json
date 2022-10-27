@@ -14,6 +14,8 @@
         "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path ../.gitignore"
     },
     "dependencies": {
+        "@mdi/font": "^7.0.96",
+        "@mdi/js": "^7.0.96",
         "d3": "^7.6.1",
         "d3-scale-chromatic": "^3.0.0",
         "mobile-device-detect": "^0.4.3",
