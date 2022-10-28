@@ -3,13 +3,13 @@ import GeoButton from '@/components/GeoButton.vue';
 import PageFooter from '@/components/PageFooter.vue';
 import router from '@/router';
 import MainMenuContainer from '@/components/MainMenuContainer.vue';
-import { isMobile } from 'mobile-device-detect';
+import { isMobileOnly	 } from 'mobile-device-detect';
 </script>
 
 <template>
         <MainMenuContainer>
             <div class="wrapper">
-                <GeoButton color="green" size="large" @click="router.push(isMobile?'/quizMob':'/quiz')"> Play now</GeoButton>
+                <GeoButton color="green" size="large" @click="router.push(isMobileOnly?'/quizMob':'/quiz')"> Play now</GeoButton>
                 <div class="buttons">
                     <div class="button-wrapper">
                         <GeoButton @click="router.push('/profile')">Profile</GeoButton>

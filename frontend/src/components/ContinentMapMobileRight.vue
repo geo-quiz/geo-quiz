@@ -2,7 +2,7 @@
 import * as d3 from 'd3';
 import router from '@/router';
 import { onMounted } from 'vue';
-import ArrowLeftIcon from 'vue-material-design-icons/ArrowLeft.vue';
+import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue';
 
 
 onMounted(() => {
@@ -95,7 +95,7 @@ onMounted(() => {
     <p>Click to play</p>
     <div class="header_under__map">
       <svg id="my_dataviz" width="600" height="490"></svg>
-      <ArrowLeftIcon
+      <ChevronLeft
           :size="60"
           class="left-button"
           fillColor="var(--color-white)"
@@ -115,7 +115,7 @@ onMounted(() => {
   position: absolute;
   top: 40%;
   left: 0;
-  transform: translate(-0%, -30%);
+  transform: translate(-0%, 90%);
   cursor: pointer;
 }
 
