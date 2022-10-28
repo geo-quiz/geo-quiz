@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
-import { onMounted, ref } from 'vue';
+import QuizQuestionBoxes from '@/components/QuizQuestionBoxes.vue';
+import CheckIcon from 'vue-material-design-icons/CheckCircleOutline.vue';
+import CloseIcon from 'vue-material-design-icons/CloseCircleOutline.vue';
+import ClockIcon from 'vue-material-design-icons/ClockTimeFourOutline.vue';
+import GlobeIcon from 'vue-material-design-icons/Earth.vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import router from '@/router';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
 import type { IAnswer } from '@/utility/interfaces/IAnswer';
@@ -14,23 +19,34 @@ const props = defineProps({
 
 const isCorrect = ref(false);
 const isAnswered = ref(false);
-const isIncorrectAnswer = ref(true);
+const isIncorrect = ref(false);
+const selectedAnswerId = ref(0);
 
-const CORRECT = 'Correct answer!';
-const INCORRECT = 'Wrong answer!';
-const noANSWER = 'No answer was given!';
+const nrOfQuestions = ref(0);
 
-const msg = ref(INCORRECT);
+const answers = ref(new Map<number, boolean>());
+
 const timeLeft = ref(15);
+const timeLeftAsString = ref('15');
+
+const points = ref(0);
+const pointsAsString = ref('00');
 
 const currentQuiz = useCurrentQuizStore();
+
+let timer: number;
+
+let nextQuestionTimer: number;
 
 onMounted(() => {
     fetch(`http://localhost:3000/quiz/continent/${props.id}`)
         .then((response) => response.json())
         .then((data) => {
             currentQuiz.setQuestions(data);
+            nrOfQuestions.value = currentQuiz.questions.length;
             countdown();
+            resetAnswerResponses();
+            currentQuiz.resetAnswers();
         })
         .catch(() => {
             router.back();
@@ -38,18 +54,66 @@ onMounted(() => {
         });
 });
 
-function answerQuestion(selectedAnswer: IAnswer) {
-    if (!isAnswered.value) {
-        const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
-        const indexOfCorrect = findIndexOfCorrectAnswer();
+onUnmounted(() => {
+    currentQuiz.resetQuestions();
+    currentQuiz.resetAnswers();
+    clearInterval(timer);
+});
 
-        if (indexOfAnswer === indexOfCorrect) {
-            isCorrect.value = true;
-            msg.value = CORRECT;
-            isIncorrectAnswer.value = false;
+function setAnswers() {
+    answers.value = new Map<number, boolean>();
+    for (const answer of currentQuiz.currentQuestion.answers) {
+        if (answer.id == currentQuiz.currentQuestion.correctAnswer) {
+            answers.value.set(answer.id, true);
+        } else {
+            answers.value.set(answer.id, false);
         }
     }
+}
+
+function countdown() {
+    timer = setInterval(() => {
+        if (!isAnswered.value) {
+            timeLeft.value--;
+            timeLeftAsString.value = timeLeft.value.toString();
+            if (timeLeft.value < 10) {
+                timeLeftAsString.value = '0' + timeLeftAsString.value;
+            }
+            if (timeLeft.value <= 0) {
+                answerQuestion(undefined);
+            }
+        }
+    }, 1000);
+}
+
+function resetCountdown() {
+    timeLeft.value = 15;
+    isAnswered.value = false;
+}
+
+function answerQuestion(selectedAnswer: IAnswer | undefined) {
+    if (!isAnswered.value) {
+        if (!selectedAnswer) {
+            currentQuiz.setAnswer({ id: 0, answer: 'No answer was given' });
+        } else {
+            selectedAnswerId.value = selectedAnswer.id;
+            currentQuiz.setAnswer(selectedAnswer);
+            const indexOfAnswer = findIndexOfAnswer(selectedAnswer);
+            const indexOfCorrect = findIndexOfCorrectAnswer();
+
+            if (indexOfAnswer === indexOfCorrect) {
+                isCorrect.value = true;
+                isIncorrect.value = false;
+                points.value++;
+                pointsAsString.value = 0 + points.value.toString();
+            }
+        }
+    }
+
     isAnswered.value = true;
+    nextQuestionTimer = setTimeout(() => {
+        nextQuestion();
+    }, 5000);
 }
 
 function findIndexOfAnswer(selectedAnswer: IAnswer) {
@@ -62,28 +126,20 @@ function findIndexOfCorrectAnswer() {
     );
 }
 
-function getCorrectAnswer() {
-    const correct = currentQuiz.currentQuestion.answers[findIndexOfCorrectAnswer()];
-    if (correct) {
-        return correct.answer;
-    } else {
-        console.error('Correct answer not found');
-    }
-}
-
 function resetAnswerResponses() {
     isCorrect.value = false;
     isAnswered.value = false;
-    isIncorrectAnswer.value = true;
-    msg.value = INCORRECT;
+    isIncorrect.value = true;
+    setAnswers();
 }
 
 function nextQuestion() {
+    clearTimeout(nextQuestionTimer);
     if (currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
         router.push('/result');
     } else {
-        resetAnswerResponses();
         currentQuiz.nextQuestion();
+        resetAnswerResponses();
         resetCountdown();
     }
 }
@@ -108,58 +164,51 @@ function getTitle() {
             return 'Unknown';
     }
 }
-
-function countdown() {
-    const downloadTimer = setInterval(function () {
-        if (!isAnswered.value) {
-            timeLeft.value -= 1;
-            if (timeLeft.value <= 0) {
-                isAnswered.value = true;
-                msg.value = noANSWER;
-            }
-        } else {
-            clearInterval(downloadTimer);
-        }
-    }, 1000);
-}
-
-function resetCountdown() {
-    timeLeft.value = 15;
-    countdown();
-}
 </script>
 
 <template>
-    <section v-if="currentQuiz.currentQuestion">
-        <h2 class="heading"> {{ getTitle() }}</h2>
+    <div v-if="isAnswered" class="clickable" @click="nextQuestion"></div>
+    <main v-if="currentQuiz.currentQuestion">
+        <h2 class="heading">{{ getTitle() }}</h2>
         <div class="wrapper">
-            <div class="timer-and-level">
-                <div id="timer">
-                    <img id="clock" alt="clock icon" src="/images/icons8-clock.svg">
-                    <p id="countdown"> {{ timeLeft }}</p>
+            <QuizQuestionBoxes :nrOfQuestions="nrOfQuestions" />
+            <div class="also-wrapper">
+                <div class="timer-and-points">
+                    <div id="points">
+                        <GlobeIcon :size="32" class="icon" />
+                        <p class="score-text">{{ pointsAsString }}</p>
+                    </div>
+                    <div id="timer">
+                        <ClockIcon :size="32" class="icon" />
+                        <p class="score-text">{{ timeLeftAsString }}</p>
+                    </div>
+                </div>
+                <div class="question-div">
+                    <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
                 </div>
             </div>
-            <div class="question-div">
-                <p class="question-text">{{ currentQuiz.currentQuestion.question }}</p>
-            </div>
             <div class="answers">
-                <div v-for="(answer, index) in currentQuiz.currentQuestion.answers" :key="index" class="button-wrapper">
-                    <GeoButton size="answer" @click="answerQuestion(answer)">
+                <div v-for="answer in currentQuiz.currentQuestion.answers" :key="answer.id" class="button-wrapper">
+                    <GeoButton
+                        :class="[
+                            { correct: answers.get(answer.id) && isAnswered },
+                            { incorrect: !answers.get(answer.id) && isAnswered && selectedAnswerId === answer.id },
+                            { 'not-selected': !answers.get(answer.id) && isAnswered && selectedAnswerId !== answer.id },
+                        ]"
+                        size="answer"
+                        @click="answerQuestion(answer)">
+                        <div v-if="isAnswered">
+                            <CheckIcon :size="32" v-if="answers.get(answer.id)" />
+                            <CloseIcon
+                                :size="32"
+                                v-else-if="!answers.get(answer.id) && selectedAnswerId === answer.id" />
+                        </div>
                         {{ answer.answer }}
                     </GeoButton>
                 </div>
             </div>
-            <div v-if="isAnswered" class="answered">
-                <div>
-                    <p>{{ msg }}</p>
-                    <p v-if="isIncorrectAnswer">The correct answer is: {{ getCorrectAnswer() }}</p>
-                </div>
-                <GeoButton id="next-question-button" font-size="1.125rem" @click="nextQuestion">
-                    Next question
-                </GeoButton>
-            </div>
         </div>
-    </section>
+    </main>
 </template>
 
 <style scoped>
@@ -168,31 +217,67 @@ function resetCountdown() {
     flex-wrap: wrap;
     gap: var(--gap);
     justify-content: center;
-    width: 75%;
-}
-
-.answered {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap);
-    text-align: center;
-    width: 75%;
+    width: 100%;
 }
 
 .button-wrapper {
     width: calc(50% - var(--gap) / 2);
 }
 
+.clickable {
+    height: calc(100vh - 100px);
+    left: 0;
+    position: fixed;
+    top: 100px;
+    width: 100vw;
+    z-index: 1;
+}
+
+.icon {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.correct,
+.correct:hover {
+    background: var(--color-green) !important;
+    color: white !important;
+    cursor: default;
+    opacity: 1 !important;
+}
+
+.score-text {
+    font-size: 1.5rem;
+    text-align: right;
+    width: 1.75rem;
+}
+
 .heading {
     color: var(--color-white);
     font-size: 2rem;
-    margin: 0;
+    margin: -8px 0;
     text-align: center;
     width: 100%;
 }
 
-.timer-and-level {
+.incorrect,
+.incorrect:hover {
+    background: var(--color-red) !important;
+    color: white !important;
+    cursor: default;
+    opacity: 1 !important;
+}
+
+.not-selected,
+.not-selected:hover {
+    background: var(--color-blue) !important;
+    color: var(--color-white) !important;
+    cursor: default;
+    opacity: 0.75;
+}
+
+.timer-and-points {
     align-items: center;
     background: var(--color-light-blue);
     border-radius: var(--radius);
@@ -200,26 +285,27 @@ function resetCountdown() {
     display: flex;
     height: 40px;
     justify-content: right;
-    width: 75%;
+    width: 100%;
 }
 
 #timer {
     align-items: center;
     display: flex;
     flex-direction: row;
-    gap: 4px;
+    gap: calc((var(--gap) / 3) * 2);
     justify-content: flex-end;
+    padding-right: var(--gap);
     width: 50%;
 }
 
-#clock {
-    padding-right: 6vw;
-    position: fixed;
-}
-
-#countdown {
-    font-size: 1.5rem;
-    margin-right: 3vw;
+#points {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: calc((var(--gap) / 3) * 2);
+    justify-content: flex-start;
+    padding-left: var(--gap);
+    width: 50%;
 }
 
 p {
@@ -232,9 +318,9 @@ p {
     border-radius: var(--radius);
     display: flex;
     justify-content: center;
-    min-height: 100px;
+    min-height: 250px;
     overflow-wrap: anywhere;
-    width: 75%;
+    width: 100%;
 }
 
 .question-text {
@@ -243,14 +329,16 @@ p {
     padding: 5px 10px;
 }
 
-section {
+main {
     display: flex;
     flex-wrap: wrap;
-    gap: 50px;
+    gap: calc(var(--gap) * 2);
     justify-content: center;
+    min-width: 300px;
+    width: 75%;
 }
 
-.wrapper {
+.also-wrapper {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -258,24 +346,15 @@ section {
     width: 100%;
 }
 
+.wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--gap) * 2);
+    width: 100%;
+}
+
 @media only screen and (min-width: 768px) {
-    .answers {
-        width: 75%;
-    }
-
-    .answered {
-        width: 75%;
-    }
-
-    #next-question-button {
-        width: 30%;
-    }
-
-    .question-div {
-        min-height: 150px;
-        width: 75%;
-    }
-
     .question-text {
         font-size: 1.5rem;
     }

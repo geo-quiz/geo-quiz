@@ -6,7 +6,6 @@ import MainMenuContainer from '@/components/MainMenuContainer.vue';
 </script>
 
 <template>
-    <div class="center-vertical">
         <MainMenuContainer>
             <div class="wrapper">
                 <GeoButton color="green" size="large" @click="router.push('/quiz')"> Play now</GeoButton>
@@ -27,7 +26,6 @@ import MainMenuContainer from '@/components/MainMenuContainer.vue';
             </div>
         </MainMenuContainer>
         <PageFooter />
-    </div>
 </template>
 
 <style scoped>

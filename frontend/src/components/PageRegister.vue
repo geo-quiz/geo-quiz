@@ -116,75 +116,78 @@ function correctingPassword() {
 </script>
 
 <template>
-    <form id="register-form" @submit.prevent="submitIfValid">
-        <div class="fields">
-            <div class="field">
-                <label class="register-label" for="email">Email address</label>
-                <input
-                    id="email"
-                    v-model="email"
-                    autocomplete="off"
-                    class="input"
-                    name="email"
-                    pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,63}$"
-                    placeholder="Enter your email address..."
-                    required
-                    title="Must be a valid email address. (Example@email.com)."
-                    type="email"
-                    @input="correctingEmail" />
-                <label v-if="isErrorEmail" class="error">{{ errorEmail }}</label>
-            </div>
-            <div class="field">
-                <label class="register-label" for="password">Password</label>
-                <input
-                    id="password"
-                    v-model="password"
-                    autocomplete="off"
-                    class="input"
-                    name="password"
-                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$"
-                    placeholder="Enter your password..."
-                    required
-                    title="Password must contain at least 8 characters, including one lowercase letter, one uppercase letter and one number. Password must not contain any symbols."
-                    type="password"
-                    @input="isValidPassword" />
+    <main>
+        <h2>Register</h2>
+        <form id="register-form" @submit.prevent="submitIfValid">
+            <div class="fields">
+                <div class="field">
+                    <label class="register-label" for="email">Email address</label>
+                    <input
+                        id="email"
+                        v-model="email"
+                        autocomplete="off"
+                        class="input"
+                        name="email"
+                        pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,63}$"
+                        placeholder="Enter your email address..."
+                        required
+                        title="Must be a valid email address. (Example@email.com)."
+                        type="email"
+                        @input="correctingEmail" />
+                    <label v-if="isErrorEmail" class="error">{{ errorEmail }}</label>
+                </div>
+                <div class="field">
+                    <label class="register-label" for="password">Password</label>
+                    <input
+                        id="password"
+                        v-model="password"
+                        autocomplete="off"
+                        class="input"
+                        name="password"
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$"
+                        placeholder="Enter your password..."
+                        required
+                        title="Password must contain at least 8 characters, including one lowercase letter, one uppercase letter and one number. Password must not contain any symbols."
+                        type="password"
+                        @input="isValidPassword" />
 
-                <label class="register-label" for="password">Confirm password</label>
-                <input
-                    v-model="confirmPassword"
-                    autocomplete="off"
-                    class="input"
-                    name="password"
-                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$"
-                    placeholder="Enter your password..."
-                    required
-                    title="Password must contain at least 8 characters, including one lowercase letter, one uppercase letter and one number. Password must not contain any symbols."
-                    type="password"
-                    @input="isValidPassword" />
-                <span class="label-wrapper" v-if="confirmPassword.length > 0">
+                    <label class="register-label" for="password">Confirm password</label>
+                    <input
+                        v-model="confirmPassword"
+                        autocomplete="off"
+                        class="input"
+                        name="password"
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$"
+                        placeholder="Enter your password..."
+                        required
+                        title="Password must contain at least 8 characters, including one lowercase letter, one uppercase letter and one number. Password must not contain any symbols."
+                        type="password"
+                        @input="isValidPassword" />
+                    <span v-if="confirmPassword.length > 0" class="label-wrapper">
                     <label
                         v-if="isErrorPassword || !isEqualPassword || passwordNotFilledOut || !isPasswordValid"
                         class="error">
                         {{ errorPassword }}
                     </label>
                 </span>
+                </div>
             </div>
-        </div>
-        <div class="register">
-            <GeoButton color="green"> Register</GeoButton>
-        </div>
-        <div class="existing-user">
-            <p>
-                Already a user?
-                <RouterLink to="/login">Login to your account.</RouterLink>
-            </p>
-        </div>
-        <PageNotification v-if="awaitingResponse">
-            <div id="notification-wrapper">
-                <PageLoad />
+            <div class="register">
+                <GeoButton color="green"> Register</GeoButton>
             </div>
-        </PageNotification>
-    </form>
+            <div class="existing-user">
+                <p>
+                    Already a user?
+                    <RouterLink to="/login">Login to your account.</RouterLink>
+                </p>
+            </div>
+            <PageNotification v-if="awaitingResponse">
+                <div id="notification-wrapper">
+                    <PageLoad />
+                </div>
+            </PageNotification>
+        </form>
+    </main>
 </template>
 
 <style scoped>
@@ -221,6 +224,14 @@ a {
     justify-content: center;
 }
 
+h2 {
+    color: var(--color-white);
+    font-size: 2rem;
+    text-align: center;
+    width: 100%;
+    margin: -8px 0;
+}
+
 #notification-wrapper {
     align-items: center;
     background: var(--color-dark-blue);
@@ -229,6 +240,15 @@ a {
     height: 175px;
     justify-content: center;
     width: 80%;
+}
+
+main {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--gap) * 2);
+    justify-content: center;
+    width: 90%;
 }
 
 .register {
@@ -247,7 +267,6 @@ a {
     display: flex;
     flex-direction: column;
     gap: calc(var(--gap) * 2);
-    margin-top: 150px;
     width: 90%;
 }
 
@@ -263,17 +282,5 @@ a {
     margin: 0;
     padding: 0;
     text-align: center;
-}
-
-@media only screen and (min-width: 768px) {
-    #register-form {
-        width: 75%;
-    }
-}
-
-@media only screen and (min-width: 1024px) {
-    #register-form {
-        width: 50%;
-    }
 }
 </style>
