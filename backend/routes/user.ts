@@ -3,7 +3,7 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { AppDataSource } from '../AppDataSource';
 import { Account } from '../entities/Account';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Role } from '../entities/Role';
 
 dotenv.config();
@@ -175,6 +175,45 @@ userRoute.post('/login', (req, res) => {
         return;
     } else {
         res.statusMessage = 'Missing email and password';
+        res.status(400).end();
+        return;
+    }
+});
+
+userRoute.post('/validate', (req, res) => {
+    const body = req.body;
+    if (body.token && body.password) {
+        jwt.verify(body.token, secretToken, {}, (error, decoded) => {
+            console.log('error: ', error);
+            console.log('decoded: ', decoded);
+            if (error) {
+                res.statusMessage = 'Invalid token';
+                res.status(400).end();
+                return;
+            }
+            if (decoded) {
+                repository.findOneBy({ email: (decoded as JwtPayload).email }).then((account) => {
+                    if (account) {
+                        bcrypt.compare(body.password, account.passwordHash).then((validPass) => {
+                            if (validPass) {
+                                res.status(200).json({ msg: 'Correct password' });
+                                return;
+                            } else {
+                                res.statusMessage = 'Incorrect password';
+                                res.status(400).end();
+                                return;
+                            }
+                        });
+                    } else {
+                        res.statusMessage = 'Account not found';
+                        res.status(400).end();
+                        return;
+                    }
+                });
+            }
+        });
+    } else {
+        res.statusMessage = 'Missing token and/or password';
         res.status(400).end();
         return;
     }
