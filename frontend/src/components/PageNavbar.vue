@@ -4,10 +4,17 @@ import { useAuthStore } from '@/stores/auth';
 
 const isTouchScreen = ref(true);
 const TOUCHSCREEN_MAX_WIDTH = 1024;
+const isLoggedIn = ref(false);
+const authStore = useAuthStore();
+const loginOrLogout = ref('Login');
 
 onMounted(() => {
     window.addEventListener('resize', onResize);
     onResize();
+    if (localStorage.getItem('token') || sessionStorage.getItem('token')) {
+        isLoggedIn.value = true;
+    }
+    checkRoute();
 });
 
 onUnmounted(() => {
@@ -18,19 +25,18 @@ function onResize() {
     isTouchScreen.value = window.innerWidth < TOUCHSCREEN_MAX_WIDTH;
 }
 
-onMounted(() => {
-    window.addEventListener('resize', onResize);
-    onResize();
-});
-
-onUnmounted(() => {
-    window.removeEventListener('resize', onResize);
-});
-
-const authStore = useAuthStore();
+function checkRoute() {
+    if(!isLoggedIn.value) {
+        loginOrLogout.value = 'Login';
+    } else {
+        loginOrLogout.value = 'Logout';
+    }
+}
 
 function logout() {
-    authStore.logout();
+    if(loginOrLogout.value === 'Logout') {
+        authStore.logout();
+    }
 }
 </script>
 
@@ -46,7 +52,7 @@ function logout() {
             <nav class="nav-list">
                 <RouterLink to="/home">Home</RouterLink>
                 <RouterLink to="/profile">Profile</RouterLink>
-                <RouterLink to="/" @click="logout()">Log out</RouterLink>
+                <RouterLink to="/" @click="logout()">{{ loginOrLogout }}</RouterLink>
             </nav>
         </div>
     </div>
@@ -54,7 +60,7 @@ function logout() {
         <nav class="nav-list">
             <RouterLink to="/home">Home</RouterLink>
             <RouterLink to="/profile">Profile</RouterLink>
-            <RouterLink to="/" @click="logout()">Log out</RouterLink>
+            <RouterLink to="/" @click="logout()">{{ loginOrLogout }}</RouterLink>
         </nav>
     </div>
 </template>
