@@ -119,42 +119,52 @@ userRoute.post('/login', (req, res) => {
             res.statusMessage = 'Invalid email format';
             res.status(400).end();
         } else
-            repository.findOneBy({ email: email }).then((account) => {
-                if (account) {
-                    const password = body.password as string;
-                    const passwordHash = account.passwordHash as string;
-                    if (passwordHash === undefined) {
-                        console.log('passwordHash is undefined');
-                        res.statusMessage = 'Problem with database password';
-                        res.status(400).end();
-                    } else {
-                        bcrypt
-                            .compare(password, account.passwordHash)
-                            .then((validPass) => {
-                                if (validPass) {
-                                    const accessToken = jwt.sign(
-                                        { email: account.email, role: account.role },
-                                        secretToken,
-                                        { expiresIn: 2629800000 },
-                                    );
-                                    res.json({ accessToken: accessToken });
-                                } else {
-                                    res.statusMessage = 'Invalid password or email';
+            repository
+                .findOne({
+                    relations: { role: true },
+                    where: { email: email },
+                })
+                .then((account) => {
+                    if (account) {
+                        const password = body.password as string;
+                        const passwordHash = account.passwordHash as string;
+                        if (passwordHash === undefined) {
+                            console.log('passwordHash is undefined');
+                            res.statusMessage = 'Problem with database password';
+                            res.status(400).end();
+                        } else {
+                            bcrypt
+                                .compare(password, account.passwordHash)
+                                .then((validPass) => {
+                                    if (account.role) {
+                                        if (validPass) {
+                                            const accessToken = jwt.sign(
+                                                { email: account.email, role: account.role.id },
+                                                secretToken,
+                                                { expiresIn: 2629800000 },
+                                            );
+                                            res.json({ accessToken: accessToken });
+                                        } else {
+                                            res.statusMessage = 'Invalid password or email';
+                                            res.status(400).end();
+                                        }
+                                    } else {
+                                        res.statusMessage = 'Invalid account, contact website administrator';
+                                        res.status(400).end();
+                                    }
+                                })
+                                .catch((err) => {
+                                    console.log('error: ' + err);
+                                    res.statusMessage = 'Something went wrong while checking the password';
                                     res.status(400).end();
-                                }
-                            })
-                            .catch((err) => {
-                                console.log('error: ' + err);
-                                res.statusMessage = 'Something went wrong while checking the password';
-                                res.status(400).end();
-                            });
+                                });
+                        }
+                    } else {
+                        res.statusMessage = 'Invalid password or email';
+                        res.status(400).end();
                     }
-                } else {
-                    res.statusMessage = 'Invalid password or email';
-                    res.status(400).end();
-                }
-                return;
-            });
+                    return;
+                });
     } else if (!body.password && body.email) {
         res.statusMessage = 'Missing password';
         res.status(400).end();
