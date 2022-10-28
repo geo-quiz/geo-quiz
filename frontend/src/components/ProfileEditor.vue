@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
+import GeoCheckbox from '@/components/GeoCheckbox.vue';
 import PageNotification from '@/components/PageNotification.vue';
 import { onMounted, ref } from 'vue';
 
@@ -18,7 +19,7 @@ const isPasswordValid = ref(false);
 const deleteAccountPassword = ref('');
 const showConfirmDeleteAccount = ref(false);
 const confirmDeleteAccount = ref(false);
-const isLeaderboardChecked = ref(false);
+const isLeaderboardChecked = ref(true);
 
 const imageRef = ref('');
 
@@ -75,6 +76,10 @@ function submitIfValid() {
     }
 }
 
+function updateLeaderboardCheckedValue(value: boolean) {
+    isLeaderboardChecked.value = value;
+}
+
 onMounted(() => {
     if (user) {
         displayName.value = user.displayName;
@@ -118,8 +123,8 @@ onMounted(() => {
                     <input
                         id="new-password"
                         v-model="newPassword"
-                        name="new-password"
                         autocomplete="off"
+                        name="new-password"
                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$"
                         placeholder="Enter a new password..."
                         title="Password must contain at least 8 characters, including one lowercase letter, one uppercase letter and one number. Password must not contain any symbols."
@@ -144,22 +149,9 @@ onMounted(() => {
                 </label>
             </div>
             <div>
-                <div class="item">
-                    <input
-                        id="cbx"
-                        :value="isLeaderboardChecked"
-                        class="inp-cbx"
-                        style="display: none"
-                        type="checkbox" />
-                    <label class="cbx" for="cbx">
-                        <span>
-                            <svg height="10px" viewbox="0 0 12 10" width="12px">
-                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                            </svg>
-                        </span>
-                        <span>Leaderboard participation</span>
-                    </label>
-                </div>
+                <GeoCheckbox :startingValue="isLeaderboardChecked" @value="updateLeaderboardCheckedValue">
+                    Leaderboard participation
+                </GeoCheckbox>
             </div>
             <div class="field">
                 <label for="display-name">Current Password</label>
@@ -312,88 +304,5 @@ main {
     padding: 10px 20px;
     text-align: center;
     width: fit-content;
-}
-
-/*Rules for checkbox*/
-.cbx {
-    cursor: pointer;
-    margin: auto;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-.cbx span {
-    display: inline-block;
-    transform: translate3d(0, 0, 0);
-    vertical-align: middle;
-}
-
-.cbx span:first-child {
-    border: 2px solid var(--color-light-green);
-    border-radius: 4px;
-    height: 24px;
-    position: relative;
-    transform: scale(1);
-    transition: all 0.2s ease;
-    vertical-align: middle;
-    width: 24px;
-}
-
-.cbx span:first-child svg {
-    fill: none;
-    left: 6px;
-    position: absolute;
-    stroke: var(--color-white);
-    stroke-dasharray: 16px;
-    stroke-dashoffset: 16px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 2;
-    top: 7px;
-    transform: translate3d(0, 0, 0);
-    transition: all 0.3s ease;
-    transition-delay: 0.1s;
-}
-
-.cbx span:first-child:before {
-    background: var(--color-light-green);
-    border-radius: 50%;
-    content: '';
-    display: block;
-    height: 100%;
-    opacity: 1;
-    transform: scale(0);
-    width: 100%;
-}
-
-.cbx span:last-child {
-    padding-left: 8px;
-}
-
-.cbx:hover span:first-child {
-    border-color: var(--color-light-green);
-}
-
-.inp-cbx:checked + .cbx span:first-child {
-    animation: wave 0.4s ease;
-
-    background: var(--color-light-green);
-    border-color: var(--color-light-green);
-}
-
-.inp-cbx:checked + .cbx span:first-child svg {
-    stroke-dashoffset: 0;
-}
-
-.inp-cbx:checked + .cbx span:first-child:before {
-    opacity: 0;
-    transform: scale(3.5);
-    transition: all 0.6s ease;
-}
-
-@keyframes wave {
-    50% {
-        transform: scale(0.9);
-    }
 }
 </style>
