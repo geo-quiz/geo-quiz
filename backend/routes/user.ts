@@ -3,7 +3,7 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { AppDataSource } from '../AppDataSource';
 import { Account } from '../entities/Account';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import { Role } from '../entities/Role';
 
 dotenv.config();
@@ -20,92 +20,77 @@ const emailPattern = /^[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9
 //routes
 userRoute.post('/register', (req, res) => {
     const body = req.body;
-    let password = '';
-    let email = '';
 
-    if (body.password && body.email) {
+    if (body.password && body.email && body.displayName) {
         if (!passwordPattern.test(body.password) && !emailPattern.test(body.email)) {
-            res.status(400).json({
-                errorMessage: 'Password & Email do not meet the requirements',
-                error:
-                    'Invalid email address & password. Password must contain at least 8 characters, one lowercase' +
-                    ' letter, one uppercase letter and one number. It must NOT contain any symbols',
-            });
+            res.statusMessage = 'Password & Email do not meet the requirements';
+            res.status(400).end();
             return;
         }
 
-        password = body.password as string;
+        const password = body.password as string;
 
         if (!passwordPattern.test(password)) {
-            res.status(400).json({
-                errorMessage: 'Password does not meet the requirements',
-                error:
-                    'Password must contain at least 8 characters, one lowercase letter, one uppercase letter and' +
-                    ' one number. It must NOT contain any symbols',
-            });
+            res.statusMessage = 'Password does not meet the requirements';
+            res.status(400).end();
             return;
         }
 
         bcrypt
             .hash(password, 10)
             .then((hashedPassword: string) => {
-                email = body.email as string;
+                const email = body.email as string;
                 if (!emailPattern.test(email)) {
-                    res.status(400).json({
-                        errorMessage: 'Email is not valid',
-                        error: 'Invalid email address',
-                    });
+                    res.statusMessage = 'Invalid email address';
+                    res.status(400).end();
                     return;
                 }
 
                 repository.findOneBy({ email: email }).then((account) => {
                     if (account) {
-                        res.status(400).json({
-                            errorMessage: 'Email already exists',
-                            error: `Account with email: ${email} already exists`,
-                        });
+                        res.statusMessage = 'Email already exists';
+                        res.status(400).end();
                         return;
                     }
 
-                    const newAccount = new Account(email, hashedPassword);
+                    const newAccount = new Account(email, body.displayName as string, hashedPassword);
                     roleRepository.findOneBy({ id: 1 }).then((role) => {
                         if (role) {
                             newAccount.role = role;
                             repository
                                 .save(newAccount)
                                 .then(() => {
-                                    res.status(200).json({ msg: 'Account created' });
+                                    res.status(201).json({ msg: 'Account created' });
+                                    return;
                                 })
                                 .catch((error) => {
-                                    res.status(400).json({ errorMessage: 'Something went wrong', error: error });
+                                    res.statusMessage = 'Something went wrong when saving account details';
+                                    res.status(400).json({ error: error }).end();
+                                    return;
                                 });
                         } else {
-                            res.status(400).json({ errorMessage: 'Something went wrong', error: 'Role not found' });
+                            res.statusMessage = 'Role not found';
+                            res.status(400).end();
+                            return;
                         }
                     });
                 });
             })
             .catch((error) => {
-                res.status(400).json({ errorMessage: 'Something went wrong', error: error });
+                res.statusMessage = 'Something went wrong when hashing password';
+                res.status(400).json({ error: error }).end();
                 return;
             });
-    } else if (!body.password && body.email) {
-        res.status(400).json({
-            errorMessage: 'Missing parameters',
-            error: 'Request must contain parameters: password',
-        });
-        return;
-    } else if (!body.email && body.password) {
-        res.status(400).json({
-            errorMessage: 'Missing parameters',
-            error: 'Request must contain parameters: email',
-        });
-        return;
     } else {
-        res.status(400).json({
-            errorMessage: 'Missing parameters',
-            error: 'Request must contain parameters: email and password',
-        });
+        const email = body.email ? body.email : 'undefined';
+        const displayName = body.displayName ? body.displayName : 'undefined';
+        const password = body.password ? body.password : 'undefined';
+        res.statusMessage = 'Missing parameters';
+        res.status(400)
+            .json({
+                parameters: { email: email, displayName: displayName, password: password },
+            })
+            .end();
         return;
     }
 });
@@ -118,6 +103,7 @@ userRoute.post('/login', (req, res) => {
             console.log('Email is wrong');
             res.statusMessage = 'Invalid email format';
             res.status(400).end();
+            return;
         } else
             repository
                 .findOne({
@@ -132,6 +118,7 @@ userRoute.post('/login', (req, res) => {
                             console.log('passwordHash is undefined');
                             res.statusMessage = 'Problem with database password';
                             res.status(400).end();
+                            return;
                         } else {
                             bcrypt
                                 .compare(password, account.passwordHash)
@@ -147,23 +134,26 @@ userRoute.post('/login', (req, res) => {
                                         } else {
                                             res.statusMessage = 'Invalid password or email';
                                             res.status(400).end();
+                                            return;
                                         }
                                     } else {
                                         res.statusMessage = 'Invalid account, contact website administrator';
                                         res.status(400).end();
+                                        return;
                                     }
                                 })
                                 .catch((err) => {
                                     console.log('error: ' + err);
                                     res.statusMessage = 'Something went wrong while checking the password';
                                     res.status(400).end();
+                                    return;
                                 });
                         }
                     } else {
                         res.statusMessage = 'Invalid password or email';
                         res.status(400).end();
+                        return;
                     }
-                    return;
                 });
     } else if (!body.password && body.email) {
         res.statusMessage = 'Missing password';
@@ -281,6 +271,7 @@ userRoute.post('/update', (req, res) => {
                                         .catch((err) => {
                                             res.statusMessage = 'Something went wrong while updating the account';
                                             res.status(400).json({ msg: err }).end();
+                                            return;
                                         });
                                 }
                             } else {
