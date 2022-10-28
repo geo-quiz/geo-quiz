@@ -38,6 +38,3 @@ frontend/*.sw?
 
 # User-specific files
 backend/.env
-
-# Other
-frontend/tsconfig.app.tsbuildinfo
