@@ -93,13 +93,13 @@ onMounted(() => {
   <div class="header_under__title">
     <h1>Asia / Oceania</h1>
     <p>Click to play</p>
-    <ArrowLeftIcon
-      :size="60"
-      class="left-button"
-      fillColor="var(--color-white)"
-      @click="router.push('/quizMob')" />
     <div class="header_under__map">
       <svg id="my_dataviz" width="600" height="490"></svg>
+      <ArrowLeftIcon
+          :size="60"
+          class="left-button"
+          fillColor="var(--color-white)"
+          @click="$router.back()" />
     </div>
   </div>
 </template>
@@ -111,7 +111,6 @@ onMounted(() => {
 
 }
 
-
 .left-button{
   position: absolute;
   top: 40%;
@@ -120,12 +119,9 @@ onMounted(() => {
   cursor: pointer;
 }
 
-
 h1 {
   margin: 0
 }
-
-
 
 .header_under__title {
   display: contents;

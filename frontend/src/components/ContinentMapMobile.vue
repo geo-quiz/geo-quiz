@@ -94,19 +94,18 @@ onMounted(() => {
   <div class="header_under__title">
     <h1>Europe / Asia</h1>
     <p>Click to play</p>
-    <ArrowLeftIcon
-      :size="60"
-      class="left-button"
-      fillColor="var(--color-white)"
-      @click="router.push('/mobile-left')" />
-    <ArrowRightIcon
-        :size="60"
-        class="right-button"
-        fillColor="var(--color-white)"
-        @click="router.push('/mobile-right')" />
     <div class="header_under__map">
       <svg id="my_dataviz" width="600" height="490"></svg>
-
+      <ArrowLeftIcon
+          :size="60"
+          class="left-button"
+          fillColor="var(--color-white)"
+          @click="router.push('/mobile-left')" />
+      <ArrowRightIcon
+          :size="60"
+          class="right-button"
+          fillColor="var(--color-white)"
+          @click="router.push('/mobile-right')" />
     </div>
 
 
@@ -114,6 +113,9 @@ onMounted(() => {
 </template>
 
 <style scoped>
+#my_dataviz{
+  transform: translate(-5%, 0%);
+}
 
 .left-button{
   position: absolute;
@@ -134,8 +136,6 @@ onMounted(() => {
 h1 {
   margin: 0
 }
-
-
 
 .header_under__title {
   display: contents;
