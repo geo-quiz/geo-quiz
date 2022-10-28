@@ -180,10 +180,17 @@ userRoute.post('/login', (req, res) => {
     }
 });
 
+function verifyToken(
+    token: string,
+    callback: (err: VerifyErrors | null, decoded: JwtPayload | string | undefined) => void,
+) {
+    jwt.verify(token, secretToken, callback);
+}
+
 userRoute.post('/validate', (req, res) => {
     const body = req.body;
     if (body.token && body.password) {
-        jwt.verify(body.token, secretToken, {}, (error, decoded) => {
+        verifyToken(body.token, (error, decoded) => {
             console.log('error: ', error);
             console.log('decoded: ', decoded);
             if (error) {
@@ -214,6 +221,84 @@ userRoute.post('/validate', (req, res) => {
         });
     } else {
         res.statusMessage = 'Missing token and/or password';
+        res.status(400).end();
+        return;
+    }
+});
+
+userRoute.post('/update', (req, res) => {
+    const token = req.body.token;
+
+    if (token) {
+        verifyToken(token, (error, decoded) => {
+            if (error) {
+                res.statusMessage = 'Invalid token';
+                res.status(400).end();
+                return;
+            }
+            if (decoded) {
+                if ((decoded as JwtPayload).email) {
+                    const email = (decoded as JwtPayload).email;
+
+                    const body = req.body.account;
+                    if (body) {
+                        repository.findOneBy({ email: email }).then((account) => {
+                            if (account) {
+                                if (body.displayName) {
+                                    account.displayName = body.displayName as string;
+                                }
+                                if (body.profilePicture) {
+                                    account.profilePicture = body.profilePicture as string;
+                                }
+                                if (body.leaderboardParticipation) {
+                                    if (body.leaderboardParticipation as boolean) {
+                                        account.leaderboardParticipation = 1;
+                                    } else {
+                                        account.leaderboardParticipation = 0;
+                                    }
+                                }
+                                if (body.password) {
+                                    if (passwordPattern.test(body.password as string)) {
+                                        bcrypt.hash(body.password as string, 10).then((hash) => {
+                                            account.passwordHash = hash;
+                                            repository.save(account).then(() => {
+                                                res.status(200).json({ msg: 'Account updated' });
+                                                return;
+                                            });
+                                        });
+                                    } else {
+                                        res.statusMessage = 'Invalid password format';
+                                        res.status(400).end();
+                                        return;
+                                    }
+                                } else {
+                                    repository
+                                        .save(account)
+                                        .then(() => {
+                                            res.status(200).json({ msg: 'Account updated' });
+                                            return;
+                                        })
+                                        .catch((err) => {
+                                            res.statusMessage = 'Something went wrong while updating the account';
+                                            res.status(400).json({ msg: err }).end();
+                                        });
+                                }
+                            } else {
+                                res.statusMessage = 'Account not found';
+                                res.status(404).end();
+                                return;
+                            }
+                        });
+                    } else {
+                        res.statusMessage = 'Missing parameters';
+                        res.status(400).end();
+                        return;
+                    }
+                }
+            }
+        });
+    } else {
+        res.statusMessage = 'Missing parameters';
         res.status(400).end();
         return;
     }
