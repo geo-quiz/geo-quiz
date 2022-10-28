@@ -46,34 +46,44 @@ userRoute.post('/register', (req, res) => {
                     return;
                 }
 
-                repository.findOneBy({ email: email }).then((account) => {
-                    if (account) {
-                        res.statusMessage = 'Email already exists';
+                const displayName = body.displayName as string;
+
+                repository.findOneBy({ displayName: displayName }).then((account) => {
+                    if (!account) {
+                        repository.findOneBy({ email: email }).then((account) => {
+                            if (account) {
+                                res.statusMessage = 'Email already exists';
+                                res.status(400).end();
+                                return;
+                            }
+
+                            const newAccount = new Account(email, displayName as string, hashedPassword);
+                            roleRepository.findOneBy({ id: 1 }).then((role) => {
+                                if (role) {
+                                    newAccount.role = role;
+                                    repository
+                                        .save(newAccount)
+                                        .then(() => {
+                                            res.status(201).json({ msg: 'Account created' });
+                                            return;
+                                        })
+                                        .catch((error) => {
+                                            res.statusMessage = 'Something went wrong when saving account details';
+                                            res.status(400).json({ error: error }).end();
+                                            return;
+                                        });
+                                } else {
+                                    res.statusMessage = 'Role not found';
+                                    res.status(400).end();
+                                    return;
+                                }
+                            });
+                        });
+                    } else {
+                        res.statusMessage = 'Display name already exists';
                         res.status(400).end();
                         return;
                     }
-
-                    const newAccount = new Account(email, body.displayName as string, hashedPassword);
-                    roleRepository.findOneBy({ id: 1 }).then((role) => {
-                        if (role) {
-                            newAccount.role = role;
-                            repository
-                                .save(newAccount)
-                                .then(() => {
-                                    res.status(201).json({ msg: 'Account created' });
-                                    return;
-                                })
-                                .catch((error) => {
-                                    res.statusMessage = 'Something went wrong when saving account details';
-                                    res.status(400).json({ error: error }).end();
-                                    return;
-                                });
-                        } else {
-                            res.statusMessage = 'Role not found';
-                            res.status(400).end();
-                            return;
-                        }
-                    });
                 });
             })
             .catch((error) => {
