@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import router from '@/router/index';
 
 const isTouchScreen = ref(true);
 const TOUCHSCREEN_MAX_WIDTH = 1024;
@@ -26,7 +27,7 @@ function onResize() {
 }
 
 function checkRoute() {
-    if(!isLoggedIn.value) {
+    if (!isLoggedIn.value) {
         loginOrLogout.value = 'Login';
     } else {
         loginOrLogout.value = 'Logout';
@@ -34,8 +35,10 @@ function checkRoute() {
 }
 
 function logout() {
-    if(loginOrLogout.value === 'Logout') {
+    if (loginOrLogout.value === 'Logout') {
         authStore.logout();
+    } else {
+        router.push('/login');
     }
 }
 </script>
