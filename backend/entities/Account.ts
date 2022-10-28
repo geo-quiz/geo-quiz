@@ -3,31 +3,31 @@ import { Role } from './Role';
 
 @Entity()
 export class Account {
-    constructor(email: string, passwordHash: string) {
+    constructor(email: string, displayName: string, passwordHash: string) {
         this.email = email;
         this.passwordHash = passwordHash;
-        this.displayName = '';
+        this.displayName = displayName;
         this.profilePicture = '';
-        this.leaderboardParticipation = true;
+        this.leaderboardParticipation = 1;
     }
 
     @PrimaryGeneratedColumn()
     id: number | undefined;
 
-    @Column()
+    @Column({ unique: true })
     email: string;
 
     @Column()
     passwordHash: string;
 
-    @Column()
+    @Column({ unique: true })
     displayName: string;
 
     @Column()
     profilePicture: string;
 
-    @Column()
-    leaderboardParticipation: boolean;
+    @Column({ type: 'tinyint' })
+    leaderboardParticipation: 0 | 1;
 
     @ManyToOne(() => Role, (role) => role.id)
     role: Role | undefined;
