@@ -93,7 +93,7 @@ onMounted(() => {
 <template>
   <div class="header_under__title">
     <h1>Europe / Asia</h1>
-    <p>Click to play</p>
+    <h2>Click on the continent to play!</h2>
     <div class="header_under__map">
       <svg id="my_dataviz" width="600" height="490"></svg>
       <ChevronLeft
