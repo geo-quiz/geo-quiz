@@ -26,14 +26,15 @@ leaderBoardRoute.get('/leaderboard/:id', (req, res) => {
 });
 
 
-leaderBoardRoute.get('/leaderboard/player/:displayName', (req, res) => {
-    const userName = (req.params.displayName as string).toLowerCase();
+/*
+leaderBoardRoute.get('/leaderboard/player/:id', (req, res) => {
+    const userName = (req.params.id )
     console.log(userName);
 
     repository
         .find({
-            relations: ['accounts'],
-            where: { accounts: { displayName: userName } },
+            relations: ['score'],
+            where: { boardName: { leaderboardId: userName } },
         })
         .then((leaderboard) => {
             res.status(200).json(leaderboard);
@@ -42,13 +43,14 @@ leaderBoardRoute.get('/leaderboard/player/:displayName', (req, res) => {
             res.status(404).json({ errorMessage: `${userName} doesn't exist`, error: error }),
         );
 });
+*/
 
 
 leaderBoardRoute.get(baseUrl, (_req, res) => {
     repository
         .find({
-            relations: ['accounts'],
-            order: { score: 'DESC' },
+            relations: ['score'],
+            order: { id: 'DESC' },
             take :10,
         })
 

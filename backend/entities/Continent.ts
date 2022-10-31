@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Leaderboard } from './Leaderboard';
+
 
 @Entity()
 export class Continent {
@@ -11,4 +13,8 @@ export class Continent {
 
     @Column()
     name: string;
+
+    @ManyToOne(() => Leaderboard, (leaderboard) => leaderboard.id)
+    leaderboard: Leaderboard[] | undefined;
+
 }

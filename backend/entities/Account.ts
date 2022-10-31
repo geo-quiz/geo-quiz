@@ -1,5 +1,7 @@
-import { Column, Entity,ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from './Role';
+import { Score } from './Score';
+
 
 @Entity()
 export class Account {
@@ -24,4 +26,8 @@ export class Account {
 
     @ManyToOne(() => Role, ((role) => role.id))
     role: Role | 1;
+
+    @OneToMany(() => Score, ((scores) => scores.id))
+    scores: Score | undefined;
+
 }
