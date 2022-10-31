@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import PageNavbar from '@/components/PageNavbar.vue';
-import ArrowLeftCircleOutlineIcon from 'vue-material-design-icons/ArrowLeftCircleOutline.vue';
-</script>
+import ArrowLeftCircleOutlineIcon from 'vue-material-design-icons/ArrowLeftCircleOutline.vue';</script>
 
 <template>
     <header class="header-background">
@@ -17,7 +16,7 @@ import ArrowLeftCircleOutlineIcon from 'vue-material-design-icons/ArrowLeftCircl
                 <RouterLink class="logo-text" to="/home">GeoQuiz</RouterLink>
             </h1>
         </div>
-       <PageNavbar />
+        <PageNavbar />
     </header>
 </template>
 
