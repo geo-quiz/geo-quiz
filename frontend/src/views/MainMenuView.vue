@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
 import PageFooter from '@/components/PageFooter.vue';
+import LogoutDoor from '@/components/LogoutDoor.vue';
 import router from '@/router';
-import MainMenuContainer from '@/components/MainMenuContainer.vue';
-</script>
+import MainMenuContainer from '@/components/MainMenuContainer.vue';</script>
 
 <template>
+    <LogoutDoor />
     <MainMenuContainer>
         <div class="wrapper">
             <GeoButton color="green" size="large" @click="router.push('/quiz')"> Play now</GeoButton>
@@ -15,12 +16,6 @@ import MainMenuContainer from '@/components/MainMenuContainer.vue';
                 </div>
                 <div class="button-wrapper">
                     <GeoButton @click="router.push('/leaderboard')">Leaderboard</GeoButton>
-                </div>
-                <div class="button-wrapper">
-                    <GeoButton @click="router.push('/settings')">Settings</GeoButton>
-                </div>
-                <div class="button-wrapper">
-                    <GeoButton @click="router.push('/')">Log out</GeoButton>
                 </div>
             </div>
         </div>
