@@ -3,7 +3,29 @@ import GeoButton from '@/components/GeoButton.vue';
 import ArrowRightThinCircleOutline from 'vue-material-design-icons/arrowrightthincircleoutline.vue';
 import ClockTimeTenOutline from 'vue-material-design-icons/clocktimetenoutline.vue';
 import Earth from 'vue-material-design-icons/earth.vue';
-import ShareVariantOutline from 'vue-material-design-icons/sharevariantoutline.vue';</script>
+import ShareVariantOutline from 'vue-material-design-icons/sharevariantoutline.vue';
+import { onUnmounted, ref, Ref } from 'vue';
+import { useUserAnswerStore } from '@/stores/userAnswers';
+import type { IQuestion } from '@/utility/interfaces/IQuestion';
+import router from '@/router';
+import ResultAnswer from '@/components/ResultAnswer.vue';
+
+const userAnswersStore = useUserAnswerStore();
+
+const usersAnswer: Ref<Map<number, number>> = ref(userAnswersStore.answers);
+const questions: Ref<IQuestion[]> = ref(userAnswersStore.questions);
+
+function proceed() {
+    userAnswersStore.clearAnswers();
+    userAnswersStore.clearQuestions();
+    router.push('/');
+}
+
+onUnmounted(() => {
+    userAnswersStore.clearAnswers();
+    userAnswersStore.clearQuestions();
+});
+</script>
 
 <template>
     <div class="results">
@@ -38,36 +60,11 @@ import ShareVariantOutline from 'vue-material-design-icons/sharevariantoutline.v
                 </div>
             </div>
         </div>
-        <div class="question-container">
-            <div class="question-block">
-                <p class="question">1. In which US state is Mount Rushmore located?</p>
-            </div>
-            <div class="answer-block">
-                <div class="answers">
-                    <p class="correct-answer-title">Correct answer</p>
-                    <div class="correct-answer">South Dakota</div>
-                </div>
-                <div class="answers">
-                    <p class="correct-answer-title">Your answer</p>
-                    <div class="wrong-answer">North Dakota</div>
-                </div>
-            </div>
-        </div>
-        <div class="question-container">
-            <div class="question-block">
-                <p class="question">2. What is the state capital of Florida?</p>
-            </div>
-            <div class="answer-block">
-                <div class="answers">
-                    <p class="correct-answer-title">Correct answer</p>
-                    <div class="correct-answer">Tallahassee</div>
-                </div>
-                <div class="answers">
-                    <p class="correct-answer-title">Your answer</p>
-                    <div class="wrong-answer">Miami</div>
-                </div>
-            </div>
-        </div>
+        <ResultAnswer
+            v-for="question in questions"
+            :key="question.id"
+            :answer="usersAnswer.get(question.id)"
+            :question="question" />
         <div class="buttons">
             <GeoButton>
                 <ShareVariantOutline class="icons" />
@@ -82,40 +79,10 @@ import ShareVariantOutline from 'vue-material-design-icons/sharevariantoutline.v
 </template>
 
 <style scoped>
-.answers {
-    display: flex;
-    flex-wrap: wrap;
-    gap: calc(var(--gap) / 2);
-    justify-content: center;
-    width: 100%;
-}
-
-.answer-block {
-    display: flex;
-    gap: calc(var(--gap) * 2);
-    margin: 0 16px 16px 16px;
-    width: 100%;
-}
-
 .buttons {
     display: flex;
     gap: calc(var(--gap) * 2);
     width: 100%;
-}
-
-.correct-answer {
-    align-items: center;
-    background: var(--color-green);
-    border-radius: 8px;
-    color: var(--color-light-blue);
-    display: flex;
-    height: 50px;
-    justify-content: center;
-    width: 100%;
-}
-
-.correct-answer-title {
-    margin: 0;
 }
 
 h2 {
@@ -123,37 +90,11 @@ h2 {
     margin: 8px 0 10px 0;
 }
 
-.question {
-    margin: 0;
-}
-
-.question-block {
-    align-items: center;
-    background: var(--color-light-blue);
-    border-radius: 8px;
-    color: var(--color-black);
-    display: flex;
-    height: 50px;
-    justify-content: center;
-    margin: 16px 16px 14px 16px;
-    text-align: center;
-    width: 100%;
-}
-
-.question-container {
-    background: var(--color-blue);
-    border-radius: 8px;
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-}
-
 .results {
     display: flex;
     flex-wrap: wrap;
     gap: calc(var(--gap) * 2);
     justify-content: center;
-    margin-top: 120px;
     width: 100%;
 }
 
@@ -196,16 +137,6 @@ h2 {
 
 #total-time {
     margin: 0 16px 16px 8px;
-    width: 100%;
-}
-
-.wrong-answer {
-    align-items: center;
-    background: var(--color-red);
-    border-radius: 8px;
-    display: flex;
-    height: 50px;
-    justify-content: center;
     width: 100%;
 }
 </style>
