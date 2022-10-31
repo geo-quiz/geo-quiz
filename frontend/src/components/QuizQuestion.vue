@@ -9,6 +9,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import router from '@/router';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
 import type { IAnswer } from '@/utility/interfaces/IAnswer';
+import { useUserAnswerStore } from '@/stores/userAnswers';
 
 const props = defineProps({
     id: {
@@ -33,6 +34,7 @@ const points = ref(0);
 const pointsAsString = ref('00');
 
 const currentQuiz = useCurrentQuizStore();
+const userAnswers = useUserAnswerStore();
 
 let timer: number;
 
@@ -52,6 +54,8 @@ onMounted(() => {
             router.back();
             alert('Something went wrong, please try again');
         });
+    userAnswers.clearAnswers();
+    userAnswers.clearQuestions();
 });
 
 onUnmounted(() => {
@@ -135,6 +139,9 @@ function resetAnswerResponses() {
 
 function nextQuestion() {
     clearTimeout(nextQuestionTimer);
+    userAnswers.addQuestion(currentQuiz.currentQuestion);
+    userAnswers.addAnswer(currentQuiz.currentQuestion.id, selectedAnswerId.value);
+
     if (currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
         router.push('/result');
     } else {
@@ -198,10 +205,10 @@ function getTitle() {
                         size="answer"
                         @click="answerQuestion(answer)">
                         <div v-if="isAnswered">
-                            <CheckIcon :size="32" v-if="answers.get(answer.id)" />
+                            <CheckIcon v-if="answers.get(answer.id)" :size="32" />
                             <CloseIcon
-                                :size="32"
-                                v-else-if="!answers.get(answer.id) && selectedAnswerId === answer.id" />
+                                v-else-if="!answers.get(answer.id) && selectedAnswerId === answer.id"
+                                :size="32" />
                         </div>
                         {{ answer.answer }}
                     </GeoButton>
