@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import * as d3 from 'd3';
 import router from '@/router';
-import { onMounted } from 'vue';
+import {onMounted} from 'vue';
 import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue';
 import ChevronRight from 'vue-material-design-icons/ChevronRight.vue';
 
@@ -107,8 +107,6 @@ onMounted(() => {
           fillColor="var(--color-white)"
           @click="router.push('/mobile-right')" />
     </div>
-
-
   </div>
 </template>
 
