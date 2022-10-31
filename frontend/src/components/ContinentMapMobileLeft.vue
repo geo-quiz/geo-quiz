@@ -92,7 +92,7 @@ onMounted(() => {
 
 <template>
   <div class="header_under__title">
-    <h1>N.America / S. America</h1>
+    <h1>The Americas</h1>
     <h2>Click on the continent to play!</h2>
     <div class="header_under__map">
       <svg id="my_dataviz" width="600" height="490"></svg>
