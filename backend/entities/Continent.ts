@@ -8,6 +8,7 @@ export class Continent {
 
     @PrimaryGeneratedColumn()
     id: number | undefined;
+
     @Column()
     name: string;
 }
