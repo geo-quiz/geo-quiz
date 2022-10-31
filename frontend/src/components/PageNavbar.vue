@@ -7,7 +7,8 @@ const isTouchScreen = ref(true);
 const TOUCHSCREEN_MAX_WIDTH = 1024;
 const isLoggedIn = ref(false);
 const authStore = useAuthStore();
-const loginOrLogout = ref('Login');
+const loginOrLogout = ref('Logout');
+const isRouteLoginOrRegister = ref(false);
 
 onMounted(() => {
     window.addEventListener('resize', onResize);
@@ -15,7 +16,8 @@ onMounted(() => {
     if (localStorage.getItem('token') || sessionStorage.getItem('token')) {
         isLoggedIn.value = true;
     }
-    checkRoute();
+    checkIfRouteIsLoginOrRegister();
+    console.log(isRouteLoginOrRegister.value);
 });
 
 onUnmounted(() => {
@@ -26,14 +28,6 @@ function onResize() {
     isTouchScreen.value = window.innerWidth < TOUCHSCREEN_MAX_WIDTH;
 }
 
-function checkRoute() {
-    if (!isLoggedIn.value) {
-        loginOrLogout.value = 'Login';
-    } else {
-        loginOrLogout.value = 'Logout';
-    }
-}
-
 function logout() {
     if (loginOrLogout.value === 'Logout') {
         authStore.logout();
@@ -41,10 +35,17 @@ function logout() {
         router.push('/login');
     }
 }
+
+function checkIfRouteIsLoginOrRegister() {
+    const hrefParts = location.href.split('/');
+    const url = hrefParts[hrefParts.length - 1];
+    if (url === 'login' || url === 'register')
+        isRouteLoginOrRegister.value = true;
+}
 </script>
 
 <template>
-    <div v-if="isTouchScreen" class="hamburger-container">
+    <div v-if="isTouchScreen && !isRouteLoginOrRegister" class="hamburger-container">
         <input id="hamburger-toggle" aria-label="Toggle Navigation" class="checkbox" type="checkbox" />
         <label class="hamburger" for="hamburger-toggle">
             <span class="slice"></span>
@@ -59,16 +60,22 @@ function logout() {
             </nav>
         </div>
     </div>
-    <div v-if="!isTouchScreen" class="navbar-container-desktop">
+    <div v-else-if="isTouchScreen && isRouteLoginOrRegister" class="empty-div"></div>
+    <div v-else-if="!isTouchScreen && !isRouteLoginOrRegister" class="navbar-container-desktop">
         <nav class="nav-list">
             <RouterLink to="/home">Home</RouterLink>
             <RouterLink to="/profile">Profile</RouterLink>
             <RouterLink to="/" @click="logout()">{{ loginOrLogout }}</RouterLink>
         </nav>
     </div>
+    <div v-else class="empty-div"></div>
 </template>
 
 <style scoped>
+.empty-div {
+    width: 30%;
+}
+
 .navbar-container-desktop {
     display: flex;
     justify-content: center;
