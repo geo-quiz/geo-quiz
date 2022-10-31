@@ -35,7 +35,7 @@ onUnmounted(() => {
                 <ShareVariantOutline class="icons" />
                 Share
             </GeoButton>
-            <GeoButton color="green">
+            <GeoButton color="green" @click="proceed">
                 <ArrowRightThinCircleOutline class="icons" />
                 Continue
             </GeoButton>
@@ -70,7 +70,7 @@ onUnmounted(() => {
                 <ShareVariantOutline class="icons" />
                 Share
             </GeoButton>
-            <GeoButton color="green">
+            <GeoButton color="green" @click="proceed">
                 <ArrowRightThinCircleOutline class="icons" />
                 Continue
             </GeoButton>
