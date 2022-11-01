@@ -15,7 +15,7 @@ export class Leaderboard {
     @PrimaryGeneratedColumn()
     id: number | undefined;
 
-    @Column()
+    @Column({default: '' })
     name: string;
 
     @Column()

@@ -5,11 +5,13 @@ import { Account } from '../entities/Account';
 import { Leaderboard } from '../entities/Leaderboard';
 import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import { Continent } from '../entities/Continent';
-import { EContinent } from '../utility/enums/EContinent';
+
+
 
 const baseUrl = '/scores';
 const repository = AppDataSource.getRepository(Score);
 const accountRepository = AppDataSource.getRepository(Account);
+const secretToken = process.env.SECRET_TOKEN_SECRETS as string;
 
 //route
 export const scoreRoute = Router();
@@ -17,7 +19,7 @@ export const scoreRoute = Router();
 scoreRoute.get(baseUrl, (_req, res) => {
     repository
         .find({
-            relations: ['leaderboards', 'accounts'],
+            relations: ['leaderboards'],
         })
         .then((scores) => {
             res.status(200).json(scores);
@@ -32,6 +34,7 @@ function verifyToken(
     jwt.verify(token, secretToken, callback);
 }
 
+
 scoreRoute.post(baseUrl, (req, res) => {
     const leaderboardRepository = AppDataSource.getRepository(Leaderboard);
     //const worldDailyBoardRepo = AppDataSource.getRepository(Leaderboard);
@@ -41,7 +44,7 @@ scoreRoute.post(baseUrl, (req, res) => {
     const token = req.body.token;
 
     //let continent = '';
-    //let secretToken = '';//??
+   // let secretToken = userRoute.;//??
 
     //if()
     function saveToContinentLeaderboards(continent: Continent, savedScore: Score) {

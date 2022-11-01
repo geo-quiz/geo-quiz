@@ -46,12 +46,30 @@ leaderBoardRoute.get('/leaderboard/player/:id', (req, res) => {
 */
 
 
+/*
 leaderBoardRoute.get(baseUrl, (_req, res) => {
     repository
         .find({
             relations: ['score'],
             order: { id: 'DESC' },
             take :10,
+        })
+
+        .then((leaderboard) => {
+            res.status(200).json(leaderboard);
+        })
+        .catch((error) => res.status(404).json(error));
+});
+*/
+
+
+leaderBoardRoute.get(baseUrl, (_req, res) => {
+    repository
+        .find({
+            relations: ['scores'],
+         //   order: { id: 'DESC' },
+            take :10,
+
         })
 
         .then((leaderboard) => {
