@@ -196,7 +196,7 @@ function getTitle() {
             </div>
             <div class="answers">
                 <div v-for="answer in currentQuiz.currentQuestion.answers" :key="answer.id" class="button-wrapper">
-                    <GeoButton
+                    <GeoButton :disabled="isAnswered"
                         :class="[
                             { correct: answers.get(answer.id) && isAnswered },
                             { incorrect: !answers.get(answer.id) && isAnswered && selectedAnswerId === answer.id },
