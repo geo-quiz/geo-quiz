@@ -4,19 +4,14 @@ import { Continent } from './Continent';
 
 @Entity()
 export class Leaderboard {
-    constructor(name: string, continent: Continent, daily: boolean) {
-        this.name = name;
+    constructor(continent: Continent, daily: boolean) {
         this.continent = continent;
         this.daily = daily;
         this.scores = undefined;
-        //new Score(0, 0, 'nobody');
     }
 
     @PrimaryGeneratedColumn()
     id: number | undefined;
-
-    @Column({default: '' })
-    name: string;
 
     @Column()
     daily: boolean;
@@ -27,7 +22,4 @@ export class Leaderboard {
     @ManyToMany(() => Score, (score) => score.leaderboards)
     @JoinTable()
     scores: Score[] | undefined;
-
-    /* @ManyToOne(() => Continent, (continent) => continent.leaderboards)
-    continent: Continent | undefined;*/
 }
