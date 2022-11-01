@@ -30,7 +30,6 @@ const answers = ref(new Map<number, boolean>());
 const timeLeft = ref(15);
 const timeLeftAsString = ref('15');
 
-const points = ref(0);
 const pointsAsString = ref('00');
 
 const currentQuiz = useCurrentQuizStore();
