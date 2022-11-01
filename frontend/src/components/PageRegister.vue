@@ -5,6 +5,7 @@ import PageLoad from '@/components/PageLoad.vue';
 import { ref } from 'vue';
 import router from '@/router/index';
 
+const displayName = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
@@ -12,8 +13,10 @@ const isEqualPassword = ref(false);
 const isPasswordValid = ref(false);
 const passwordNotFilledOut = ref(true);
 const isSubmitted = ref(false);
-const responseFromServer = ref('');
 const awaitingResponse = ref(false);
+
+const isErrorDisplayName = ref(false);
+const errorDisplayName = ref('');
 
 const isErrorEmail = ref(false);
 const errorEmail = ref('Invalid Email');
@@ -45,28 +48,37 @@ function isValidPassword() {
     }
 }
 
-function checkErrors() {
-    const error = JSON.stringify(responseFromServer.value);
-    if (error.includes('Password does not meet the requirements')) {
+function checkErrors(res: Response) {
+    console.log(res);
+    const error = res.statusText;
+    if (error == 'Password does not meet the requirements') {
+        isErrorPassword.value = true;
+        errorPassword.value = error;
+        return;
+    } else if (error == 'Password & Email do not meet the requirements') {
+        isErrorEmail.value = true;
+        errorEmail.value = 'Email does not meet the requirements';
         isErrorPassword.value = true;
         errorPassword.value = 'Password does not meet the requirements';
         return;
-    } else if (error.includes('Password & Email do not meet the requirements')) {
+    } else if (error == 'Email is not valid') {
         isErrorEmail.value = true;
-        errorEmail.value = 'Email is invalid';
-        isErrorPassword.value = true;
-        errorPassword.value = 'Password does not meet the requirements';
+        errorEmail.value = error;
         return;
-    } else if (error.includes('Email is not valid')) {
+    } else if (error == 'Email already exists') {
         isErrorEmail.value = true;
-        errorEmail.value = 'Email is not valid';
+        errorEmail.value = error;
         return;
-    } else if (error.includes('Email already exists')) {
+    } else if (error == 'Display name already exists') {
+        isErrorDisplayName.value = true;
+        errorDisplayName.value = error;
+        return;
+    } else if (error == 'Email & Display Name already exists') {
+        isErrorDisplayName.value = true;
+        errorDisplayName.value = 'Display name already exists';
         isErrorEmail.value = true;
-        errorEmail.value = 'Email is already in use';
+        errorEmail.value = 'Email already exists';
         return;
-    } else if (error.includes('Account created')) {
-        router.push({ name: 'profile' });
     }
 }
 
@@ -86,24 +98,34 @@ function submitIfValid() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    displayName: displayName.value,
                     email: email.value,
                     password: password.value,
                 }),
                 mode: 'cors',
             })
-                .then((response) => response.json())
-                .then((data) => {
-                    responseFromServer.value = data as string;
-                    awaitingResponse.value = false;
-                    isSubmitted.value = false;
-                    checkErrors();
-                    console.log(data);
+                .then((response) => {
+                    if (response.ok) {
+                        response.json().then(() => {
+                            awaitingResponse.value = false;
+                            isSubmitted.value = false;
+                            router.push('/login');
+                        });
+                    } else {
+                        checkErrors(response);
+                        awaitingResponse.value = false;
+                    }
                 })
                 .catch((error) => {
                     console.error(error);
+                    awaitingResponse.value = false;
                 });
         }
     }
+}
+
+function correctingDisplayName() {
+    isErrorDisplayName.value = false;
 }
 
 function correctingEmail() {
@@ -120,6 +142,20 @@ function correctingPassword() {
         <h2>Register</h2>
         <form id="register-form" @submit.prevent="submitIfValid">
             <div class="fields">
+                <div class="field">
+                    <label class="register-label" for="display-name">Display Name</label>
+                    <input
+                        id="display-name"
+                        v-model="displayName"
+                        autocomplete="off"
+                        class="input"
+                        name="display-name"
+                        placeholder="Enter your display name..."
+                        required
+                        type="text"
+                        @input="correctingDisplayName" />
+                    <label v-if="isErrorDisplayName" class="error">{{ errorDisplayName }}</label>
+                </div>
                 <div class="field">
                     <label class="register-label" for="email">Email address</label>
                     <input
@@ -164,12 +200,12 @@ function correctingPassword() {
                         type="password"
                         @input="isValidPassword" />
                     <span v-if="confirmPassword.length > 0" class="label-wrapper">
-                    <label
-                        v-if="isErrorPassword || !isEqualPassword || passwordNotFilledOut || !isPasswordValid"
-                        class="error">
-                        {{ errorPassword }}
-                    </label>
-                </span>
+                        <label
+                            v-if="isErrorPassword || !isEqualPassword || passwordNotFilledOut || !isPasswordValid"
+                            class="error">
+                            {{ errorPassword }}
+                        </label>
+                    </span>
                 </div>
             </div>
             <div class="register">
@@ -227,9 +263,9 @@ a {
 h2 {
     color: var(--color-white);
     font-size: 2rem;
+    margin: -8px 0;
     text-align: center;
     width: 100%;
-    margin: -8px 0;
 }
 
 #notification-wrapper {
