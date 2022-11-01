@@ -108,8 +108,8 @@ function answerQuestion(selectedAnswer: IAnswer | undefined) {
             if (indexOfAnswer === indexOfCorrect) {
                 isCorrect.value = true;
                 isIncorrect.value = false;
-                points.value++;
-                pointsAsString.value = 0 + points.value.toString();
+                currentQuiz.incrementPoints();
+                pointsAsString.value = 0 + currentQuiz.points.toString();
             }
         }
     }
