@@ -47,15 +47,15 @@ onMounted(() => {
                 console.log('clicked', target.id);
 
                 switch (target.id) {
-                case 'Africa':
-                    router.push({ name: 'quiz-question', params: { id: 'africa' } });
-                    break;
-                case 'Europe':
-                    router.push({ name: 'quiz-question', params: { id: 'europe' } });
-                    break;
-                default:
-                    router.push('/quizMob');
-                    break;
+                    case 'Africa':
+                        router.push({ name: 'quiz-question', params: { id: 'africa' } });
+                        break;
+                    case 'Europe':
+                        router.push({ name: 'quiz-question', params: { id: 'europe' } });
+                        break;
+                    default:
+                        router.push('/quizMob');
+                        break;
                 }
             }
         }
@@ -87,6 +87,8 @@ onMounted(() => {
             .on('click', mouseClick);
     });
 });
+
+const emit = defineEmits(['goTo']);
 </script>
 
 <template>
@@ -94,57 +96,63 @@ onMounted(() => {
         <h1>Europe / Asia</h1>
         <h2>Click on the continent to play!</h2>
         <div class="header_under__map">
-            <svg id="my_dataviz" width="600" height="490"></svg>
-            <ChevronLeft
-                :size="60"
-                class="left-button"
-                fillColor="var(--color-white)"
-                @click="router.push('/mobile-left')" />
+            <svg id="my_dataviz" height="490" width="350"></svg>
+            <ChevronLeft :size="60" class="left-button" fillColor="var(--color-white)" @click="emit('goTo', 'left')" />
             <ChevronRight
                 :size="60"
                 class="right-button"
                 fillColor="var(--color-white)"
-                @click="router.push('/mobile-right')" />
+                @click="emit('goTo', 'right')" />
         </div>
     </div>
 </template>
 
 <style scoped>
 #my_dataviz {
-    transform: translate(-5%, 0%);
+    left: -45px;
+    overflow: visible;
+    position: relative;
+    top: 0;
 }
 
 .left-button {
+    cursor: pointer;
+    left: 0;
     position: absolute;
     top: 40%;
-    left: 0;
     transform: translate(-0%, 90%);
-    cursor: pointer;
 }
 
 .right-button {
-    position: absolute;
-    top: 40%;
-    right: 0;
-    transform: translate(0%, 90%);
     cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 40%;
+    transform: translate(0%, 90%);
 }
 
 h1 {
     margin: 0;
 }
 
+h2 {
+    font-size: 1.3rem;
+    margin: 0;
+}
+
 .header_under__title {
+    align-items: center;
     display: contents;
     flex-direction: column;
-    align-items: center;
+    gap: calc(var(--gap) * 2);
     justify-content: center;
     margin-top: 116px;
-    gap: calc(var(--gap) * 2);
 }
 
 .header_under__map {
     align-items: center;
     display: flex;
+    max-width: 100vw;
+    overflow: hidden;
 }
 </style>
