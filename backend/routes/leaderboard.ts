@@ -2,13 +2,11 @@ import { Router } from 'express';
 import { AppDataSource } from '../AppDataSource';
 import { Leaderboard } from '../entities/Leaderboard';
 
-
 const baseUrl = '/leaderboard';
 const repository = AppDataSource.getRepository(Leaderboard);
 
 //route
 export const leaderBoardRoute = Router();
-
 
 leaderBoardRoute.get('/leaderboard/:id', (req, res) => {
     const userId = Number.parseInt(req.params.id);
@@ -20,11 +18,8 @@ leaderBoardRoute.get('/leaderboard/:id', (req, res) => {
         .then((leaderboard) => {
             res.status(200).json(leaderboard);
         })
-        .catch((error) =>
-            res.status(404).json({ errorMessage: `${userId} doesn't exist`, error: error }),
-        );
+        .catch((error) => res.status(404).json({ errorMessage: `${userId} doesn't exist`, error: error }));
 });
-
 
 /*
 leaderBoardRoute.get('/leaderboard/player/:id', (req, res) => {
@@ -45,7 +40,6 @@ leaderBoardRoute.get('/leaderboard/player/:id', (req, res) => {
 });
 */
 
-
 /*
 leaderBoardRoute.get(baseUrl, (_req, res) => {
     repository
@@ -62,14 +56,11 @@ leaderBoardRoute.get(baseUrl, (_req, res) => {
 });
 */
 
-
 leaderBoardRoute.get(baseUrl, (_req, res) => {
     repository
         .find({
-            relations: ['scores'],
-         //   order: { id: 'DESC' },
-            take :10,
-
+            relations: ['scores', 'continent'],
+            take: 14,
         })
 
         .then((leaderboard) => {
