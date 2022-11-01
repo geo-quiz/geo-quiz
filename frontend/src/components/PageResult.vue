@@ -9,8 +9,11 @@ import { useUserAnswerStore } from '@/stores/userAnswers';
 import type { IQuestion } from '@/utility/interfaces/IQuestion';
 import router from '@/router';
 import ResultAnswer from '@/components/ResultAnswer.vue';
+import { useCurrentQuizStore } from '@/stores/currentQuiz';
 
 const userAnswersStore = useUserAnswerStore();
+
+const currentQuiz = useCurrentQuizStore();
 
 const usersAnswer: Ref<Map<number, number>> = ref(userAnswersStore.answers);
 const questions: Ref<IQuestion[]> = ref(userAnswersStore.questions);
@@ -47,7 +50,7 @@ onUnmounted(() => {
                     <p>Total score</p>
                 </div>
                 <div class="test2">
-                    <div class="total">6 points</div>
+                    <div class="total">{{ currentQuiz.points }}</div>
                 </div>
             </div>
             <div id="total-time">
@@ -56,7 +59,7 @@ onUnmounted(() => {
                     <p>Total time</p>
                 </div>
                 <div class="test2">
-                    <div class="total">36 seconds</div>
+                    <div class="total"></div>
                 </div>
             </div>
         </div>
