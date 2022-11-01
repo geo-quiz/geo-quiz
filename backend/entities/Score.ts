@@ -1,8 +1,5 @@
-import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Account } from './Account';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
 import { Leaderboard } from './Leaderboard';
-
-
 
 @Entity()
 export class Score {
@@ -27,13 +24,9 @@ export class Score {
     // @Column()
     // profilePicture: string;
 
-    @ManyToMany(() => Leaderboard, (leaderboard) => leaderboard.id)
+    @ManyToMany(() => Leaderboard, (leaderboard) => leaderboard.scores, { cascade: true })
     leaderboards: Leaderboard[] | undefined;
 
-    @ManyToOne(() => Account, ((account) => account.id))
-    accounts: Account | undefined;
-
-    @ManyToOne(() => Leaderboard, (leaderboard) => leaderboard.id)
-    leaderboards: Leaderboard[] | undefined;
-
+    // @ManyToOne(() => Account, ((account) => account.id))
+    // accounts: Account | undefined;
 }

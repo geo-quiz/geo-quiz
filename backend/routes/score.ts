@@ -5,7 +5,7 @@ import { Account } from '../entities/Account';
 import { Leaderboard } from '../entities/Leaderboard';
 import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import { Continent } from '../entities/Continent';
-
+import { EContinent } from '../utility/enums/EContinent';
 
 const baseUrl = '/scores';
 const repository = AppDataSource.getRepository(Score);
@@ -14,23 +14,16 @@ const accountRepository = AppDataSource.getRepository(Account);
 //route
 export const scoreRoute = Router();
 
-
 scoreRoute.get(baseUrl, (_req, res) => {
-
-
     repository
         .find({
             relations: ['leaderboards', 'accounts'],
-
         })
         .then((scores) => {
             res.status(200).json(scores);
         })
-        .catch((error) =>
-            res.status(404).json({ errorMessage: 'Could not be found', error: error }),
-        );
+        .catch((error) => res.status(404).json({ errorMessage: 'Could not be found', error: error }));
 });
-
 
 function verifyToken(
     token: string,
@@ -44,7 +37,6 @@ scoreRoute.post(baseUrl, (req, res) => {
     //const worldDailyBoardRepo = AppDataSource.getRepository(Leaderboard);
     //const europeBoardRepo = AppDataSource.getRepository(Leaderboard);
 
-
     const body = req.body;
     const token = req.body.token;
 
@@ -52,7 +44,82 @@ scoreRoute.post(baseUrl, (req, res) => {
     //let secretToken = '';//??
 
     //if()
-    //if token giltig, få epost ur det, sen leta fram kontot med epost & spara det
+    function saveToContinentLeaderboards(continent: Continent, savedScore: Score) {
+        leaderboardRepository
+            .findOneBy({ continent: continent, daily: false })
+            .then((leaderboard) => {
+                if (leaderboard) {
+                    if (leaderboard.scores != undefined) {
+                        leaderboard.scores.push(savedScore);
+                    } else {
+                        console.error('Could not save score to ' + leaderboard.continent);
+                    }
+                }
+            })
+            .catch((error) =>
+                res.status(404).json({
+                    errorMessage: continent + ' overall repo could not be found',
+                    error: error,
+                }),
+            );
+
+        leaderboardRepository
+            .findOneBy({ continent: continent, daily: true })
+            .then((leaderboard) => {
+                if (leaderboard) {
+                    if (leaderboard.scores != undefined) {
+                        leaderboard.scores.push(savedScore);
+                    } else {
+                        console.error('Could not save score to ' + leaderboard.continent);
+                    }
+                }
+            })
+            .catch((error) =>
+                res.status(404).json({
+                    errorMessage: continent + ' daily repo could not be found',
+                    error: error,
+                }),
+            );
+    }
+
+    function saveToWorldLeaderboards(world: Continent, savedScore: Score) {
+        leaderboardRepository
+            .findOneBy({ continent: world, daily: false })
+            .then((leaderboard) => {
+                if (leaderboard) {
+                    if (leaderboard.scores != undefined) {
+                        leaderboard.scores.push(savedScore);
+                    } else {
+                        console.error('Could not save score to ' + leaderboard.continent);
+                    }
+                }
+            })
+            .catch((error) =>
+                res.status(404).json({
+                    errorMessage: 'World overall leaderboard could not be found',
+                    error: error,
+                }),
+            );
+        leaderboardRepository
+            .findOneBy({ continent: world, daily: true })
+            .then((leaderboard) => {
+                if (leaderboard) {
+                    if (leaderboard.scores != undefined) {
+                        leaderboard.scores.push(savedScore);
+                    } else {
+                        console.error('Could not save score to ' + leaderboard.continent);
+                    }
+                }
+            })
+            .catch((error) =>
+                res.status(404).json({
+                    errorMessage: 'World daily leaderboard could not be found',
+                    error: error,
+                }),
+            );
+    }
+
+//if token giltig, få epost ur det, sen leta fram kontot med epost & spara det
     if (token) {
         verifyToken(token, (error, decoded) => {
             if (error) {
@@ -75,60 +142,25 @@ scoreRoute.post(baseUrl, (req, res) => {
 
                                 if (points >= 0 && time > 0 && continent) {
                                     const savedScore = new Score(points, time, displayName);
+                                    const world = new Continent('world');
 
                                     // save score in each applicable leaderboard
+                                    saveToContinentLeaderboards(continent, savedScore);
+                                    saveToWorldLeaderboards(world, savedScore);
 
-                                    leaderboardRepository.findOneBy( { continent: continent, daily: false})
-                                        .then((leaderboard) => {
-                                            if (leaderboard){
-                                                leaderboard.scores.push(savedScore);
-                                            }
-                                        });
-                                    leaderboardRepository
-                                        .save(continent, false, savedScore)
-                                        .then(() => {
-                                            res.status(200).json();
-                                        })
-                                        .catch((error) =>
-                                            res.status(404).json({
-                                                errorMessage: continent + ' overall repo could not be found',
-                                                error: error
-                                            }),
-                                        );
-                                    leaderboardRepository
-                                        .save(continent, false, savedScore)
-                                        .then(() => {
-                                            res.status(200).json();
-                                        })
-                                        .catch((error) =>
-                                            res.status(404).json({
-                                                errorMessage: continent + ' daily repo could not be found',
-                                                error: error
-                                            }),
-                                        );
+                                    // a different way to save to leaderboards
+                                    // const leaderboards: Leaderboard[] = [];
+                                    //
+                                    // for (let i = 0; i < 4; i++) {
+                                    //     let leaderboard = leaderboardRepository
+                                    //         .findOneBy({ continent: world, daily: false })
+                                    //         .then((leaderboard) => {
+                                    //             if (leaderboard) {
+                                    //                 leaderboards.push(leaderboard);
+                                    //             }
+                                    //         });
+                                    // }
 
-                                    leaderboardRepository
-                                        .save('world', false, savedScore)
-                                        .then(() => {
-                                            res.status(200).json();
-                                        })
-                                        .catch((error) =>
-                                            res.status(404).json({
-                                                errorMessage: 'World overall repo could not be found',
-                                                error: error
-                                            }),
-                                        );
-                                    leaderboardRepository
-                                        .save('world', true, savedScore)
-                                        .then(() => {
-                                            res.status(200).json();
-                                        })
-                                        .catch((error) =>
-                                            res.status(404).json({
-                                                errorMessage: 'World daily repo could not be found',
-                                                error: error
-                                            }),
-                                        );
 
                                     repository
                                         .save(savedScore)
@@ -136,13 +168,14 @@ scoreRoute.post(baseUrl, (req, res) => {
                                             res.status(200).json(score);
                                         })
                                         .catch((error) =>
-                                            res.status(404)
+                                            res
+                                                .status(404)
                                                 .json({ errorMessage: 'Score repo could not be found', error: error }),
                                         );
                                     // else return error in score
                                 }
                             }
-                        })
+                        });
                     } else {
                         res.statusMessage = 'Account not found';
                         res.status(404).end();
@@ -153,7 +186,6 @@ scoreRoute.post(baseUrl, (req, res) => {
         });
     }
 });
-
 
 /*
 scoreRoute.get(baseUrl, (_req, res) => {
