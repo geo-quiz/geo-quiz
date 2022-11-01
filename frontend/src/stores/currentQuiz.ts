@@ -4,6 +4,7 @@ import type { IQuestion } from '@/utility/interfaces/IQuestion';
 import type { IAnswer } from '@/utility/interfaces/IAnswer';
 
 export const useCurrentQuizStore = defineStore('currentQuiz', () => {
+    const points = ref(0);
     const questions = ref<IQuestion[]>([]);
     const currentQuestionIndex = ref(0);
     const currentQuestion = computed<IQuestion>(() => {
@@ -33,6 +34,14 @@ export const useCurrentQuizStore = defineStore('currentQuiz', () => {
         answers.value = [];
     }
 
+    function incrementPoints() {
+        points.value++;
+    }
+
+    function resetPoints() {
+        points.value = 0;
+    }
+
     return {
         questions,
         currentQuestionIndex,
@@ -43,5 +52,8 @@ export const useCurrentQuizStore = defineStore('currentQuiz', () => {
         answers,
         setAnswer,
         resetAnswers,
+        incrementPoints,
+        points,
+        resetPoints,
     };
 });
