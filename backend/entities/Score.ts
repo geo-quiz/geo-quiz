@@ -24,7 +24,7 @@ export class Score {
     // @Column()
     // profilePicture: string;
 
-    @ManyToMany(() => Leaderboard, (leaderboard) => leaderboard.scores, { cascade: true })
+    @ManyToMany(() => Leaderboard, (leaderboard) => leaderboard.scores)
     leaderboards: Leaderboard[] | undefined;
 
     // @ManyToOne(() => Account, ((account) => account.id))
