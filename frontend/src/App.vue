@@ -3,6 +3,7 @@ import { onMounted, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import router from '@/router/index';
 import { useRoute } from 'vue-router';
+
 const authStore = useAuthStore();
 const route = useRoute();
 
@@ -16,25 +17,17 @@ watch(
 );
 
 function checkAuthentication() {
-    const sessionToken = sessionStorage.getItem('token');
-    const localToken = localStorage.getItem('token');
+    const token = authStore.getToken();
     const hrefParts = location.href.split('/');
     const url = hrefParts[hrefParts.length - 1];
-    console.log('url ', { value: url });
-    if (!authStore.token) {
-        if (localToken) {
-            authStore.setToken(localToken);
-            redirectIfLoggedIn();
-        } else if (sessionToken) {
-            authStore.setToken(sessionToken);
-            redirectIfLoggedIn();
-        } else {
-            if (url !== 'login' && url !== 'register') {
-                router.push('/');
-            }
-        }
-    } else {
+    if (token) {
         redirectIfLoggedIn();
+        return;
+    } else {
+        if (url !== 'login' && url !== 'register') {
+            router.push('/');
+            return;
+        }
     }
 }
 
