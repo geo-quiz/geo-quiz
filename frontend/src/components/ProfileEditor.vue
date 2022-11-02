@@ -77,6 +77,38 @@ function submitIfValid() {
             token = possibleToken;
         }
     }
+
+    if (token) {
+        fetch('https://localhost:3000/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                // token: user.email,
+                account: {
+                    displayName: displayName.value,
+                    // profilePicture: profilePicture.value,
+                    password: newPassword.value,
+                    leaderboardParticipation: isLeaderboardChecked.value,
+                },
+            }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    router.push('/home');
+                } else {
+                    const statusText = response.statusText;
+                    console.log(statusText);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    } else {
+        router.push('/home');
+        console.log('No token');
+    }
 }
 
 function updateLeaderboardCheckedValue(value: boolean) {
