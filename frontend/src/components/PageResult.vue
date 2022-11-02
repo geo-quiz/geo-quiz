@@ -17,6 +17,7 @@ const currentQuiz = useCurrentQuizStore();
 
 const usersAnswer: Ref<Map<number, number>> = ref(userAnswersStore.answers);
 const questions: Ref<IQuestion[]> = ref(userAnswersStore.questions);
+const totalTime: Ref<Number> = ref(currentQuiz.totalTime);
 
 function proceed() {
     userAnswersStore.clearAnswers();
@@ -59,7 +60,7 @@ onUnmounted(() => {
                     <p>Total time</p>
                 </div>
                 <div class="test2">
-                    <div class="total"></div>
+                    <div class="total">{{ totalTime }}</div>
                 </div>
             </div>
         </div>
