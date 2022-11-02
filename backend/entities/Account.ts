@@ -7,7 +7,7 @@ export class Account {
         this.email = email;
         this.passwordHash = passwordHash;
         this.displayName = displayName;
-        this.profilePicture = '';
+        this.profilePicture = 'default.svg';
         this.leaderboardParticipation = 1;
     }
 
