@@ -275,7 +275,7 @@ h2 {
     display: flex;
     height: 175px;
     justify-content: center;
-    width: 80%;
+    width: 300px;
 }
 
 main {

@@ -3,7 +3,8 @@ import GeoButton from '@/components/GeoButton.vue';
 import PageFooter from '@/components/PageFooter.vue';
 import LogoutDoor from '@/components/LogoutDoor.vue';
 import router from '@/router';
-import MainMenuContainer from '@/components/MainMenuContainer.vue';</script>
+import MainMenuContainer from '@/components/MainMenuContainer.vue';
+</script>
 
 <template>
     <LogoutDoor />
