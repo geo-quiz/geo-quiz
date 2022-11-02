@@ -328,7 +328,6 @@ userRoute.post('/update', (req, res) => {
 
 userRoute.post('/logout', (req, res) => {
     const token = req.body.token;
-    console.log(req.body);
     if (token) {
         verifyToken(token, (error, decoded) => {
             if (decoded) {
