@@ -246,62 +246,72 @@ userRoute.post('/verify', (req, res) => {
 
 userRoute.post('/update', (req, res) => {
     const token = req.body.token;
+    const password = req.body.password;
 
-    if (token) {
+    if (token && password) {
         verifyToken(token, (error, decoded) => {
             if (error) {
                 res.statusMessage = 'Invalid token';
-                res.status(400).end();
+                res.status(400).json({ error: error }).end();
                 return;
             }
             if (decoded) {
                 if ((decoded as JwtPayload).email) {
                     const email = (decoded as JwtPayload).email;
-
-                    const body = req.body.account;
-                    if (body) {
+                    const accountBody = req.body.account;
+                    if (accountBody) {
                         repository.findOneBy({ email: email }).then((account) => {
                             if (account) {
-                                if (body.displayName) {
-                                    account.displayName = body.displayName as string;
-                                }
-                                if (body.profilePicture) {
-                                    account.profilePicture = body.profilePicture as string;
-                                }
-                                if (body.leaderboardParticipation) {
-                                    if (body.leaderboardParticipation as boolean) {
-                                        account.leaderboardParticipation = 1;
-                                    } else {
-                                        account.leaderboardParticipation = 0;
-                                    }
-                                }
-                                if (body.password) {
-                                    if (passwordPattern.test(body.password as string)) {
-                                        bcrypt.hash(body.password as string, 10).then((hash) => {
-                                            account.passwordHash = hash;
-                                            repository.save(account).then(() => {
-                                                res.status(200).json({ msg: 'Account updated' });
+                                bcrypt.compare(password, account.passwordHash).then((validPass) => {
+                                    if (validPass) {
+                                        if (accountBody.displayName) {
+                                            account.displayName = accountBody.displayName as string;
+                                        }
+                                        if (accountBody.profilePicture) {
+                                            account.profilePicture = accountBody.profilePicture as string;
+                                        }
+                                        if (accountBody.leaderboardParticipation) {
+                                            if (accountBody.leaderboardParticipation as boolean) {
+                                                account.leaderboardParticipation = 1;
+                                            } else {
+                                                account.leaderboardParticipation = 0;
+                                            }
+                                        }
+                                        if (accountBody.password) {
+                                            if (passwordPattern.test(accountBody.password as string)) {
+                                                bcrypt.hash(accountBody.password as string, 10).then((hash) => {
+                                                    account.passwordHash = hash;
+                                                    repository.save(account).then(() => {
+                                                        res.status(200).json({ msg: 'Account updated' });
+                                                        return;
+                                                    });
+                                                });
+                                            } else {
+                                                res.statusMessage = 'Invalid password format';
+                                                res.status(400).end();
                                                 return;
-                                            });
-                                        });
+                                            }
+                                        } else {
+                                            repository
+                                                .save(account)
+                                                .then(() => {
+                                                    res.status(200).json({ msg: 'Account updated' });
+                                                    return;
+                                                })
+                                                .catch((err) => {
+                                                    console.log(error);
+                                                    res.statusMessage =
+                                                        'Something went wrong while updating the account';
+                                                    res.status(400).json({ msg: err }).end();
+                                                    return;
+                                                });
+                                        }
                                     } else {
-                                        res.statusMessage = 'Invalid password format';
+                                        res.statusMessage = 'Invalid password';
                                         res.status(400).end();
                                         return;
                                     }
-                                } else {
-                                    repository
-                                        .save(account)
-                                        .then(() => {
-                                            res.status(200).json({ msg: 'Account updated' });
-                                            return;
-                                        })
-                                        .catch((err) => {
-                                            res.statusMessage = 'Something went wrong while updating the account';
-                                            res.status(400).json({ msg: err }).end();
-                                            return;
-                                        });
-                                }
+                                });
                             } else {
                                 res.statusMessage = 'Account not found';
                                 res.status(404).end();
@@ -309,15 +319,27 @@ userRoute.post('/update', (req, res) => {
                             }
                         });
                     } else {
-                        res.statusMessage = 'Missing parameters';
+                        res.statusMessage = 'Missing parameter: account';
                         res.status(400).end();
                         return;
                     }
+                } else {
+                    res.statusMessage = 'Invalid token';
+                    res.status(400).end();
+                    return;
                 }
             }
         });
+    } else if (!token && password) {
+        res.statusMessage = 'Missing parameter: token';
+        res.status(400).end();
+        return;
+    } else if (token && !password) {
+        res.statusMessage = 'Missing parameter: password';
+        res.status(400).end();
+        return;
     } else {
-        res.statusMessage = 'Missing parameters';
+        res.statusMessage = 'Missing parameters: token & password';
         res.status(400).end();
         return;
     }
