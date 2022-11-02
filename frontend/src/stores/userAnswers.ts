@@ -27,7 +27,7 @@ export const useUserAnswerStore = defineStore('userAnswers', () => {
     }
 
     function clearQuestions() {
-        questions.value.forEach(() => questions.value.pop());
+        questions.value = new Array<IQuestion>();
     }
 
     return {

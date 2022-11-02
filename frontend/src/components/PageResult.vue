@@ -4,7 +4,7 @@ import ArrowRightThinCircleOutline from 'vue-material-design-icons/arrowrightthi
 import ClockTimeTenOutline from 'vue-material-design-icons/clocktimetenoutline.vue';
 import Earth from 'vue-material-design-icons/earth.vue';
 import ShareVariantOutline from 'vue-material-design-icons/sharevariantoutline.vue';
-import { onUnmounted, ref, Ref } from 'vue';
+import { ref, Ref } from 'vue';
 import { useUserAnswerStore } from '@/stores/userAnswers';
 import type { IQuestion } from '@/utility/interfaces/IQuestion';
 import router from '@/router';
@@ -20,15 +20,13 @@ const questions: Ref<IQuestion[]> = ref(userAnswersStore.questions);
 const totalTime: Ref<Number> = ref(currentQuiz.totalTime);
 
 function proceed() {
-    userAnswersStore.clearAnswers();
-    userAnswersStore.clearQuestions();
-    router.push('/');
+    router.push('/home').then(() => {
+        userAnswersStore.clearAnswers();
+        userAnswersStore.clearQuestions();
+    }).catch((error) => {
+        console.log(error);
+    });
 }
-
-onUnmounted(() => {
-    userAnswersStore.clearAnswers();
-    userAnswersStore.clearQuestions();
-});
 </script>
 
 <template>
@@ -64,11 +62,13 @@ onUnmounted(() => {
                 </div>
             </div>
         </div>
-        <ResultAnswer
-            v-for="question in questions"
-            :key="question.id"
-            :answer="usersAnswer.get(question.id)"
-            :question="question" />
+        <div v-if="usersAnswer.size > 0" class="answer-wrapper">
+            <ResultAnswer
+                v-for="question in questions"
+                :key="question.id"
+                :answer="usersAnswer.get(question.id)"
+                :question="question" />
+        </div>
         <div class="buttons">
             <GeoButton>
                 <ShareVariantOutline class="icons" />
@@ -83,6 +83,12 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.answer-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
 .buttons {
     display: flex;
     gap: calc(var(--gap) * 2);

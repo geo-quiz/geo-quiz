@@ -27,7 +27,6 @@ const nrOfQuestions = ref(0);
 
 const answers = ref(new Map<number, boolean>());
 
-const timeLeft = ref(15);
 const timeLeftAsString = ref('15');
 
 const pointsAsString = ref('00');
@@ -40,6 +39,14 @@ let timer: number;
 let nextQuestionTimer: number;
 
 onMounted(() => {
+    userAnswers.clearAnswers();
+    userAnswers.clearQuestions();
+    currentQuiz.resetQuestions();
+    currentQuiz.resetAnswers();
+    currentQuiz.resetTime();
+    currentQuiz.resetPoints();
+    currentQuiz.resetTotalTime();
+
     fetch(`http://localhost:3000/quiz/continent/${props.id}`)
         .then((response) => response.json())
         .then((data) => {
@@ -47,19 +54,14 @@ onMounted(() => {
             nrOfQuestions.value = currentQuiz.questions.length;
             countdown();
             resetAnswerResponses();
-            currentQuiz.resetAnswers();
         })
         .catch(() => {
             router.back();
             alert('Something went wrong, please try again');
         });
-    userAnswers.clearAnswers();
-    userAnswers.clearQuestions();
 });
 
 onUnmounted(() => {
-    currentQuiz.resetQuestions();
-    currentQuiz.resetAnswers();
     clearInterval(timer);
 });
 
@@ -77,21 +79,16 @@ function setAnswers() {
 function countdown() {
     timer = setInterval(() => {
         if (!isAnswered.value) {
-            timeLeft.value--;
-            timeLeftAsString.value = timeLeft.value.toString();
-            if (timeLeft.value < 10) {
+            currentQuiz.decreaseTime();
+            timeLeftAsString.value = currentQuiz.timeLeft.toString();
+            if (currentQuiz.timeLeft < 10) {
                 timeLeftAsString.value = '0' + timeLeftAsString.value;
             }
-            if (timeLeft.value <= 0) {
+            if (currentQuiz.timeLeft <= 0) {
                 answerQuestion(undefined);
             }
         }
     }, 1000);
-}
-
-function resetCountdown() {
-    timeLeft.value = 15;
-    isAnswered.value = false;
 }
 
 function answerQuestion(selectedAnswer: IAnswer | undefined) {
@@ -111,6 +108,9 @@ function answerQuestion(selectedAnswer: IAnswer | undefined) {
                 pointsAsString.value = 0 + currentQuiz.points.toString();
             }
         }
+        userAnswers.addQuestion(currentQuiz.currentQuestion);
+        userAnswers.addAnswer(currentQuiz.currentQuestion.id, selectedAnswerId.value);
+        currentQuiz.resetTime();
     }
 
     isAnswered.value = true;
@@ -137,16 +137,15 @@ function resetAnswerResponses() {
 }
 
 function nextQuestion() {
+    timeLeftAsString.value = '15';
     clearTimeout(nextQuestionTimer);
-    userAnswers.addQuestion(currentQuiz.currentQuestion);
-    userAnswers.addAnswer(currentQuiz.currentQuestion.id, selectedAnswerId.value);
 
     if (currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
         router.push('/result');
     } else {
         currentQuiz.nextQuestion();
         resetAnswerResponses();
-        resetCountdown();
+        isAnswered.value = false;
     }
 }
 
@@ -195,12 +194,13 @@ function getTitle() {
             </div>
             <div class="answers">
                 <div v-for="answer in currentQuiz.currentQuestion.answers" :key="answer.id" class="button-wrapper">
-                    <GeoButton :disabled="isAnswered"
+                    <GeoButton
                         :class="[
                             { correct: answers.get(answer.id) && isAnswered },
                             { incorrect: !answers.get(answer.id) && isAnswered && selectedAnswerId === answer.id },
                             { 'not-selected': !answers.get(answer.id) && isAnswered && selectedAnswerId !== answer.id },
                         ]"
+                        :disabled="isAnswered"
                         size="answer"
                         @click="answerQuestion(answer)">
                         <div v-if="isAnswered">
