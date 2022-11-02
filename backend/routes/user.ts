@@ -149,7 +149,11 @@ userRoute.post('/login', (req, res) => {
                                     if (account.role) {
                                         if (validPass) {
                                             const accessToken = jwt.sign(
-                                                { email: account.email, role: account.role.id },
+                                                {
+                                                    email: account.email,
+                                                    role: account.role.id,
+                                                    displayName: account.displayName
+                                                },
                                                 secretToken,
                                                 { expiresIn: 2629800000 },
                                             );
