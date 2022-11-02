@@ -8,6 +8,7 @@ import { Leaderboard } from './entities/Leaderboard';
 import { Role } from './entities/Role';
 import {Score} from './entities/Score';
 
+import { Token } from './entities/Token';
 
 dotenv.config();
 
@@ -24,7 +25,7 @@ export const AppDataSource = new DataSource({
     username: username,
     password: password,
     database: database,
-    entities: [Question, Continent, Answer, Account, Role, Leaderboard, Score],
+    entities: [Question, Continent, Answer, Account, Role, Leaderboard, Token, Score],
     synchronize: true,
     logging: false,
 });
