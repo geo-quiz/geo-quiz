@@ -4,7 +4,11 @@ import GeoCheckbox from '@/components/GeoCheckbox.vue';
 import PageNotification from '@/components/PageNotification.vue';
 import { onMounted, ref } from 'vue';
 import router from '@/router/index';
+import { useAuthStore } from '@/stores/auth';
 
+const authStore = useAuthStore();
+
+const profilePicture = ref('');
 const displayName = ref('');
 const isDisplayNameChanging = ref(true);
 const isDisplayNameError = ref(false);
@@ -115,7 +119,10 @@ function updateLeaderboardCheckedValue(value: boolean) {
     isLeaderboardChecked.value = value;
 }
 
-onMounted(() => {});
+onMounted(() => {
+    displayName.value = authStore.getDisplayName();
+    profilePicture.value = authStore.getProfilePicture();
+});
 </script>
 
 <template>
@@ -124,7 +131,7 @@ onMounted(() => {});
         <form id="profile-form">
             <div id="profile-picture-wrapper" class="field">
                 <div class="profile-picture-div">
-                    <img id="profile-picture" src="/images/default-profile-picture.svg" alt="Profile picture" />
+                    <img id="profile-picture" alt="Profile picture" src="/images/default-profile-picture.svg" />
                     <label id="upload-label" for="upload">
                         Upload <br />
                         Image
@@ -136,14 +143,14 @@ onMounted(() => {});
                 <label for="display-name">Display name</label>
                 <input
                     id="display-name"
-                    placeholder="Display name"
                     :ref="displayName"
                     :value="displayName"
                     autocomplete="off"
                     name="display-name"
                     pattern="^[a-zA-Z]{3,}"
-                    title="Display name must be at least 3 characters long and only contain letters"
+                    placeholder="Display name"
                     required
+                    title="Display name must be at least 3 characters long and only contain letters"
                     type="text"
                     @input="isDisplayNameChanging = true" />
                 <label v-if="isDisplayNameError && !isDisplayNameChanging" class="error">
