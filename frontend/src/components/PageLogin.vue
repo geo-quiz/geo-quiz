@@ -47,6 +47,7 @@ function login() {
                 sessionStorage.setItem('token', data.accessToken);
                 localStorage.removeItem('token');
             }
+            authStore.setToken(data.accessToken);
             router.push('/home');
             awaitingResponse.value = false;
         })

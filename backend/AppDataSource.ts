@@ -6,6 +6,7 @@ import { Account } from './entities/Account';
 import dotenv from 'dotenv';
 import { Leaderboard } from './entities/Leaderboard';
 import { Role } from './entities/Role';
+import { Token } from './entities/Token';
 
 dotenv.config();
 
@@ -22,7 +23,7 @@ export const AppDataSource = new DataSource({
     username: username,
     password: password,
     database: database,
-    entities: [Question, Continent, Answer, Account, Role, Leaderboard],
+    entities: [Question, Continent, Answer, Account, Role, Leaderboard, Token],
     synchronize: true,
     logging: false,
 });
