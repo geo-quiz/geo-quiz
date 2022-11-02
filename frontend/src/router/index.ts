@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import StartView from '@/views/StartView.vue';
-import HomeView from '@/views/HomeView.vue';
+import LandingPageView from '@/views/LandingPageView.vue';
+import MainManuView from '@/views/MainMenuView.vue';
 import QuizView from '@/views/QuizView.vue';
 import ResultView from '@/views/ResultView.vue';
 import LoginView from '@/views/LoginView.vue';
@@ -14,13 +14,13 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            name: 'start',
-            component: StartView,
+            name: 'landing-page',
+            component: LandingPageView,
         },
         {
             path: '/home',
-            name: 'home',
-            component: HomeView,
+            name: 'main-menu',
+            component: MainManuView,
         },
         {
             path: '/result',

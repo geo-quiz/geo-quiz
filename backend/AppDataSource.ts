@@ -5,8 +5,7 @@ import { Answer } from './entities/Answer';
 import { Account } from './entities/Account';
 import dotenv from 'dotenv';
 import { Leaderboard } from './entities/Leaderboard';
-import {Role} from "./entities/Role";
-
+import { Role } from './entities/Role';
 
 dotenv.config();
 

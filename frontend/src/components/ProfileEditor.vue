@@ -166,28 +166,28 @@ onMounted(() => {
             <GeoButton id="save-button" color="green" @click.prevent="submitIfValid">Save</GeoButton>
             <small id="delete-account" @click="deleteAccount">Delete account</small>
         </form>
-
-        <PageNotification v-if="showConfirmDeleteAccount">
-            <form id="deletion-form">
-                <div id="deletion-field" class="field">
-                    <label for="display-name">Enter your password to confirm deletion of your account</label>
-                    <input
-                        id="new-password"
-                        v-model="deleteAccountPassword"
-                        autocomplete="off"
-                        name="delete-account-password"
-                        placeholder="Enter your current password..."
-                        type="password" />
-                    <div class="button-wrapper">
-                        <GeoButton size="small" @click.prevent="cancelDeletion">Cancel</GeoButton>
-                    </div>
-                    <div class="button-wrapper">
-                        <GeoButton color="red" size="small" @click.prevent="confirmDeletion">Confirm</GeoButton>
-                    </div>
-                </div>
-            </form>
-        </PageNotification>
     </main>
+
+    <PageNotification v-if="showConfirmDeleteAccount">
+        <form id="deletion-form">
+            <div id="deletion-field" class="field">
+                <label for="display-name">Enter your password to confirm deletion of your account</label>
+                <input
+                    id="new-password"
+                    v-model="deleteAccountPassword"
+                    autocomplete="off"
+                    name="delete-account-password"
+                    placeholder="Enter your current password..."
+                    type="password" />
+                <div class="button-wrapper">
+                    <GeoButton size="small" @click.prevent="cancelDeletion">Cancel</GeoButton>
+                </div>
+                <div class="button-wrapper">
+                    <GeoButton color="red" size="small" @click.prevent="confirmDeletion">Confirm</GeoButton>
+                </div>
+            </div>
+        </form>
+    </PageNotification>
 </template>
 
 <style scoped>

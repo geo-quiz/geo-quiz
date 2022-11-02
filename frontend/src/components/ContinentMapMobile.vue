@@ -2,6 +2,8 @@
 import * as d3 from 'd3';
 import router from '@/router';
 import { onMounted } from 'vue';
+import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue';
+import ChevronRight from 'vue-material-design-icons/ChevronRight.vue';
 
 onMounted(() => {
     // The svg
@@ -23,7 +25,7 @@ onMounted(() => {
     // Load external data and boot
     Promise.all([
         d3.json(
-            'https://gist.githubusercontent.com/Yuriks1/1e32c9f0d06a92b6e07b17c94327a144/raw/866e587065ccae308c71f0c549da4f575745024f/continents12.json',
+            'https://gist.githubusercontent.com/Yuriks1/9a83cade3100b21589e02b864875c384/raw/1a65730048d10e907ff7031916c49de46fe04d3e/continents_afr_eur.json',
         ),
     ]).then(function (loadData) {
         let topo: any = loadData[0];
@@ -45,30 +47,15 @@ onMounted(() => {
                 console.log('clicked', target.id);
 
                 switch (target.id) {
-                case 'Africa':
-                    router.push({ name: 'quiz-question', params: { id: 'africa' } });
-                    break;
-                case 'Asia':
-                    router.push({ name: 'quiz-question', params: { id: 'asia' } });
-                    break;
-                case 'Europe':
-                    router.push({ name: 'quiz-question', params: { id: 'europe' } });
-                    break;
-                case 'North America':
-                    router.push({ name: 'quiz-question', params: { id: 'north-america' } });
-                    break;
-                case 'South America':
-                    router.push({ name: 'quiz-question', params: { id: 'south-america' } });
-                    break;
-                case 'Oceania':
-                    router.push({ name: 'quiz-question', params: { id: 'oceania' } });
-                    break;
-                case 'World':
-                    router.push({ name: 'quiz-question', params: { id: 'world' } });
-                    break;
-                default:
-                    router.push('/quiz');
-                    break;
+                    case 'Africa':
+                        router.push({ name: 'quiz-question', params: { id: 'africa' } });
+                        break;
+                    case 'Europe':
+                        router.push({ name: 'quiz-question', params: { id: 'europe' } });
+                        break;
+                    default:
+                        router.push('/quizMob');
+                        break;
                 }
             }
         }
@@ -100,35 +87,72 @@ onMounted(() => {
             .on('click', mouseClick);
     });
 });
+
+const emit = defineEmits(['goTo']);
 </script>
 
 <template>
     <div class="header_under__title">
-        <h1>Click on a continent to start the quiz</h1>
+        <h1>Europe / Africa</h1>
+        <h2>Click on the continent to play!</h2>
         <div class="header_under__map">
-            <svg id="my_dataviz" width="1000" height="500"></svg>
+            <svg id="my_dataviz" height="490" width="350"></svg>
+            <ChevronLeft :size="60" class="left-button" fillColor="var(--color-white)" @click="emit('goTo', 'left')" />
+            <ChevronRight
+                :size="60"
+                class="right-button"
+                fillColor="var(--color-white)"
+                @click="emit('goTo', 'right')" />
         </div>
     </div>
 </template>
 
 <style scoped>
+#my_dataviz {
+    left: -45px;
+    overflow: visible;
+    position: relative;
+    top: 0;
+}
+
+.left-button {
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    top: 40%;
+    transform: translate(-0%, 90%);
+}
+
+.right-button {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 40%;
+    transform: translate(0%, 90%);
+}
 
 h1 {
-    margin: 0
+    margin: 0;
+}
+
+h2 {
+    font-size: 1.3rem;
+    margin: 0;
 }
 
 .header_under__title {
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    margin-top: 50px;
+    display: contents;
+    flex-direction: column;
     gap: calc(var(--gap) * 2);
+    justify-content: center;
+    margin-top: 116px;
 }
 
 .header_under__map {
     align-items: center;
     display: flex;
-    flex-direction: column;
+    max-width: 100vw;
+    overflow: hidden;
 }
 </style>
