@@ -1,7 +1,11 @@
 import { defineStore } from 'pinia';
 import router from '@/router';
+import { ref } from 'vue';
 
 export const useAuthStore = defineStore('auth', () => {
+    const displayName = ref('');
+    const profilePicture = ref('');
+
     function setToken(token: string, rememberMe: boolean) {
         if (rememberMe) {
             localStorage.setItem('token', token);
@@ -53,5 +57,21 @@ export const useAuthStore = defineStore('auth', () => {
         });
     }
 
-    return { logout, setToken, getToken };
+    function getDisplayName() {
+        return displayName.value;
+    }
+
+    function setDisplayName(newDisplayName: string) {
+        displayName.value = newDisplayName;
+    }
+
+    function getProfilePicture() {
+        return profilePicture.value;
+    }
+
+    function setProfilePicture(newProfilePicture: string) {
+        profilePicture.value = newProfilePicture;
+    }
+
+    return { setToken, getToken, logout, getDisplayName, setDisplayName, getProfilePicture, setProfilePicture };
 });
