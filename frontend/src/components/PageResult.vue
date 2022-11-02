@@ -95,6 +95,11 @@ function proceed() {
     width: 100%;
 }
 
+.icons {
+    position: relative;
+    top: 4px;
+}
+
 h2 {
     font-size: 2rem;
     margin: 8px 0 10px 0;
