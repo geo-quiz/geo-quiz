@@ -10,6 +10,16 @@ export const useAuthStore = defineStore('auth', () => {
         token.value = newToken;
     }
 
+    function getToken(): string {
+        const potentialTokens = [localStorage.getItem('token'), sessionStorage.getItem('token')];
+        for (const potentialToken of potentialTokens) {
+            if (potentialToken) {
+                return potentialToken;
+            }
+        }
+        return '';
+    }
+
     function logout(): Promise<Boolean> {
         return new Promise<Boolean>((success, fail) => {
             let potentialToken = localStorage.getItem('token');
@@ -28,25 +38,27 @@ export const useAuthStore = defineStore('auth', () => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ token: token.value }),
-                }).then((res) => {
-                    if (res.ok) {
-                        sessionStorage.removeItem('token');
-                        localStorage.removeItem('token');
-                        token.value = null;
-                        router.push('/');
-                        success(true);
-                    } else {
-                        fail('Response not OK');
-                    }
-                }).catch((error) => {
-                    console.error(error);
-                    fail('Failed to fetch');
-                });
+                })
+                    .then((res) => {
+                        if (res.ok) {
+                            sessionStorage.removeItem('token');
+                            localStorage.removeItem('token');
+                            token.value = null;
+                            router.push('/');
+                            success(true);
+                        } else {
+                            fail('Response not OK');
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        fail('Failed to fetch');
+                    });
             } else {
                 fail('No token');
             }
         });
     }
 
-    return { token, logout, setToken };
+    return { token, logout, setToken, getToken };
 });
