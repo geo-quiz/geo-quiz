@@ -5,10 +5,12 @@ import { AppDataSource } from '../AppDataSource';
 import { Account } from '../entities/Account';
 import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import { Role } from '../entities/Role';
+import { Token } from '../entities/Token';
 
 dotenv.config();
 const repository = AppDataSource.getRepository(Account);
 const roleRepository = AppDataSource.getRepository(Role);
+const tokenRepository = AppDataSource.getRepository(Token);
 
 export const userRoute = Router();
 
@@ -147,7 +149,11 @@ userRoute.post('/login', (req, res) => {
                                     if (account.role) {
                                         if (validPass) {
                                             const accessToken = jwt.sign(
-                                                { email: account.email, role: account.role.id },
+                                                {
+                                                    email: account.email,
+                                                    role: account.role.id,
+                                                    displayName: account.displayName
+                                                },
                                                 secretToken,
                                                 { expiresIn: 2629800000 },
                                             );
@@ -202,8 +208,12 @@ userRoute.post('/validate', (req, res) => {
     const body = req.body;
     if (body.token && body.password) {
         verifyToken(body.token, (error, decoded) => {
-            console.log('error: ', error);
-            console.log('decoded: ', decoded);
+            tokenRepository.findOneBy({ token: body.token }).then((token) => {
+                if (token) {
+                    res.statusMessage = 'Invalid token';
+                    res.status(400).end();
+                }
+            });
             if (error) {
                 res.statusMessage = 'Invalid token';
                 res.status(400).end();
@@ -307,6 +317,53 @@ userRoute.post('/update', (req, res) => {
                         return;
                     }
                 }
+            }
+        });
+    } else {
+        res.statusMessage = 'Missing parameters';
+        res.status(400).end();
+        return;
+    }
+});
+
+userRoute.post('/logout', (req, res) => {
+    const token = req.body.token;
+    console.log(req.body);
+    if (token) {
+        verifyToken(token, (error, decoded) => {
+            if (decoded) {
+                tokenRepository.findOneBy({ token: token }).then((existingToken) => {
+                    if (!existingToken) {
+                        repository.findOneBy({ email: (decoded as JwtPayload).email }).then((account) => {
+                            if (account) {
+                                const tokenEntity = new Token(req.body.token, account);
+                                tokenRepository.insert(tokenEntity).then((savedToken) => {
+                                    if (savedToken) {
+                                        res.statusMessage = 'Logged out';
+                                        res.status(200).json({ msg: 'Logged Out' }).end();
+                                        return;
+                                    } else {
+                                        res.statusMessage = 'Something went wrong while logging out';
+                                        res.status(400).end();
+                                        return;
+                                    }
+                                });
+                            } else {
+                                res.statusMessage = 'Account not found';
+                                res.status(400).end();
+                                return;
+                            }
+                        });
+                    } else {
+                        res.statusMessage = 'Invalid token';
+                        res.status(400).end();
+                        return;
+                    }
+                });
+            } else {
+                res.statusMessage = 'Invalid token';
+                res.status(400).json({ error: error }).end();
+                return;
             }
         });
     } else {
