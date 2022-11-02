@@ -93,7 +93,7 @@ const emit = defineEmits(['goTo']);
 
 <template>
     <div class="header_under__title">
-        <h1>Europe / Asia</h1>
+        <h1>Europe / Africa</h1>
         <h2>Click on the continent to play!</h2>
         <div class="header_under__map">
             <svg id="my_dataviz" height="490" width="350"></svg>
