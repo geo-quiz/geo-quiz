@@ -77,11 +77,11 @@ function getOverallBoard() {
         <div class="wrapper">
             <div class="arrows">
                 <div class="arrow-left">
-                    <ChevronLeft></ChevronLeft>
+                    <ChevronLeft size="50"></ChevronLeft>
                 </div>
                 <h3 class="subtitle">WORLD</h3>
                 <div class="arrow-right">
-                    <ChevronRight></ChevronRight>
+                    <ChevronRight size="50"></ChevronRight>
                 </div>
             </div>
 
@@ -90,8 +90,39 @@ function getOverallBoard() {
                 <GeoButton class="daily-button" font-size="1.125rem" @click="getDailyBoard()"> Daily </GeoButton>
             </div>
 
+            <div id="profile-pictures-wrapper" class="field">
+                <div class="profile-picture-div">
+                    <img id="profile-picture-second" :src="secondpic" alt="Second place profile picture"/>
+                    <img id="profile-picture-first" :src="firstpic" alt="First place profile picture"/>
+                    <img id="profile-picture-third" :src="thirdpic" alt="Third place profile picture"/>
+                </div>
+            </div>
+            <div class="winner-container">
+                <div class="winner-stats">
+                    <label class="winner-name">Second place name</label>
+                    <div class="winner-time-points">
+                        <label class="winner-points">200p</label>
+                        <label class="winner-time">20 sec</label>
+                    </div>
+                </div>
+                <div class="winner-stats">
+                    <label class="winner-name">First place name</label>
+                    <div class="winner-time-points">
+                        <label class="winner-points">300p</label>
+                        <label class="winner-time">10 sec</label>
+                    </div>
+                </div>
+                <div class="winner-stats">
+                    <label class="winner-name">Third place name</label>
+                    <div class="winner-time-points">
+                        <label class="winner-points">100p</label>
+                        <label class="winner-time">30 sec</label>
+                    </div>
+                </div>
+            </div>
+
+
             <div class="table-wrapper">
-                background
                 <table v-if="overall" id="overallTable">
                     <tr>
                         getScoresTable() Overall
@@ -145,18 +176,7 @@ function getOverallBoard() {
 
 .arrow-right {
 }
-.overall-daily-buttons-wrapper {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-    width: 50%;
-}
 
-.previous-next-buttons-wrapper {
-    justify-content: space-between;
-    display: flex;
-    width: 40%;
-}
 .daily-button {
     border-radius: 0 var(--radius) var(--radius) 0;
 }
@@ -173,7 +193,7 @@ main {
 }
 
 .subtitle {
-    margin-top: -5px;
+    margin-top: 12px;
 }
 .table-wrapper {
     background: var(--color-white);
@@ -183,6 +203,34 @@ main {
     padding: 3px 6px;
     width: 100%;
 }
+
+.winner-container {
+    display: flex;
+    flex-direction: row;
+    gap: calc(var(--gap) * 3.7);
+    justify-content: center;
+}
+
+
+.winner-name{
+    display: flex;
+    text-align: center;
+}
+
+.winner-stats {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--gap) * 2);
+    justify-content: center;
+}
+
+.winner-time-points {
+    display: flex;
+    flex-direction: row;
+    gap: calc(var(--gap) * 2);
+    justify-content: center;
+}
+
 .wrapper {
     align-items: center;
     display: flex;
@@ -190,4 +238,29 @@ main {
     gap: calc(var(--gap) * 2);
     width: 100%;
 }
+
+#profile-picture-first {
+    background: var(--color-light-blue);
+    border: 5px var(--color-blue) solid;
+    border-radius: 90px;
+    height: 180px;
+    width: 180px;
+}
+
+#profile-picture-second {
+    background: var(--color-light-blue);
+    border: 5px var(--color-blue) solid;
+    border-radius: 90px;
+    height: 150px;
+    width: 150px;
+}
+
+#profile-picture-third {
+    background: var(--color-light-blue);
+    border: 5px var(--color-blue) solid;
+    border-radius: 90px;
+    height: 130px;
+    width: 130px;
+}
 </style>
+
