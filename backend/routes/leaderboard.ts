@@ -5,66 +5,51 @@ import { Leaderboard } from '../entities/Leaderboard';
 const baseUrl = '/leaderboard';
 const repository = AppDataSource.getRepository(Leaderboard);
 
-//route
 export const leaderBoardRoute = Router();
 
-leaderBoardRoute.get('/leaderboard/:id', (req, res) => {
-    const userId = Number.parseInt(req.params.id);
+leaderBoardRoute.get('/leaderboard/:continent', (req, res) => {
+    const continentParam = (req.params.continent as string).toLowerCase();
 
-    repository
-        .findOne({
-            where: { id: userId },
-        })
-        .then((leaderboard) => {
-            res.status(200).json(leaderboard);
-        })
-        .catch((error) => res.status(404).json({ errorMessage: `${userId} doesn't exist`, error: error }));
-});
+    //id från JWTtoken
+    const user = 'Trilliam';
 
-/*
-leaderBoardRoute.get('/leaderboard/player/:id', (req, res) => {
-    const userName = (req.params.id )
-    console.log(userName);
 
     repository
         .find({
-            relations: ['score'],
-            where: { boardName: { leaderboardId: userName } },
+            relations: ['scores'],
+            order: { scores: { points: 'DESC' }},
+            where: { continent: { name: continentParam } },
         })
-        .then((leaderboard) => {
-            res.status(200).json(leaderboard);
-        })
-        .catch((error) =>
-            res.status(404).json({ errorMessage: `${userName} doesn't exist`, error: error }),
-        );
-});
-*/
+        .then((leaderboards) => {
 
-/*
-leaderBoardRoute.get(baseUrl, (_req, res) => {
-    repository
-        .find({
-            relations: ['score'],
-            order: { id: 'DESC' },
-            take :10,
-        })
+            repository.find({
+                relations: ['scores'],
+                order: { scores: { points: 'DESC' }},
+                where: { continent: { name: continentParam }, scores: { displayName: user } }
+            })
+                .then((userleaderboards) => {
 
-        .then((leaderboard) => {
-            res.status(200).json(leaderboard);
-        })
-        .catch((error) => res.status(404).json(error));
-});
-*/
+                    const responseData = {
+                        userScore: userleaderboards,
+                        continentBoards: leaderboards,
+                    };
+                    res.status(200).json(responseData);
+                });
+        });
 
-leaderBoardRoute.get(baseUrl, (_req, res) => {
-    repository
-        .find({
-            relations: ['scores', 'continent'],
-            take: 14,
-        })
 
-        .then((leaderboard) => {
-            res.status(200).json(leaderboard);
-        })
-        .catch((error) => res.status(404).json(error));
+    leaderBoardRoute.get(baseUrl, (_req, res) => {
+        repository
+            .find({
+                relations: ['scores', 'continent'],
+                // order: { daily: 'DESC' },
+                take: 14,
+            })
+
+            .then((leaderboard) => {
+                res.status(200).json(leaderboard);
+            })
+            .catch((error) => res.status(404).json(error));
+
+    });
 });
