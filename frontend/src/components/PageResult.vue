@@ -4,7 +4,7 @@ import ArrowRightThinCircleOutline from 'vue-material-design-icons/arrowrightthi
 import ClockTimeTenOutline from 'vue-material-design-icons/clocktimetenoutline.vue';
 import Earth from 'vue-material-design-icons/earth.vue';
 import ShareVariantOutline from 'vue-material-design-icons/sharevariantoutline.vue';
-import { ref, Ref } from 'vue';
+import { onMounted, ref, Ref } from 'vue';
 import { useUserAnswerStore } from '@/stores/userAnswers';
 import type { IQuestion } from '@/utility/interfaces/IQuestion';
 import router from '@/router';
@@ -27,6 +27,13 @@ function proceed() {
         console.log(error);
     });
 }
+
+onMounted(() => {
+    if (usersAnswer.value.size <= 0) {
+        router.push('/home');
+    }
+});
+
 </script>
 
 <template>
