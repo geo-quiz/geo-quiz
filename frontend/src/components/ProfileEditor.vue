@@ -3,50 +3,25 @@ import GeoButton from '@/components/GeoButton.vue';
 import GeoCheckbox from '@/components/GeoCheckbox.vue';
 import PageNotification from '@/components/PageNotification.vue';
 import { onMounted, ref } from 'vue';
-
-const user = {
-    email: 'marcus.leeman@iths.se',
-    displayName: 'DarkendHall',
-    picture: '',
-};
+import router from '@/router/index';
 
 const displayName = ref('');
+const isDisplayNameChanging = ref(true);
+const isDisplayNameError = ref(false);
 const currentPassword = ref('');
 const isPasswordChanging = ref(false);
 const newPassword = ref('');
 const confirmNewPassword = ref('');
+const isEqualPassword = ref(false);
 const isPasswordValid = ref(false);
 const deleteAccountPassword = ref('');
 const showConfirmDeleteAccount = ref(false);
 const confirmDeleteAccount = ref(false);
 const isLeaderboardChecked = ref(true);
+const isPasswordError = ref(false);
+const passwordError = ref('');
 
-const imageRef = ref('');
-
-function saveImage(event: Event) {
-    if (event.target) {
-        let target = event.target as HTMLInputElement;
-        let image = target.files![0];
-        let imageObject = URL.createObjectURL(image);
-        localStorage.setItem('profileImage', imageObject);
-        getImage();
-    }
-}
-
-function getImage() {
-    const image = localStorage.getItem('profileImage');
-    if (image) {
-        imageRef.value = image;
-    }
-}
-
-function updateDisplayNameValue(event: InputEvent) {
-    if (event.target) {
-        let target = event.target as HTMLInputElement;
-        displayName.value = target.value;
-    }
-    console.log(displayName.value);
-}
+const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$/;
 
 function deleteAccount() {
     showConfirmDeleteAccount.value = true;
@@ -63,15 +38,43 @@ function confirmDeletion() {
 }
 
 function checkPassword() {
-    isPasswordChanging.value = true;
-    isPasswordValid.value = newPassword.value === confirmNewPassword.value;
+    clearPasswordErrors();
+    isPasswordChanging.value = false;
+    isEqualPassword.value = newPassword.value === confirmNewPassword.value;
+    isPasswordValid.value = isValidPassword();
+    if (!isPasswordValid.value) {
+        isPasswordError.value = true;
+    }
+}
+
+function clearPasswordErrors() {
+    isPasswordError.value = false;
+    passwordError.value = '';
+}
+
+function isValidPassword(): boolean {
+    if (isEqualPassword.value) {
+        if (passwordPattern.test(newPassword.value)) {
+            return true;
+        } else {
+            passwordError.value = 'Invalid password format';
+            return false;
+        }
+    } else {
+        passwordError.value = 'Passwords do not match';
+        return false;
+    }
 }
 
 function submitIfValid() {
-    if (isPasswordValid.value) {
-        const form = document.querySelector('#register-form') as HTMLFormElement;
-        if (form) {
-            form.submit();
+    let token;
+    let possibleToken = localStorage.getItem('token');
+    if (possibleToken) {
+        token = possibleToken;
+    } else {
+        possibleToken = sessionStorage.getItem('token');
+        if (possibleToken) {
+            token = possibleToken;
         }
     }
 }
@@ -80,16 +83,7 @@ function updateLeaderboardCheckedValue(value: boolean) {
     isLeaderboardChecked.value = value;
 }
 
-onMounted(() => {
-    if (user) {
-        displayName.value = user.displayName;
-        if (user.picture) {
-            imageRef.value = user.picture;
-        } else {
-            imageRef.value = '/images/default-profile-picture.svg';
-        }
-    }
-});
+onMounted(() => {});
 </script>
 
 <template>
@@ -98,28 +92,35 @@ onMounted(() => {
         <form id="profile-form">
             <div id="profile-picture-wrapper" class="field">
                 <div class="profile-picture-div">
-                    <img id="profile-picture" :src="imageRef" alt="Profile picture" />
+                    <img id="profile-picture" src="/images/default-profile-picture.svg" alt="Profile picture" />
                     <label id="upload-label" for="upload">
                         Upload <br />
                         Image
                     </label>
-                    <input id="upload" accept="image/*" type="file" @change="saveImage" />
+                    <input id="upload" accept="image/*" type="file" />
                 </div>
             </div>
             <div class="field">
                 <label for="display-name">Display name</label>
                 <input
                     id="display-name"
+                    placeholder="Display name"
+                    :ref="displayName"
                     :value="displayName"
                     autocomplete="off"
                     name="display-name"
+                    pattern="^[a-zA-Z]{3,}"
+                    title="Display name must be at least 3 characters long and only contain letters"
                     required
                     type="text"
-                    @input="updateDisplayNameValue" />
+                    @input="isDisplayNameChanging = true" />
+                <label v-if="isDisplayNameError && !isDisplayNameChanging" class="error">
+                    DisplayName already taken
+                </label>
             </div>
             <div class="password">
                 <div class="field">
-                    <label for="display-name">New Password</label>
+                    <label for="new-password">New Password</label>
                     <input
                         id="new-password"
                         v-model="newPassword"
@@ -129,10 +130,10 @@ onMounted(() => {
                         placeholder="Enter a new password..."
                         title="Password must contain at least 8 characters, including one lowercase letter, one uppercase letter and one number. Password must not contain any symbols."
                         type="password"
-                        @input="checkPassword" />
+                        @input="isPasswordChanging = true" />
                 </div>
                 <div class="field">
-                    <label for="display-name">Confirm New Password</label>
+                    <label for="confirm-password">Confirm New Password</label>
                     <input
                         id="confirm-password"
                         v-model="confirmNewPassword"
@@ -144,12 +145,13 @@ onMounted(() => {
                         type="password"
                         @input="checkPassword" />
                 </div>
-                <label v-if="!isPasswordValid && isPasswordChanging" id="password-dont-match">
-                    Passwords don't match or don't follow the correct format
-                </label>
+                <label v-if="!isPasswordChanging && passwordError" class="error">{{ passwordError }}</label>
             </div>
             <div>
-                <GeoCheckbox :startingValue="isLeaderboardChecked" @value="updateLeaderboardCheckedValue">
+                <GeoCheckbox
+                    :startingValue="isLeaderboardChecked"
+                    class="extra-space"
+                    @value="updateLeaderboardCheckedValue">
                     Leaderboard participation
                 </GeoCheckbox>
             </div>
@@ -221,6 +223,15 @@ onMounted(() => {
     cursor: pointer;
 }
 
+.error {
+    color: var(--color-red);
+    font-size: 1rem;
+    height: 16px;
+    margin: 0 0 -28px 0;
+    text-align: center;
+    width: 100%;
+}
+
 .field {
     display: flex;
     flex-wrap: wrap;
@@ -252,13 +263,6 @@ main {
     display: flex;
     flex-direction: column;
     gap: var(--gap);
-    width: 100%;
-}
-
-#password-dont-match {
-    color: var(--color-red);
-    font-size: 1rem;
-    margin-top: 10px;
     width: 100%;
 }
 
