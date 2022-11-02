@@ -18,15 +18,28 @@ watch(
 
 function checkAuthentication() {
     const token = authStore.getToken();
+
     const hrefParts = location.href.split('/');
     const url = hrefParts[hrefParts.length - 1];
     if (token) {
+        fetch('http://localhost:3000/verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token }),
+        }).then((res) => {
+            if (res.ok) {
+                res.json().then((data) => {
+                    authStore.setDisplayName(data.displayName);
+                    authStore.setProfilePicture(data.profilePicture);
+                });
+            }
+        });
         redirectIfLoggedIn();
-        return;
     } else {
         if (url !== 'login' && url !== 'register') {
             router.push('/');
-            return;
         }
     }
 }
