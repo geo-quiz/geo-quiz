@@ -2,6 +2,7 @@
 import GeoButton from '@/components/GeoButton.vue';
 import GeoCheckbox from '@/components/GeoCheckbox.vue';
 import PageNotification from '@/components/PageNotification.vue';
+import PageLoad from '@/components/PageLoad.vue';
 import { onMounted, ref } from 'vue';
 import router from '@/router/index';
 import { useAuthStore } from '@/stores/auth';
@@ -24,6 +25,9 @@ const confirmDeleteAccount = ref(false);
 const isLeaderboardChecked = ref(true);
 const isPasswordError = ref(false);
 const passwordError = ref('');
+const isCurrentPasswordValid = ref(true);
+const isUpdated = ref(false);
+const awaitingResponse = ref(false);
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$/;
 
@@ -71,47 +75,48 @@ function isValidPassword(): boolean {
 }
 
 function submitIfValid() {
-    let token;
-    let possibleToken = localStorage.getItem('token');
-    if (possibleToken) {
-        token = possibleToken;
-    } else {
-        possibleToken = sessionStorage.getItem('token');
-        if (possibleToken) {
-            token = possibleToken;
-        }
-    }
-
-    if (token) {
-        fetch('https://localhost:3000/update', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                // token: user.email,
-                account: {
-                    displayName: displayName.value,
-                    // profilePicture: profilePicture.value,
-                    password: newPassword.value,
-                    leaderboardParticipation: isLeaderboardChecked.value,
+    isCurrentPasswordValid.value = passwordPattern.test(currentPassword.value);
+    if (isCurrentPasswordValid.value) {
+        const token = authStore.getToken();
+        if (token) {
+            awaitingResponse.value = true;
+            fetch('http://localhost:3000/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-            }),
-        })
-            .then((response) => {
-                if (response.ok) {
-                    router.push('/home');
-                } else {
-                    const statusText = response.statusText;
-                    console.log(statusText);
-                }
+                body: JSON.stringify({
+                    token: token,
+                    password: currentPassword.value,
+                    account: {
+                        displayName: displayName.value,
+                        profilePicture: profilePicture.value,
+                        password: newPassword.value,
+                        leaderboardParticipation: isLeaderboardChecked.value,
+                    },
+                }),
             })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+                .then((response) => {
+                    if (response.ok) {
+                        console.log(response);
+                        isUpdated.value = true;
+                    } else {
+                        const statusText = response.statusText;
+                        if (statusText === 'Invalid password') {
+                            isCurrentPasswordValid.value = false;
+                        }
+                    }
+                    awaitingResponse.value = false;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    awaitingResponse.value = false;
+                });
+        } else {
+            console.log('No token');
+        }
     } else {
-        router.push('/home');
-        console.log('No token');
+        isCurrentPasswordValid.value = false;
     }
 }
 
@@ -120,8 +125,10 @@ function updateLeaderboardCheckedValue(value: boolean) {
 }
 
 onMounted(() => {
-    displayName.value = authStore.getDisplayName();
-    profilePicture.value = authStore.getProfilePicture();
+    setTimeout(() => {
+        displayName.value = authStore.getDisplayName();
+        profilePicture.value = authStore.getProfilePicture();
+    }, 100);
 });
 </script>
 
@@ -143,8 +150,7 @@ onMounted(() => {
                 <label for="display-name">Display name</label>
                 <input
                     id="display-name"
-                    :ref="displayName"
-                    :value="displayName"
+                    v-model="displayName"
                     autocomplete="off"
                     name="display-name"
                     pattern="^[a-zA-Z]{3,}"
@@ -202,12 +208,28 @@ onMounted(() => {
                     autocomplete="off"
                     name="current-password"
                     placeholder="Enter your current password..."
-                    type="password" />
+                    type="password"
+                    @input="isCurrentPasswordValid = true" />
+                <label v-if="!isCurrentPasswordValid" class="error">Invalid password</label>
             </div>
             <GeoButton id="save-button" color="green" @click.prevent="submitIfValid">Save</GeoButton>
             <small id="delete-account" @click="deleteAccount">Delete account</small>
         </form>
     </main>
+
+    <PageNotification v-if="isUpdated || awaitingResponse">
+        <div class="notification-wrapper">
+            <div v-if="isUpdated" class="wrapper">
+                <p>Account details updated!</p>
+                <div class="notification-button-wrapper">
+                    <GeoButton size="small" @click="router.push('/home')">OK</GeoButton>
+                </div>
+            </div>
+            <div v-if="awaitingResponse" class="wrapper">
+                <PageLoad />
+            </div>
+        </div>
+    </PageNotification>
 
     <PageNotification v-if="showConfirmDeleteAccount">
         <form id="deletion-form">
@@ -295,6 +317,29 @@ main {
     align-items: center;
     display: flex;
     flex-direction: column;
+    width: 100%;
+}
+
+.notification-button-wrapper {
+    width: 50%;
+}
+
+.notification-wrapper {
+    align-items: center;
+    background: var(--color-dark-blue);
+    border-radius: var(--radius);
+    display: flex;
+    height: 175px;
+    justify-content: center;
+    width: 300px;
+}
+
+.wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    justify-content: center;
     width: 100%;
 }
 
