@@ -38,3 +38,4 @@ frontend/*.sw?
 
 # User-specific files
 backend/.env
+*/*.tsbuildinfo
