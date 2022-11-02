@@ -152,7 +152,7 @@ userRoute.post('/login', (req, res) => {
                                                 {
                                                     email: account.email,
                                                     role: account.role.id,
-                                                    displayName: account.displayName
+                                                    displayName: account.displayName,
                                                 },
                                                 secretToken,
                                                 { expiresIn: 2629800000 },
@@ -204,9 +204,9 @@ function verifyToken(
     jwt.verify(token, secretToken, callback);
 }
 
-userRoute.post('/validate', (req, res) => {
+userRoute.post('/verify', (req, res) => {
     const body = req.body;
-    if (body.token && body.password) {
+    if (body.token) {
         verifyToken(body.token, (error, decoded) => {
             tokenRepository.findOneBy({ token: body.token }).then((token) => {
                 if (token) {
@@ -222,26 +222,23 @@ userRoute.post('/validate', (req, res) => {
             if (decoded) {
                 repository.findOneBy({ email: (decoded as JwtPayload).email }).then((account) => {
                     if (account) {
-                        bcrypt.compare(body.password, account.passwordHash).then((validPass) => {
-                            if (validPass) {
-                                res.status(200).json({ msg: 'Correct password' });
-                                return;
-                            } else {
-                                res.statusMessage = 'Incorrect password';
-                                res.status(400).end();
-                                return;
-                            }
+                        res.status(200).json({
+                            displayName: account.displayName,
+                            profilePicture: account.profilePicture,
                         });
                     } else {
-                        res.statusMessage = 'Account not found';
+                        res.statusMessage = 'Invalid token';
                         res.status(400).end();
                         return;
                     }
                 });
+            } else {
+                res.statusMessage = 'Account not found';
+                res.status(400).end();
+                return;
             }
         });
     } else {
-        res.statusMessage = 'Missing token and/or password';
         res.status(400).end();
         return;
     }
