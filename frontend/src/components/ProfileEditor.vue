@@ -34,8 +34,6 @@ const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$/
 const imageToUpload = ref();
 
 function uploadImage() {
-    console.log(imageToUpload.value.files[0]);
-
     const formData = new FormData();
 
     formData.append('image', imageToUpload.value.files[0]);
@@ -46,7 +44,11 @@ function uploadImage() {
         body: formData,
     })
         .then((res) => {
-            console.log(res.ok);
+            if (res.ok) {
+                res.json().then((data) => {
+                    profilePicture.value = data.image;
+                });
+            }
         })
         .catch((error) => {
             console.error(error);
@@ -120,7 +122,6 @@ function submitIfValid() {
             })
                 .then((response) => {
                     if (response.ok) {
-                        console.log(response);
                         isUpdated.value = true;
                     } else {
                         const statusText = response.statusText;
@@ -154,7 +155,7 @@ onMounted(() => {
     setTimeout(() => {
         displayName.value = authStore.getDisplayName();
         profilePicture.value = authStore.getProfilePicture();
-    }, 100);
+    }, 500);
 });
 </script>
 
@@ -164,7 +165,7 @@ onMounted(() => {
         <form id="profile-form">
             <div id="profile-picture-wrapper" class="field">
                 <div class="profile-picture-div">
-                    <img id="profile-picture" alt="Profile picture" src="/images/default-profile-picture.svg" />
+                    <img id="profile-picture" :src="'http://127.0.0.1:3000/' + profilePicture" alt="Profile picture" />
                     <label id="upload-label" for="upload">
                         Upload <br />
                         Image
