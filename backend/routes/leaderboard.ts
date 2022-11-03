@@ -10,7 +10,7 @@ export const leaderBoardRoute = Router();
 leaderBoardRoute.get('/leaderboard/:continent', (req, res) => {
     const continentParam = (req.params.continent as string).toLowerCase();
 
-    //id från JWTtoken
+    //id from JWTtoken
     const user = 'Trilliam';
 
 
