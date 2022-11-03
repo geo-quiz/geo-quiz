@@ -31,6 +31,28 @@ const awaitingResponse = ref(false);
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$/;
 
+const imageToUpload = ref();
+
+function uploadImage() {
+    console.log(imageToUpload.value.files[0]);
+
+    const formData = new FormData();
+
+    formData.append('image', imageToUpload.value.files[0]);
+    formData.append('token', authStore.getToken());
+
+    fetch('http://localhost:3000/upload-image', {
+        method: 'POST',
+        body: formData,
+    })
+        .then((res) => {
+            console.log(res.ok);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+}
+
 function deleteAccount() {
     showConfirmDeleteAccount.value = true;
 }
@@ -147,7 +169,7 @@ onMounted(() => {
                         Upload <br />
                         Image
                     </label>
-                    <input id="upload" accept="image/*" type="file" />
+                    <input id="upload" ref="imageToUpload" accept="image/*" type="file" @input="uploadImage" />
                 </div>
             </div>
             <div class="field">
