@@ -1,22 +1,25 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Account } from './Account';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
+import { Score } from './Score';
+import { Continent } from './Continent';
 
 @Entity()
 export class Leaderboard {
-    constructor(score: number, time: number) {
-        this.score = score;
-        this.time = time;
+    constructor(continent: Continent, daily: boolean) {
+        this.continent = continent;
+        this.daily = daily;
+        this.scores = undefined;
     }
 
     @PrimaryGeneratedColumn()
     id: number | undefined;
 
     @Column()
-    score: number;
+    daily: boolean;
 
-    @Column()
-    time: number;
+    @ManyToOne(() => Continent, (continent) => continent.id)
+    continent: Continent | undefined;
 
-    @ManyToOne(() => Account, ((account) => account.id))
-    accounts: Account | undefined;
+    @ManyToMany(() => Score, (score) => score.leaderboards)
+    @JoinTable()
+    scores: Score[] | undefined;
 }
