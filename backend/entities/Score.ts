@@ -21,12 +21,7 @@ export class Score {
     @Column()
     displayName: string;
 
-    // @Column()
-    // profilePicture: string;
-
     @ManyToMany(() => Leaderboard, (leaderboard) => leaderboard.scores)
     leaderboards: Leaderboard[] | undefined;
-
-    // @ManyToOne(() => Account, ((account) => account.id))
-    // accounts: Account | undefined;
+    
 }
