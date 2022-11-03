@@ -207,27 +207,18 @@ function getOverallBoard() {
                 </div>
             </div>
 
+            <h3 v-if="isOverall">Overall Table</h3>
+            <h3 v-else>Daily Table</h3>
             <div class="table-wrapper">
-                <table v-if="isOverall" id="overallTable">
-                    <tr>
-                        getScoresTable() Overall
-                    </tr>
-                </table>
-                <table v-else id="dailyTable">
-                    <tr>
-                        getScoresTable() Daily
-                    </tr>
-                </table>
-                <div class="leaders-table">
-                    <div v-for="(score, index) in scores" :key="index" class="table-wrapper">
-                        <table>
-                            <tr>
-                                <th>{{ score.displayName }}</th>
-                                <th>{{ score.points }}</th>
-                                <th>{{ score.time }}</th>
-                            </tr>
-                        </table>
-                    </div>
+                <div v-for="(score, index) in scores" :key="index">
+                    <table class="table-scores">
+                        <tr>
+                            <td> <img id="profile-picture-table" src="/images/gubbe-left.svg" alt="User profile picture" /></td>
+                            <td class="table-name">{{ score.displayName }}</td>
+                            <td class="table-points">{{ score.points }}p</td>
+                            <td class="table-time">{{ score.time }}s</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
@@ -316,10 +307,28 @@ main {
     margin-top: 12px;
 }
 
+.table-points {
+    text-align: right;
+
+}
+
+.table-scores {
+    table-layout: fixed;
+    height: 50px;
+    width: 100%;
+}
+
+.table-time {
+    padding: 6px;
+    text-align: right;
+
+
+}
+
 .table-wrapper {
     background: var(--color-light-blue);
     border: none;
-    border-radius: var(--radius);
+    border-radius: var(--radius) var(--radius) 0 0;
     color: var(--color-black);
     padding: 3px 6px;
     width: 100%;
@@ -443,5 +452,14 @@ main {
     border-radius: 90px;
     height: 130px;
     width: 130px;
+}
+
+#profile-picture-table {
+    align-items: center;
+    background: var(--color-light-blue);
+    border: 3px var(--color-blue) solid;
+    border-radius: 40px;
+    height: 60px;
+    width: 60px;
 }
 </style>
