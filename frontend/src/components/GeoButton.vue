@@ -2,6 +2,7 @@
 interface Props {
     size?: 'small' | 'medium' | 'large' | 'answer';
     color?: 'default' | 'green' | 'red';
+    disabled?: boolean;
 }
 
 interface ButtonStyle {
@@ -36,7 +37,7 @@ const button: ButtonStyle = {
 };
 
 // eslint-disable-next-line vue/no-setup-props-destructure
-const { size = 'medium', color = 'default' } = defineProps<Props>();
+const { size = 'medium', color = 'default', disabled = false } = defineProps<Props>();
 
 const buttonHeight = button[size].height;
 const buttonFontSize = button[size].fontSize;
@@ -55,7 +56,7 @@ function getColor() {
 </script>
 
 <template>
-    <button class="button">
+    <button :class="{ disabled: disabled }" :disabled="disabled" class="button">
         <slot></slot>
     </button>
 </template>
@@ -76,5 +77,9 @@ function getColor() {
     background: var(--color-light-blue);
     color: var(--color-black);
     cursor: pointer;
+}
+
+.disabled {
+    opacity: 0.75;
 }
 </style>

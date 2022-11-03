@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Leaderboard } from './Leaderboard';
 
 @Entity()
 export class Continent {
@@ -11,4 +12,7 @@ export class Continent {
 
     @Column()
     name: string;
+
+    @OneToMany(() => Leaderboard, (leaderboard) => leaderboard.id)
+    leaderboards: Leaderboard[] | undefined;
 }
