@@ -42,7 +42,6 @@ leaderBoardRoute.get('/leaderboard/:continent', (req, res) => {
         repository
             .find({
                 relations: ['scores', 'continent'],
-                // order: { daily: 'DESC' },
                 take: 14,
             })
 
