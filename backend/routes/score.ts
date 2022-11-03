@@ -122,7 +122,6 @@ scoreRoute.post(baseUrl, (req, res) => {
             );
     }
 
-//if token giltig, få epost ur det, sen leta fram kontot med epost & spara det
     if (token) {
         verifyToken(token, (error, decoded) => {
             if (error) {
@@ -147,24 +146,11 @@ scoreRoute.post(baseUrl, (req, res) => {
                                     const savedScore = new Score(points, time, displayName);
                                     const world = new Continent('world');
 
-                                    // save score in each applicable leaderboard
+                                   
                                     saveToContinentLeaderboards(continent, savedScore);
                                     saveToWorldLeaderboards(world, savedScore);
 
-                                    // a different way to save to leaderboards
-                                    // const leaderboards: Leaderboard[] = [];
-                                    //
-                                    // for (let i = 0; i < 4; i++) {
-                                    //     let leaderboard = leaderboardRepository
-                                    //         .findOneBy({ continent: world, daily: false })
-                                    //         .then((leaderboard) => {
-                                    //             if (leaderboard) {
-                                    //                 leaderboards.push(leaderboard);
-                                    //             }
-                                    //         });
-                                    // }
-
-
+                                  
                                     repository
                                         .save(savedScore)
                                         .then((score) => {
@@ -189,40 +175,3 @@ scoreRoute.post(baseUrl, (req, res) => {
         });
     }
 });
-
-/*
-scoreRoute.get(baseUrl, (_req, res) => {
-
-    repository
-        .find({
-            relations: ['leaderboards', 'accounts'],
-            order: { scores: 'DESC' },
-            take:10,
-
-        })
-        .then((scores) => {
-            res.status(200).json(scores);
-        })
-        .catch((error) =>
-            res.status(404).json({ errorMessage: 'Could not be found', error: error }),
-        );
-});
-
-scoreRoute.get('/scores/player/:displayName', (req, res) => {
-    const userName = (req.params.displayName as string).toLowerCase();
-    console.log(userName);
-
-    repository
-        .find({
-            relations: ['accounts'],
-            where: { accounts: { displayName: userName } },
-        })
-        .then((scores) => {
-            res.status(200).json(scores);
-        })
-        .catch((error) =>
-            res.status(404).json({ errorMessage: `${userName} doesn't exist`, error: error }),
-        );
-});
-
-*/
