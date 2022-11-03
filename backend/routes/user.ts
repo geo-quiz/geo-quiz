@@ -470,8 +470,9 @@ userRoute.post('/upload-image', (req, res) => {
                                                             repository
                                                                 .save(account)
                                                                 .then(() => {
-                                                                    console.log('Updated profile picture: ', newPath);
-                                                                    res.status(200).end();
+                                                                    res.status(200)
+                                                                        .json({ image: account.profilePicture })
+                                                                        .end();
                                                                     return;
                                                                 })
                                                                 .catch((err) => {
@@ -499,11 +500,9 @@ userRoute.post('/upload-image', (req, res) => {
                                                                 repository
                                                                     .save(account)
                                                                     .then(() => {
-                                                                        console.log(
-                                                                            'Updated profile picture: ',
-                                                                            newPath,
-                                                                        );
-                                                                        res.status(200).end();
+                                                                        res.status(200)
+                                                                            .json({ image: account.profilePicture })
+                                                                            .end();
                                                                         return;
                                                                     })
                                                                     .catch((err) => {
