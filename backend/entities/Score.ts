@@ -3,7 +3,7 @@ import { Leaderboard } from './Leaderboard';
 
 @Entity()
 export class Score {
-    constructor(points: number, time: number, displayName: string) {
+    constructor(points: number, time: number, displayName: string, profilePicture: any) {
         this.points = points;
         this.time = time;
         this.displayName = displayName;
@@ -20,6 +20,9 @@ export class Score {
 
     @Column()
     displayName: string;
+
+    @Column()
+    profilePicture: string;
 
     @ManyToMany(() => Leaderboard, (leaderboard) => leaderboard.scores)
     leaderboards: Leaderboard[] | undefined;

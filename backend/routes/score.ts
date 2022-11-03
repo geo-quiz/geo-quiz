@@ -130,19 +130,19 @@ scoreRoute.post(baseUrl, (req, res) => {
             }
             if (decoded) {
                 if ((decoded as JwtPayload).email) {
-                    const email = (decoded as JwtPayload).email;
+                    const displayName = (decoded as JwtPayload).email;
 
-                    if (email) {
-                        accountRepository.findOneBy({ email: email }).then((account) => {
+                    if (displayName) {
+                        accountRepository.findOneBy({ displayName: displayName }).then((account) => {
                             if (account) {
                                 const points = body.points as number;
                                 const time = body.time as number;
                                 const continent = body.continent as Continent;
                                 const displayName = account.displayName;
-                                //const profilePicture = account.profilePicture;
+                                const profilePicture = account.profilePicture;
 
                                 if (points >= 0 && time > 0 && continent) {
-                                    const savedScore = new Score(points, time, displayName);
+                                    const savedScore = new Score(points, time, displayName,profilePicture);
                                     const world = new Continent('world');
 
                                    
