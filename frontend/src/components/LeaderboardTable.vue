@@ -15,7 +15,7 @@ const awaitingResponse = ref(false);
 const route = useRoute();
 console.log('continent ', route.params.continent);
 
-let currentContinent : string = route.params.continent as string;
+let currentContinent: string = route.params.continent as string;
 console.log('currentContinent ', currentContinent);
 
 const continents = ['africa', 'asia', 'europe', 'north-america', 'oceania', 'south-america', 'world'];
@@ -35,7 +35,7 @@ const overallUserScore = computed(() => {
     return userScores.value?.filter((board) => !board.daily)[0];
 });
 
-const scores: Ref<IScore[] | null> = ref(null);
+let scores: Ref<IScore[] | null> = ref(null);
 
 let isOverall = ref(true);
 
@@ -56,8 +56,9 @@ function getLeaderboards(currentContinent: string) {
 }
 
 onMounted(() => {
-    let currentContinent : string = route.params.continent as string;
+    let currentContinent: string = route.params.continent as string;
     getLeaderboards(currentContinent);
+    getOverallBoard();
 });
 
 function getSubtitle() {
@@ -100,13 +101,38 @@ function getNext() {
 }
 
 function getDailyBoard() {
-    //scores.value = dailyLeaderboard.value.scores;
+    console.log('start getDailyBoard()');
+    if (dailyLeaderboard.value) {
+        console.log('dailyBoard has data');
+        if (dailyLeaderboard.value.scores) {
+            scores.value = dailyLeaderboard.value?.scores;
+            console.log('daily scores assigned');
+        } else {
+            console.error('no value in dailyLeaderboard scores');
+        }
+    } else {
+        console.error('no value in dailyLeaderboard');
+    }
+    console.log('daily scores ', scores.value);
     isOverall.value = false;
 }
 
 function getOverallBoard() {
-    // setScoresTable();
-    //scores.value = overallLeaderboard.value.scores;
+    console.log('start getoverallBoard()');
+    if (overallLeaderboard.value) {
+        console.log('overallBoard has data');
+        if (overallLeaderboard.value.scores) {
+            scores.value = overallLeaderboard.value?.scores;
+            console.log('overall scores assigned');
+        } else {
+            console.error('no value in overallLeaderboard scores');
+        }
+    } else {
+        console.error('no value in overallLeaderboard');
+    }
+
+    console.log('overall scores ', scores.value);
+
     isOverall.value = true;
 }
 </script>
@@ -192,17 +218,17 @@ function getOverallBoard() {
                         getScoresTable() Daily
                     </tr>
                 </table>
-                <!--                <div class="leaders-table">-->
-                <!--                    <div v-for="(score, index) in scores" :key="index" class="table-wrapper">-->
-                <!--                        <table>-->
-                <!--                            <tr>-->
-                <!--                                <th>{{ score.displayName }}</th>-->
-                <!--                                <th>{{ score.points }}</th>-->
-                <!--                                <th>{{ score.time }}</th>-->
-                <!--                            </tr>-->
-                <!--                        </table>-->
-                <!--                    </div>-->
-                <!--                </div>-->
+                <div class="leaders-table">
+                    <div v-for="(score, index) in scores" :key="index" class="table-wrapper">
+                        <table>
+                            <tr>
+                                <th>{{ score.displayName }}</th>
+                                <th>{{ score.points }}</th>
+                                <th>{{ score.time }}</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
