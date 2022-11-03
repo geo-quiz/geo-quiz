@@ -1,73 +1,112 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
-
-//import { useCurrentLeaderboardStore } from '@/stores/currentLeaderboard';
-import { ref } from 'vue';
+import { computed, onMounted, Ref, ref } from 'vue';
 import ChevronRight from 'vue-material-design-icons/ChevronRight.vue';
 import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue';
+import PageLoad from '@/components/PageLoad.vue';
+import PageNotification from '@/components/PageNotification.vue';
+import router from '@/router/index';
+import type { ILeaderboard } from '@/utility/interfaces/ILeaderboard';
+import type { IScore } from '@/utility/interfaces/IScore';
+import { useRoute } from 'vue-router';
 
-// import router from '@/router/index';
-//
-// const props = defineProps({
-//     id: {
-//         type: String,
-//         required: true,
-//     },
-// });
-//
+const awaitingResponse = ref(false);
+
+const route = useRoute();
+console.log('continent ', route.params.continent);
+
+let currentContinent = route.params.continent;
+console.log('currentContinent ', currentContinent);
+
+const continents = ['africa', 'asia', 'europe', 'north-america', 'oceania', 'south-america', 'world'];
+
+const leaderboards: Ref<ILeaderboard[] | null> = ref(null);
+const dailyLeaderboard = computed(() => {
+    return leaderboards.value?.filter((board) => board.daily)[0];
+});
+const overallLeaderboard = computed(() => {
+    return leaderboards.value?.filter((board) => !board.daily)[0];
+});
+const userScores: Ref<ILeaderboard[] | null> = ref(null);
+const dailyUserScore = computed(() => {
+    return userScores.value?.filter((board) => board.daily)[0];
+});
+const overallUserScore = computed(() => {
+    return userScores.value?.filter((board) => !board.daily)[0];
+});
+
+const scores: Ref<IScore[] | null> = ref(null);
+
 let isOverall = ref(true);
-//const leaderboard = useCurrentLeaderboardStore();
-// const nrOfLeaderboards = ref(0);
-//
-// onMounted(() => {
-//     fetch(`http://localhost:3000/leaderboard/${props.id}`)
-//         .then((response) => response.json())
-//         .then((data) => {
-//             leaderboard.setLeaderboards(data);
-//             nrOfLeaderboards.value = leaderboard.scores.length;
-//         })
-//         .catch(() => {
-//             router.back();
-//             alert('Something went wrong, please try again');
-//         });
-// });
 
-// function previousLeaderboard() {
-//     leaderboard.previousLeaderboard();
-// }
-//
-// function nextLeaderboard() {
-//     leaderboard.nextLeaderboard();
-// }
-//
-// function getSubtitle() {
-//     switch (leaderboard.currentLeaderboard.continent.toString()) {
-//         case 'europe':
-//             return 'EUROPE';
-//         case 'asia':
-//             return 'ASIA';
-//         case 'africa':
-//             return 'AFRICA';
-//         case 'north-america':
-//             return 'NORTH AMERICA';
-//         case 'south-america':
-//             return 'SOUTH AMERICA';
-//         case 'oceania':
-//             return 'OCEANIA';
-//         case 'world':
-//             return 'WORLD';
-//         default:
-//             return 'UNKNOWN';
-//     }
-//}
+function getLeaderboards(currentContinent: string) {
+    awaitingResponse.value = true;
+    fetch(`http://localhost:3000/leaderboard/${currentContinent}`)
+        .then((response) => response.json())
+        .then((data: { continentBoards: ILeaderboard[]; userScore: ILeaderboard[] }) => {
+            leaderboards.value = data.continentBoards;
+            userScores.value = data.userScore;
+            awaitingResponse.value = false;
+        })
+        .catch(() => {
+            router.back();
+            alert('Something went wrong, please try again');
+            awaitingResponse.value = false;
+        });
+}
+
+onMounted(() => {
+    currentContinent = route.params.continent;
+    getLeaderboards();
+});
+
+function getSubtitle() {
+    switch (currentContinent) {
+        case 'europe':
+            return 'EUROPE';
+        case 'asia':
+            return 'ASIA';
+        case 'africa':
+            return 'AFRICA';
+        case 'north-america':
+            return 'NORTH AMERICA';
+        case 'south-america':
+            return 'SOUTH AMERICA';
+        case 'oceania':
+            return 'OCEANIA';
+        case 'world':
+            return 'WORLD';
+        default:
+            return 'UNKNOWN';
+    }
+}
+
+function getPrevious() {
+    let previousIndex = continents.findIndex((continent) => continent === currentContinent) - 1;
+    if (previousIndex < 0) {
+        previousIndex = 6;
+    }
+    currentContinent = continents[previousIndex];
+    getLeaderboards(currentContinent);
+}
+
+function getNext() {
+    let nextIndex = continents.findIndex((continent) => continent === currentContinent) + 1;
+    if (nextIndex > 6) {
+        nextIndex = 1;
+    }
+    currentContinent = continents[nextIndex];
+    getLeaderboards(currentContinent);
+}
+
 function getDailyBoard() {
-    //setScoresTable(leaderboard.currentLeaderboard);
-
+    //scores.value = dailyLeaderboard.value.scores;
     isOverall.value = false;
 }
 
 function getOverallBoard() {
     // setScoresTable();
+    //scores.value = overallLeaderboard.value.scores;
     isOverall.value = true;
 }
 </script>
@@ -79,42 +118,43 @@ function getOverallBoard() {
         <div class="wrapper">
             <div class="arrows">
                 <div class="arrow-left">
-                    <ChevronLeft size="50"></ChevronLeft>
+                    <ChevronLeft size="50" @click="getPrevious()"></ChevronLeft>
                 </div>
-                <h3 class="subtitle">WORLD</h3>
+                <h3 class="subtitle">{{ getSubtitle() }}</h3>
                 <div class="arrow-right">
-                    <ChevronRight size="50"></ChevronRight>
+                    <ChevronRight size="50" @click="getNext()"></ChevronRight>
                 </div>
             </div>
 
             <div class="overall-daily-buttons-wrapper">
-                <GeoButton v-if="isOverall" class="overall-button-disabled" font-size="1.125rem" >Overall</GeoButton>
-                <GeoButton v-else class="overall-button-active" font-size="1.125rem" @click="getOverallBoard()">Overall</GeoButton>
+                <GeoButton v-if="isOverall" class="overall-button-disabled" font-size="1.125rem">Overall</GeoButton>
+                <GeoButton v-else class="overall-button-active" font-size="1.125rem" @click="getOverallBoard()"
+                    >Overall</GeoButton
+                >
 
-                <GeoButton v-if="isOverall" class="daily-button-active" font-size="1.125rem" @click="getDailyBoard()">Daily</GeoButton>
+                <GeoButton v-if="isOverall" class="daily-button-active" font-size="1.125rem" @click="getDailyBoard()"
+                    >Daily</GeoButton
+                >
                 <GeoButton v-else class="daily-button-disabled" font-size="1.125rem">Daily</GeoButton>
             </div>
 
-
-                <img id="crown" src="/images/crown.svg" alt="Winner's crown." />
-
+            <img id="crown" src="/images/crown.svg" alt="Winner's crown." />
 
             <div id="profile-pictures-wrapper" class="field">
                 <div class="profile-picture-div">
                     <img id="profile-picture-second" src="/images/gubbe-left.svg" alt="Second place profile picture" />
                     <label class="medallion" id="medallion-second">2</label>
-                    <img id="profile-picture-first" src="/images/default-profile-picture.svg" alt="First place profile picture" />
+                    <img
+                        id="profile-picture-first"
+                        src="/images/default-profile-picture.svg"
+                        alt="First place profile picture" />
                     <label class="medallion" id="medallion-first">1</label>
                     <img id="profile-picture-third" src="/images/gubbe-right.svg" alt="Third place profile picture" />
                     <label class="medallion" id="medallion-third">3</label>
                 </div>
             </div>
             <div class="medallion-wrapper">
-                <div class="medallion-div">
-
-
-
-                </div>
+                <div class="medallion-div"></div>
             </div>
 
             <div class="winner-container">
@@ -142,7 +182,7 @@ function getOverallBoard() {
             </div>
 
             <div class="table-wrapper">
-                <table v-if="overall" id="overallTable">
+                <table v-if="isOverall" id="overallTable">
                     <tr>
                         getScoresTable() Overall
                     </tr>
@@ -152,33 +192,26 @@ function getOverallBoard() {
                         getScoresTable() Daily
                     </tr>
                 </table>
+                <!--                <div class="leaders-table">-->
+                <!--                    <div v-for="(score, index) in scores" :key="index" class="table-wrapper">-->
+                <!--                        <table>-->
+                <!--                            <tr>-->
+                <!--                                <th>{{ score.displayName }}</th>-->
+                <!--                                <th>{{ score.points }}</th>-->
+                <!--                                <th>{{ score.time }}</th>-->
+                <!--                            </tr>-->
+                <!--                        </table>-->
+                <!--                    </div>-->
+                <!--                </div>-->
             </div>
-
-            <!--        <section v-if="leaderboard.currentLeaderboard">-->
-            <!--            <h3 class="subtitle">{{ getSubtitle() }}</h3>-->
-            <!--            <GeoButton id="overall-button" font-size="1.125rem" @click="previousLeaderboard">-->
-            <!--                Previous board-->
-            <!--            </GeoButton>-->
-            <!--            <GeoButton id="daily-button" font-size="1.125rem" @click="nextLeaderboard"> Next board </GeoButton>-->
-
-            <!--            <div class="leaders-table">-->
-            <!--                <div-->
-            <!--                    v-for="(score, index) in leaderboard.currentLeaderboard.userScores"-->
-            <!--                    :key="index"-->
-            <!--                    class="table-wrapper">-->
-            <!--                    <table>-->
-            <!--                        <tr>-->
-            <!--                            <th>{{ score.avatarUrl }}</th>-->
-            <!--                            <th>{{ score.displayName }}</th>-->
-            <!--                            <th>{{ score.points }}</th>-->
-            <!--                            <th>{{ score.time }}</th>-->
-            <!--                        </tr>-->
-            <!--                    </table>-->
-            <!--                </div>-->
-            <!--            </div>-->
-            <!--        </section>-->
         </div>
     </main>
+
+    <PageNotification v-if="awaitingResponse">
+        <div id="notification-wrapper">
+            <PageLoad />
+        </div>
+    </PageNotification>
 </template>
 
 <style scoped>
@@ -192,10 +225,6 @@ function getOverallBoard() {
 }
 
 .arrow-right {
-}
-
-.crown-wrapper {
-
 }
 
 .daily-button-active {
@@ -282,11 +311,13 @@ main {
     text-align: center;
 }
 .winner-points {
+    align-items: center;
     background: var(--color-light-blue);
     border-radius: var(--radius) 0 0 var(--radius);
     color: var(--color-black);
+    display: flex;
     height: 150%;
-    text-align: center;
+    justify-content: center;
     width: 100%;
 }
 
@@ -298,11 +329,15 @@ main {
 }
 
 .winner-time {
-    background: var(--color-blue);
+    align-items: center;
+    background: var(--color-light-blue);
     border-radius: 0 var(--radius) var(--radius) 0;
-    color: var(--color-light-blue);
+    border-left-color: 1px var(--color-blue);
+    border-left-style: solid;
+    color: var(--color-black);
+    display: flex;
     height: 150%;
-    text-align: center;
+    justify-content: center;
     width: 100%;
 }
 
@@ -311,7 +346,6 @@ main {
     flex-direction: row;
     justify-content: center;
 }
-
 
 .wrapper {
     align-items: center;
@@ -349,6 +383,16 @@ main {
     position: relative;
     left: -80px;
     top: 5px;
+}
+
+#notification-wrapper {
+    align-items: center;
+    background: var(--color-dark-blue);
+    border-radius: var(--radius);
+    display: flex;
+    height: 175px;
+    justify-content: center;
+    width: 80%;
 }
 
 #profile-picture-first {
