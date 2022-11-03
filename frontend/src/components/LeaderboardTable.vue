@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import GeoButton from '@/components/GeoButton.vue';
+
 //import { useCurrentLeaderboardStore } from '@/stores/currentLeaderboard';
 import { ref } from 'vue';
 import ChevronRight from 'vue-material-design-icons/ChevronRight.vue';
@@ -14,7 +15,7 @@ import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue';
 //     },
 // });
 //
-let overall = ref(true);
+let isOverall = ref(true);
 //const leaderboard = useCurrentLeaderboardStore();
 // const nrOfLeaderboards = ref(0);
 //
@@ -62,11 +63,12 @@ let overall = ref(true);
 function getDailyBoard() {
     //setScoresTable(leaderboard.currentLeaderboard);
 
-    overall.value = false;
+    isOverall.value = false;
 }
+
 function getOverallBoard() {
     // setScoresTable();
-    overall.value = true;
+    isOverall.value = true;
 }
 </script>
 
@@ -85,18 +87,36 @@ function getOverallBoard() {
                 </div>
             </div>
 
+
+
             <div class="overall-daily-buttons-wrapper">
-                <GeoButton class="overall-button" font-size="1.125rem" @click="getOverallBoard()"> Overall </GeoButton>
-                <GeoButton class="daily-button" font-size="1.125rem" @click="getDailyBoard()"> Daily </GeoButton>
+                <GeoButton v-if="isOverall" class="overall-button-disabled" font-size="1.125rem" >Overall</GeoButton>
+                <GeoButton v-else class="overall-button-active" font-size="1.125rem" @click="getOverallBoard()">Overall</GeoButton>
+
+                <GeoButton v-if="isOverall" class="daily-button-active" font-size="1.125rem" @click="getDailyBoard()">Daily</GeoButton>
+                <GeoButton v-else class="daily-button-disabled" font-size="1.125rem">Daily</GeoButton>
+
             </div>
+
+
+                <img id="crown" src="/images/crown.svg" alt="Winner's crown." />
+
 
             <div id="profile-pictures-wrapper" class="field">
                 <div class="profile-picture-div">
-                    <img id="profile-picture-second" :src="secondpic" alt="Second place profile picture"/>
-                    <img id="profile-picture-first" :src="firstpic" alt="First place profile picture"/>
-                    <img id="profile-picture-third" :src="thirdpic" alt="Third place profile picture"/>
+                    <img id="profile-picture-second" src="/images/gubbe-left.svg" alt="Second place profile picture" />
+                    <img id="profile-picture-first" src="/images/default-profile-picture.svg" alt="First place profile picture" />
+                    <img id="profile-picture-third" src="/images/gubbe-right.svg" alt="Third place profile picture" />
                 </div>
             </div>
+            <div class="medallion-wrapper">
+                <div class="medallion-div">
+                    <label class="medallion" id="medallion-second">2</label>
+                    <label class="medallion" id="medallion-first">1</label>
+                    <label class="medallion" id="medallion-third">3</label>
+                </div>
+            </div>
+
             <div class="winner-container">
                 <div class="winner-stats">
                     <label class="winner-name">Second place name</label>
@@ -120,7 +140,6 @@ function getOverallBoard() {
                     </div>
                 </div>
             </div>
-
 
             <div class="table-wrapper">
                 <table v-if="overall" id="overallTable">
@@ -163,8 +182,6 @@ function getOverallBoard() {
 </template>
 
 <style scoped>
-
-
 .arrows {
     display: flex;
     justify-content: space-between;
@@ -177,29 +194,92 @@ function getOverallBoard() {
 .arrow-right {
 }
 
-.daily-button {
-    border-radius: 0 var(--radius) var(--radius) 0;
+.crown-wrapper {
+
 }
-.overall-button {
-    border-radius: var(--radius) 0 0 var(--radius);
+
+.daily-button-active {
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 1.125rem;
+}
+
+.daily-button-disabled {
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: var(--color-light-blue);
+    color: var(--color-black);
+    font-size: 1.125rem;
 }
 
 h1,
 h3 {
     text-align: center;
 }
+
 main {
+    width: 100%;
+}
+
+.medallion {
+    align-items: center;
+    border: 3px var(--color-light-blue) solid;
+    border-radius: 90px;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+}
+
+.medallion-div{
+    align-items: flex-end;
+    display: flex;
+    gap: var(--gap);
+    justify-content: space-between;
+    width: 100%;
+}
+
+.medallion-wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+.overall-button-active {
+    border-radius: var(--radius) 0 0 var(--radius);
+    font-size: 1.125rem;
+}
+
+.overall-button-disabled {
+    border-radius: var(--radius) 0 0 var(--radius);
+    background: var(--color-light-blue);
+    color: var(--color-black);
+    font-size: 1.125rem;
+}
+
+.overall-daily-buttons-wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    width: 50%;
+}
+
+.profile-picture-div {
+    align-items: flex-end;
+    display: flex;
+    gap: var(--gap);
+    justify-content: space-between;
     width: 100%;
 }
 
 .subtitle {
     margin-top: 12px;
 }
+
 .table-wrapper {
-    background: var(--color-white);
-    color: var(--color-black);
+    background: var(--color-light-blue);
     border: none;
     border-radius: var(--radius);
+    color: var(--color-black);
     padding: 3px 6px;
     width: 100%;
 }
@@ -211,8 +291,7 @@ main {
     justify-content: center;
 }
 
-
-.winner-name{
+.winner-name {
     display: flex;
     text-align: center;
 }
@@ -239,6 +318,27 @@ main {
     width: 100%;
 }
 
+#crown {
+    left: 0;
+    position: relative;
+    top: 60%;
+    transform: translate(-100%, 85%);
+    height: 80px;
+    width: 80px;
+}
+
+#medallion-first {
+    background: #c29b0c;
+}
+
+#medallion-second {
+    background: #71706e;
+}
+
+#medallion-third {
+    background: #804a00;
+}
+
 #profile-picture-first {
     background: var(--color-light-blue);
     border: 5px var(--color-blue) solid;
@@ -263,4 +363,3 @@ main {
     width: 130px;
 }
 </style>
-
