@@ -9,6 +9,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import router from '@/router';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
 import type { IAnswer } from '@/utility/interfaces/IAnswer';
+import { useUserAnswerStore } from '@/stores/userAnswers';
 
 const props = defineProps({
     id: {
@@ -26,19 +27,26 @@ const nrOfQuestions = ref(0);
 
 const answers = ref(new Map<number, boolean>());
 
-const timeLeft = ref(15);
 const timeLeftAsString = ref('15');
 
-const points = ref(0);
 const pointsAsString = ref('00');
 
 const currentQuiz = useCurrentQuizStore();
+const userAnswers = useUserAnswerStore();
 
 let timer: number;
 
 let nextQuestionTimer: number;
 
 onMounted(() => {
+    userAnswers.clearAnswers();
+    userAnswers.clearQuestions();
+    currentQuiz.resetQuestions();
+    currentQuiz.resetAnswers();
+    currentQuiz.resetTime();
+    currentQuiz.resetPoints();
+    currentQuiz.resetTotalTime();
+
     fetch(`http://localhost:3000/quiz/continent/${props.id}`)
         .then((response) => response.json())
         .then((data) => {
@@ -46,7 +54,6 @@ onMounted(() => {
             nrOfQuestions.value = currentQuiz.questions.length;
             countdown();
             resetAnswerResponses();
-            currentQuiz.resetAnswers();
         })
         .catch(() => {
             router.back();
@@ -55,8 +62,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    currentQuiz.resetQuestions();
-    currentQuiz.resetAnswers();
     clearInterval(timer);
 });
 
@@ -74,21 +79,16 @@ function setAnswers() {
 function countdown() {
     timer = setInterval(() => {
         if (!isAnswered.value) {
-            timeLeft.value--;
-            timeLeftAsString.value = timeLeft.value.toString();
-            if (timeLeft.value < 10) {
+            currentQuiz.decreaseTime();
+            timeLeftAsString.value = currentQuiz.timeLeft.toString();
+            if (currentQuiz.timeLeft < 10) {
                 timeLeftAsString.value = '0' + timeLeftAsString.value;
             }
-            if (timeLeft.value <= 0) {
+            if (currentQuiz.timeLeft <= 0) {
                 answerQuestion(undefined);
             }
         }
     }, 1000);
-}
-
-function resetCountdown() {
-    timeLeft.value = 15;
-    isAnswered.value = false;
 }
 
 function answerQuestion(selectedAnswer: IAnswer | undefined) {
@@ -104,10 +104,13 @@ function answerQuestion(selectedAnswer: IAnswer | undefined) {
             if (indexOfAnswer === indexOfCorrect) {
                 isCorrect.value = true;
                 isIncorrect.value = false;
-                points.value++;
-                pointsAsString.value = 0 + points.value.toString();
+                currentQuiz.incrementPoints();
+                pointsAsString.value = 0 + currentQuiz.points.toString();
             }
         }
+        userAnswers.addQuestion(currentQuiz.currentQuestion);
+        userAnswers.addAnswer(currentQuiz.currentQuestion.id, selectedAnswerId.value);
+        currentQuiz.resetTime();
     }
 
     isAnswered.value = true;
@@ -134,13 +137,15 @@ function resetAnswerResponses() {
 }
 
 function nextQuestion() {
+    timeLeftAsString.value = '15';
     clearTimeout(nextQuestionTimer);
+
     if (currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
         router.push('/result');
     } else {
         currentQuiz.nextQuestion();
         resetAnswerResponses();
-        resetCountdown();
+        isAnswered.value = false;
     }
 }
 
@@ -195,13 +200,14 @@ function getTitle() {
                             { incorrect: !answers.get(answer.id) && isAnswered && selectedAnswerId === answer.id },
                             { 'not-selected': !answers.get(answer.id) && isAnswered && selectedAnswerId !== answer.id },
                         ]"
+                        :disabled="isAnswered"
                         size="answer"
                         @click="answerQuestion(answer)">
                         <div v-if="isAnswered">
-                            <CheckIcon :size="32" v-if="answers.get(answer.id)" />
+                            <CheckIcon v-if="answers.get(answer.id)" :size="32" />
                             <CloseIcon
-                                :size="32"
-                                v-else-if="!answers.get(answer.id) && selectedAnswerId === answer.id" />
+                                v-else-if="!answers.get(answer.id) && selectedAnswerId === answer.id"
+                                :size="32" />
                         </div>
                         {{ answer.answer }}
                     </GeoButton>

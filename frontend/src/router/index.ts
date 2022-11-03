@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LandingPageView from '@/views/LandingPageView.vue';
 import MainManuView from '@/views/MainMenuView.vue';
 import QuizView from '@/views/QuizView.vue';
-import NextView from '@/views/NextView.vue';
+import ResultView from '@/views/ResultView.vue';
 import LoginView from '@/views/LoginView.vue';
 import ContinentView from '@/views/ContinentView.vue';
 import ProfileView from '@/views/ProfileView.vue';
@@ -25,7 +25,7 @@ const router = createRouter({
         {
             path: '/result',
             name: 'result',
-            component: NextView,
+            component: ResultView,
         },
         {
             path: '/login',
