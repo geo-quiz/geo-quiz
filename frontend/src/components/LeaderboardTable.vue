@@ -15,7 +15,7 @@ const awaitingResponse = ref(false);
 const route = useRoute();
 console.log('continent ', route.params.continent);
 
-let currentContinent = route.params.continent;
+let currentContinent : string = route.params.continent as string;
 console.log('currentContinent ', currentContinent);
 
 const continents = ['africa', 'asia', 'europe', 'north-america', 'oceania', 'south-america', 'world'];
@@ -56,8 +56,8 @@ function getLeaderboards(currentContinent: string) {
 }
 
 onMounted(() => {
-    currentContinent = route.params.continent;
-    getLeaderboards();
+    let currentContinent : string = route.params.continent as string;
+    getLeaderboards(currentContinent);
 });
 
 function getSubtitle() {
@@ -93,7 +93,7 @@ function getPrevious() {
 function getNext() {
     let nextIndex = continents.findIndex((continent) => continent === currentContinent) + 1;
     if (nextIndex > 6) {
-        nextIndex = 1;
+        nextIndex = 0;
     }
     currentContinent = continents[nextIndex];
     getLeaderboards(currentContinent);
