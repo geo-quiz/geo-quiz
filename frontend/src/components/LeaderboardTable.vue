@@ -87,15 +87,12 @@ function getOverallBoard() {
                 </div>
             </div>
 
-
-
             <div class="overall-daily-buttons-wrapper">
                 <GeoButton v-if="isOverall" class="overall-button-disabled" font-size="1.125rem" >Overall</GeoButton>
                 <GeoButton v-else class="overall-button-active" font-size="1.125rem" @click="getOverallBoard()">Overall</GeoButton>
 
                 <GeoButton v-if="isOverall" class="daily-button-active" font-size="1.125rem" @click="getDailyBoard()">Daily</GeoButton>
                 <GeoButton v-else class="daily-button-disabled" font-size="1.125rem">Daily</GeoButton>
-
             </div>
 
 
@@ -105,15 +102,18 @@ function getOverallBoard() {
             <div id="profile-pictures-wrapper" class="field">
                 <div class="profile-picture-div">
                     <img id="profile-picture-second" src="/images/gubbe-left.svg" alt="Second place profile picture" />
+                    <label class="medallion" id="medallion-second">2</label>
                     <img id="profile-picture-first" src="/images/default-profile-picture.svg" alt="First place profile picture" />
+                    <label class="medallion" id="medallion-first">1</label>
                     <img id="profile-picture-third" src="/images/gubbe-right.svg" alt="Third place profile picture" />
+                    <label class="medallion" id="medallion-third">3</label>
                 </div>
             </div>
             <div class="medallion-wrapper">
                 <div class="medallion-div">
-                    <label class="medallion" id="medallion-second">2</label>
-                    <label class="medallion" id="medallion-first">1</label>
-                    <label class="medallion" id="medallion-third">3</label>
+
+
+
                 </div>
             </div>
 
@@ -226,22 +226,8 @@ main {
     display: flex;
     height: 40px;
     justify-content: center;
+    margin: -15px;
     width: 40px;
-}
-
-.medallion-div{
-    align-items: flex-end;
-    display: flex;
-    gap: var(--gap);
-    justify-content: space-between;
-    width: 100%;
-}
-
-.medallion-wrapper {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    width: 50%;
 }
 
 .overall-button-active {
@@ -260,13 +246,13 @@ main {
     align-items: center;
     display: flex;
     flex-direction: row;
+    margin-bottom: -80px;
     width: 50%;
 }
 
 .profile-picture-div {
     align-items: flex-end;
     display: flex;
-    gap: var(--gap);
     justify-content: space-between;
     width: 100%;
 }
@@ -322,21 +308,30 @@ main {
     left: 0;
     position: relative;
     top: 60%;
-    transform: translate(-100%, 85%);
+    transform: translate(-105%, 80%);
     height: 80px;
     width: 80px;
 }
 
 #medallion-first {
     background: #c29b0c;
+    position: relative;
+    left: -105px;
+    top: 5px;
 }
 
 #medallion-second {
     background: #71706e;
+    position: relative;
+    left: -90px;
+    top: 5px;
 }
 
 #medallion-third {
     background: #804a00;
+    position: relative;
+    left: -80px;
+    top: 5px;
 }
 
 #profile-picture-first {
