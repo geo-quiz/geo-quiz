@@ -13,6 +13,7 @@ const token = process.env.SECRET_TOKEN_SECRETS as string;
 
 // routes
 app.use(cors());
+app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use('/', routes);
 
