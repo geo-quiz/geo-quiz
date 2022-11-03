@@ -7,7 +7,6 @@ import dotenv from 'dotenv';
 import { Leaderboard } from './entities/Leaderboard';
 import { Role } from './entities/Role';
 import {Score} from './entities/Score';
-
 import { Token } from './entities/Token';
 
 dotenv.config();
