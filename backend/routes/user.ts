@@ -6,6 +6,9 @@ import { Account } from '../entities/Account';
 import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import { Role } from '../entities/Role';
 import { Token } from '../entities/Token';
+import formidable from 'formidable';
+import path from 'path';
+import * as fs from 'fs';
 
 dotenv.config();
 const repository = AppDataSource.getRepository(Account);
@@ -417,4 +420,173 @@ userRoute.post('/logout', (req, res) => {
         res.status(400).end();
         return;
     }
+});
+
+userRoute.post('/upload-image', (req, res) => {
+    const uploadFolder = path.join(__dirname, '../../', 'public', 'images');
+
+    const form = new formidable.IncomingForm({ uploadDir: uploadFolder });
+
+    form.parse(req, (err, fields, files) => {
+        if (err) {
+            console.log(err);
+            res.statusMessage = 'Something went wrong';
+            res.status(500).end();
+            return;
+        }
+        if (files && fields) {
+            if (files.image && fields.token) {
+                const token = fields.token as string;
+                verifyToken(token, (error, decoded) => {
+                    if (error) {
+                        res.statusMessage = 'Invalid token';
+                        res.status(400).end();
+                        return;
+                    }
+                    if (decoded) {
+                        if ((decoded as JwtPayload).email) {
+                            const email = (decoded as JwtPayload).email;
+                            let image: formidable.File;
+                            if (files.image instanceof Array) {
+                                image = files.image[0] as formidable.File;
+                            } else {
+                                image = files.image as formidable.File;
+                            }
+                            if (image) {
+                                if (image.mimetype) {
+                                    const fileEnding = image.mimetype.split('/')[1];
+                                    repository.findOneBy({ email: email }).then((account) => {
+                                        if (account) {
+                                            if (account.id) {
+                                                const newPath = path.join(uploadFolder, account.id + '.' + fileEnding);
+                                                if (account.profilePicture === '') {
+                                                    fs.rename(
+                                                        image.filepath,
+                                                        path.join(uploadFolder, account.id + '.' + fileEnding),
+                                                        () => {
+                                                            account.profilePicture = newPath;
+
+                                                            repository
+                                                                .save(account)
+                                                                .then(() => {
+                                                                    console.log('Updated profile picture: ', newPath);
+                                                                    res.status(200).end();
+                                                                    return;
+                                                                })
+                                                                .catch((err) => {
+                                                                    console.error(err);
+                                                                    res.statusMessage = 'Something went wrong';
+                                                                    res.status(500).end();
+                                                                    return;
+                                                                });
+                                                        },
+                                                    );
+                                                    res.status(200).end();
+                                                    return;
+                                                } else {
+                                                    fs.rm(account.profilePicture, (err) => {
+                                                        if (err) {
+                                                            console.log(err);
+                                                            res.statusMessage = 'Could not remove file';
+                                                            res.status(500).end();
+                                                            return;
+                                                        } else {
+                                                            fs.rename(image.filepath, newPath, () => {
+                                                                account.profilePicture = newPath;
+
+                                                                repository
+                                                                    .save(account)
+                                                                    .then(() => {
+                                                                        console.log(
+                                                                            'Updated profile picture: ',
+                                                                            newPath,
+                                                                        );
+                                                                        res.status(200).end();
+                                                                        return;
+                                                                    })
+                                                                    .catch((err) => {
+                                                                        console.error(err);
+                                                                        res.statusMessage = 'Something went wrong';
+                                                                        res.status(500).end();
+                                                                        return;
+                                                                    });
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                res.statusMessage = 'Invalid token';
+                                res.status(400).end();
+                                return;
+                            }
+                        }
+                    }
+                });
+            } else {
+                res.statusMessage = 'Something went wrong';
+                res.status(500).end();
+                return;
+            }
+        }
+    });
+    setTimeout(() => {
+        res.statusMessage = 'Something went wrong';
+        res.status(500).end();
+        return;
+    }, 5000);
+});
+
+userRoute.post('/delete-account', (req, res) => {
+    const token = req.body.token;
+    const password = req.body.password;
+
+    verifyToken(token, (error, decoded) => {
+        if (token && password) {
+            if (error) {
+                res.statusMessage = 'Invalid token';
+                res.status(400).json({ error: error }).end();
+                return;
+            }
+            if (decoded) {
+                if ((decoded as JwtPayload).email) {
+                    const email = (decoded as JwtPayload).email;
+                    const accountBody = req.body.account;
+                    if (accountBody) {
+                        repository.findOneBy({ email: email }).then((account) => {
+                            if (account) {
+                                bcrypt.compare(password, account.passwordHash).then((validPass) => {
+                                    if (validPass) {
+                                        repository.delete(account).then(() => {
+                                            res.status(200).json({ msg: 'Account deleted' });
+                                            return;
+                                        });
+                                    } else {
+                                        res.statusMessage = 'Invalid password';
+                                        res.status(400).end();
+                                        return;
+                                    }
+                                });
+                            } else {
+                                res.statusMessage = 'Account not found';
+                                res.status(404).end();
+                                return;
+                            }
+                        });
+                    } else {
+                        res.statusMessage = 'Missing parameter: account';
+                        res.status(400).end();
+                        return;
+                    }
+                } else {
+                    res.statusMessage = 'Invalid token';
+                    res.status(400).end();
+                    return;
+                }
+            }
+        }
+    });
 });
