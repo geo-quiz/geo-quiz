@@ -1,5 +1,7 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from './Role';
+import { Score } from './Score';
+
 
 @Entity()
 export class Account {
@@ -26,9 +28,12 @@ export class Account {
     @Column()
     profilePicture: string;
 
+    @ManyToOne(() => Role, ((role) => role.id))
+    role: Role | undefined;
+
+    @OneToMany(() => Score, ((scores) => scores.id))
+    scores: Score | undefined;
+
     @Column({ type: 'tinyint' })
     leaderboardParticipation: 0 | 1;
-
-    @ManyToOne(() => Role, (role) => role.id)
-    role: Role | undefined;
 }
