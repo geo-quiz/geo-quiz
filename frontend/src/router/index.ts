@@ -60,11 +60,10 @@ const router = createRouter({
             component: ForgotPasswordView,
         },
         {
-            path: '/leaderboard',
+            path: '/leaderboard/:continent',
             name: 'leaderboard',
             component: LeaderboardView,
-        }
-
+        },
     ],
 });
 
