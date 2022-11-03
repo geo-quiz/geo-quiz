@@ -122,21 +122,21 @@ function getOverallBoard() {
                     <label class="winner-name">Second place name</label>
                     <div class="winner-time-points">
                         <label class="winner-points">200p</label>
-                        <label class="winner-time">20 sec</label>
+                        <label class="winner-time">20s</label>
                     </div>
                 </div>
                 <div class="winner-stats">
                     <label class="winner-name">First place name</label>
                     <div class="winner-time-points">
                         <label class="winner-points">300p</label>
-                        <label class="winner-time">10 sec</label>
+                        <label class="winner-time">10s</label>
                     </div>
                 </div>
                 <div class="winner-stats">
                     <label class="winner-name">Third place name</label>
                     <div class="winner-time-points">
                         <label class="winner-points">100p</label>
-                        <label class="winner-time">30 sec</label>
+                        <label class="winner-time">30s</label>
                     </div>
                 </div>
             </div>
@@ -281,6 +281,14 @@ main {
     display: flex;
     text-align: center;
 }
+.winner-points {
+    background: var(--color-light-blue);
+    border-radius: var(--radius) 0 0 var(--radius);
+    color: var(--color-black);
+    height: 150%;
+    text-align: center;
+    width: 100%;
+}
 
 .winner-stats {
     display: flex;
@@ -289,12 +297,21 @@ main {
     justify-content: center;
 }
 
+.winner-time {
+    background: var(--color-blue);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    color: var(--color-light-blue);
+    height: 150%;
+    text-align: center;
+    width: 100%;
+}
+
 .winner-time-points {
     display: flex;
     flex-direction: row;
-    gap: calc(var(--gap) * 2);
     justify-content: center;
 }
+
 
 .wrapper {
     align-items: center;
