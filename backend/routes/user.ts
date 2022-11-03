@@ -464,7 +464,8 @@ userRoute.post('/upload-image', (req, res) => {
                                                         image.filepath,
                                                         path.join(uploadFolder, account.id + '.' + fileEnding),
                                                         () => {
-                                                            account.profilePicture = newPath;
+                                                            account.profilePicture =
+                                                                'images/' + account.id + '.' + fileEnding;
 
                                                             repository
                                                                 .save(account)
@@ -484,7 +485,7 @@ userRoute.post('/upload-image', (req, res) => {
                                                     res.status(200).end();
                                                     return;
                                                 } else {
-                                                    fs.rm(account.profilePicture, (err) => {
+                                                    fs.rm('public\\' + account.profilePicture, (err) => {
                                                         if (err) {
                                                             console.log(err);
                                                             res.statusMessage = 'Could not remove file';
@@ -492,7 +493,8 @@ userRoute.post('/upload-image', (req, res) => {
                                                             return;
                                                         } else {
                                                             fs.rename(image.filepath, newPath, () => {
-                                                                account.profilePicture = newPath;
+                                                                account.profilePicture =
+                                                                    'images/' + account.id + '.' + fileEnding;
 
                                                                 repository
                                                                     .save(account)
