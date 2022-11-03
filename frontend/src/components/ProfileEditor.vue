@@ -105,6 +105,10 @@ function submitIfValid() {
                         if (statusText === 'Invalid password') {
                             isCurrentPasswordValid.value = false;
                         }
+                        if (statusText === 'Display name already taken') {
+                            isDisplayNameError.value = true;
+                            isDisplayNameChanging.value = false;
+                        }
                     }
                     awaitingResponse.value = false;
                 })
@@ -153,14 +157,12 @@ onMounted(() => {
                     v-model="displayName"
                     autocomplete="off"
                     name="display-name"
-                    pattern="^[a-zA-Z]{3,}"
                     placeholder="Display name"
                     required
-                    title="Display name must be at least 3 characters long and only contain letters"
                     type="text"
                     @input="isDisplayNameChanging = true" />
                 <label v-if="isDisplayNameError && !isDisplayNameChanging" class="error">
-                    DisplayName already taken
+                    Display name already taken
                 </label>
             </div>
             <div class="password">
@@ -334,15 +336,6 @@ main {
     width: 300px;
 }
 
-.wrapper {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap);
-    justify-content: center;
-    width: 100%;
-}
-
 .password {
     display: flex;
     flex-direction: column;
@@ -392,5 +385,14 @@ main {
     padding: 10px 20px;
     text-align: center;
     width: fit-content;
+}
+
+.wrapper {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    justify-content: center;
+    width: 100%;
 }
 </style>
