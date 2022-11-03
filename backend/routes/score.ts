@@ -13,7 +13,7 @@ const repository = AppDataSource.getRepository(Score);
 const accountRepository = AppDataSource.getRepository(Account);
 const secretToken = process.env.SECRET_TOKEN_SECRETS as string;
 
-//route
+
 export const scoreRoute = Router();
 
 scoreRoute.get(baseUrl, (_req, res) => {
@@ -46,7 +46,6 @@ scoreRoute.post(baseUrl, (req, res) => {
     //let continent = '';
    // let secretToken = userRoute.;//??
 
-    //if()
     function saveToContinentLeaderboards(continent: Continent, savedScore: Score) {
         leaderboardRepository
             .findOneBy({ continent: continent, daily: false })
@@ -161,7 +160,7 @@ scoreRoute.post(baseUrl, (req, res) => {
                                                 .status(404)
                                                 .json({ errorMessage: 'Score repo could not be found', error: error }),
                                         );
-                                    // else return error in score
+                                    
                                 }
                             }
                         });
