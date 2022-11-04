@@ -5,6 +5,8 @@ import bodyParser from 'body-parser';
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import * as fs from 'fs';
+import { AppDataSource } from './AppDataSource';
+import { Account } from './entities/Account';
 
 const app = express();
 
@@ -22,10 +24,14 @@ app.use('/', routes);
 if (token) {
     app.listen(3000, () => {
         console.log('Server running : http://localhost:3000');
-        removeUnusedImages();
 
-        //Remove unused images every hour
-        setTimeout(removeUnusedImages, 1000 * 60 * 60);
+        //Remove unused images on startup and every hour
+        setTimeout(() => {
+            removeUnusedImages();
+            setInterval(() => {
+                removeUnusedImages();
+            }, 1000 * 60 * 60);
+        }, 5000);
     });
 } else {
     console.error('No token provided');
@@ -33,21 +39,36 @@ if (token) {
 }
 
 function removeUnusedImages() {
-    fs.readdir('public/images', (err, files) => {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        if (files) {
-            files.forEach((file) => {
-                if (file !== 'default.svg') {
-                    fs.rm(`public/images/${file}`, (err) => {
-                        if (err) {
-                            console.error(err);
-                        }
-                    });
-                }
-            });
-        }
+    const repository = AppDataSource.getRepository(Account);
+    const accountImages: Set<string> = new Set();
+
+    repository.find().then((accounts) => {
+        accounts.forEach((account) => {
+            if (account.profilePicture) {
+                accountImages.add(account.profilePicture.replace('images/', ''));
+            }
+        });
+        console.log(accountImages);
+
+        const imagesInUse = Array.from(accountImages);
+
+        fs.readdir('public/images', (err, files) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            if (files) {
+                files.forEach((file) => {
+                    if (file !== 'default.svg' && !imagesInUse.includes(file)) {
+                        console.log('Removing ', file);
+                        fs.rm(`public/images/${file}`, (err) => {
+                            if (err) {
+                                console.error(err);
+                            }
+                        });
+                    }
+                });
+            }
+        });
     });
 }

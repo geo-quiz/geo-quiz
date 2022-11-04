@@ -478,8 +478,6 @@ userRoute.post('/upload-image', (req, res) => {
                                                                 });
                                                         },
                                                     );
-                                                    res.status(200).end();
-                                                    return;
                                                 } else {
                                                     fs.rm('public\\' + account.profilePicture, (err) => {
                                                         if (err) {
