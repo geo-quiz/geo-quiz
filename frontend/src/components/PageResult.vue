@@ -10,14 +10,16 @@ import type { IQuestion } from '@/utility/interfaces/IQuestion';
 import router from '@/router';
 import ResultAnswer from '@/components/ResultAnswer.vue';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
+// import { useAuthStore } from '@/stores/auth';
 
 const userAnswersStore = useUserAnswerStore();
-
+// const authStore = useAuthStore();
 const currentQuiz = useCurrentQuizStore();
 
 const usersAnswer: Ref<Map<number, number>> = ref(userAnswersStore.answers);
 const questions: Ref<IQuestion[]> = ref(userAnswersStore.questions);
 const totalTime: Ref<Number> = ref(currentQuiz.totalTime);
+const continent = ref(currentQuiz.currentContinent);
 
 function proceed() {
     router.push('/home').then(() => {
@@ -31,9 +33,25 @@ function proceed() {
 onMounted(() => {
     if (usersAnswer.value.size <= 0) {
         router.push('/home');
+    } else {
+        sendToBackend();
     }
 });
 
+function sendToBackend() {
+    fetch('http://localhost:3000/scores', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            continent: continent.value,
+            time: totalTime.value,
+            score: userAnswersStore.score,
+            // token: authStore.getToken(),
+        }),
+    });
+}
 </script>
 
 <template>
@@ -51,22 +69,18 @@ onMounted(() => {
         </div>
         <div class="score-container">
             <div id="total-score">
-                <div class="test">
+                <div class="box-title">
                     <Earth class="total-header">Total score</Earth>
                     <p>Total score</p>
                 </div>
-                <div class="test2">
-                    <div class="total">{{ currentQuiz.points }}</div>
-                </div>
+                <div class="total">{{ currentQuiz.points }}</div>
             </div>
             <div id="total-time">
-                <div class="test">
+                <div class="box-title">
                     <ClockTimeTenOutline class="total-header">Total time</ClockTimeTenOutline>
                     <p>Total time</p>
                 </div>
-                <div class="test2">
-                    <div class="total">{{ totalTime }}</div>
-                </div>
+                <div class="total">{{ totalTime }}</div>
             </div>
         </div>
         <div v-if="usersAnswer.size > 0" class="answer-wrapper">
@@ -127,7 +141,7 @@ h2 {
     width: 100%;
 }
 
-.test {
+.box-title {
     display: flex;
     gap: var(--gap);
     justify-content: center;
