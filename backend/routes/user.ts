@@ -198,6 +198,7 @@ userRoute.post('/login', (req, res) => {
 });
 
 function verifyToken(
+
     token: string,
     callback: (err: VerifyErrors | null, decoded: JwtPayload | string | undefined) => void,
 ) {
