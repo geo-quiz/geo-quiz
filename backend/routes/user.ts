@@ -545,7 +545,7 @@ userRoute.post('/delete-account', (req, res) => {
     if (token && password) {
         verifyToken(token, (error, decoded) => {
             if (error) {
-                res.statusMessage = 'Invalid token 1';
+                res.statusMessage = 'Invalid token';
                 res.status(400).json({ error: error }).end();
                 return;
             }
@@ -556,10 +556,19 @@ userRoute.post('/delete-account', (req, res) => {
                         if (account) {
                             bcrypt.compare(password, account.passwordHash).then((validPass) => {
                                 if (validPass) {
-                                    repository.delete(account).then(() => {
-                                        res.status(200).json({ msg: 'Account deleted' });
-                                        return;
-                                    });
+                                    tokenRepository
+                                        .insert(token)
+                                        .then(() => {
+                                            repository.delete(account).then(() => {
+                                                res.status(200).json({ msg: 'Account deleted' });
+                                                return;
+                                            });
+                                        })
+                                        .catch(() => {
+                                            res.statusMessage = 'Something went wrong';
+                                            res.status(500).end();
+                                            return;
+                                        });
                                 } else {
                                     res.statusMessage = 'Invalid password';
                                     res.status(400).end();
@@ -573,7 +582,7 @@ userRoute.post('/delete-account', (req, res) => {
                         }
                     });
                 } else {
-                    res.statusMessage = 'Invalid token 2';
+                    res.statusMessage = 'Invalid token';
                     res.status(400).end();
                     return;
                 }

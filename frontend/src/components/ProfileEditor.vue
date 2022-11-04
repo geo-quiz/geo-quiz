@@ -81,17 +81,8 @@ function confirmDeletion() {
     })
         .then((res) => {
             if (res.ok) {
-                authStore
-                    .logout()
-                    .then(() => {
-                        awaitingResponse.value = false;
-                        router.push('/');
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                        awaitingResponse.value = false;
-                        router.push('/');
-                    });
+                authStore.clearToken();
+                awaitingResponse.value = false;
             } else {
                 deletionError.value = true;
                 deletionErrorText.value = res.statusText;
@@ -153,7 +144,6 @@ function submitIfValid() {
                     password: currentPassword.value,
                     account: {
                         displayName: displayName.value,
-                        profilePicture: profilePicture.value,
                         password: newPassword.value,
                         leaderboardParticipation: isLeaderboardChecked.value,
                     },
@@ -337,10 +327,10 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 40px;
+    max-width: 530px;
     padding: 25px;
     text-align: center;
     width: 75%;
-    max-width: 530px;
 }
 
 #deletion-field {
@@ -353,9 +343,9 @@ onMounted(() => {
 }
 
 .deletion-error {
-    text-align: center;
     overflow-wrap: normal;
     padding: 0 20px;
+    text-align: center;
 }
 
 .error {
