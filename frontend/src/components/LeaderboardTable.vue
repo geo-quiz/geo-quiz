@@ -37,28 +37,36 @@ const overallUserScore = computed(() => {
 
 let scores: Ref<IScore[] | null> = ref(null);
 
+let first: Ref<IScore | null> = ref(null);
+let second: Ref<IScore | null> = ref(null);
+let third: Ref<IScore | null> = ref(null);
+let scoresTable: Ref<IScore[] | null> = ref(null);
+
 let isOverall = ref(true);
 
 function getLeaderboards(currentContinent: string) {
-    awaitingResponse.value = true;
     fetch(`http://localhost:3000/leaderboard/${currentContinent}`)
         .then((response) => response.json())
         .then((data: { continentBoards: ILeaderboard[]; userScore: ILeaderboard[] }) => {
             leaderboards.value = data.continentBoards;
             userScores.value = data.userScore;
-            awaitingResponse.value = false;
         })
         .catch(() => {
             router.back();
             alert('Something went wrong, please try again');
-            awaitingResponse.value = false;
         });
 }
 
 onMounted(() => {
+    awaitingResponse.value = true;
     let currentContinent: string = route.params.continent as string;
     getLeaderboards(currentContinent);
-    getOverallBoard();
+    setTimeout(() => {
+        getDailyBoard();
+        awaitingResponse.value = false;
+    }, 250);
+    //getOverallBoard();
+    console.log('finished mounting');
 });
 
 function getSubtitle() {
@@ -105,15 +113,24 @@ function getDailyBoard() {
     if (dailyLeaderboard.value) {
         console.log('dailyBoard has data');
         if (dailyLeaderboard.value.scores) {
-            scores.value = dailyLeaderboard.value?.scores;
+            scores.value = dailyLeaderboard.value.scores;
+            first.value = scores.value[0];
+            second.value = scores.value[1];
+            third.value = scores.value[2];
+            scoresTable.value = scores.value.slice(3);
+
             console.log('daily scores assigned');
+            console.log('first ', first.value?.displayName);
+            console.log('second ', second.value?.displayName);
+            console.log('third ', third.value?.displayName);
         } else {
-            console.error('no value in dailyLeaderboard scores');
+            console.log('no value in dailyLeaderboard scores');
         }
     } else {
-        console.error('no value in dailyLeaderboard');
+        console.log('no value in dailyLeaderboard');
     }
     console.log('daily scores ', scores.value);
+
     isOverall.value = false;
 }
 
@@ -122,13 +139,22 @@ function getOverallBoard() {
     if (overallLeaderboard.value) {
         console.log('overallBoard has data');
         if (overallLeaderboard.value.scores) {
-            scores.value = overallLeaderboard.value?.scores;
+            scores.value = overallLeaderboard.value.scores;
+
+            first.value = scores.value[0];
+            second.value = scores.value[1];
+            third.value = scores.value[2];
+            scoresTable.value = scores.value.slice(3);
+
             console.log('overall scores assigned');
+            console.log('first ', first.value?.displayName);
+            console.log('second ', second.value?.displayName);
+            console.log('third ', third.value?.displayName);
         } else {
-            console.error('no value in overallLeaderboard scores');
+            console.log('no value in overallLeaderboard scores');
         }
     } else {
-        console.error('no value in overallLeaderboard');
+        console.log('no value in overallLeaderboard');
     }
 
     console.log('overall scores ', scores.value);
@@ -153,82 +179,86 @@ function getOverallBoard() {
             </div>
 
             <div class="overall-daily-buttons-wrapper">
-                <GeoButton v-if="isOverall" class="overall-button-disabled" font-size="1.125rem">Overall</GeoButton>
-                <GeoButton v-else class="overall-button-active" font-size="1.125rem" @click="getOverallBoard()"
-                    >Overall</GeoButton
-                >
-
-                <GeoButton v-if="isOverall" class="daily-button-active" font-size="1.125rem" @click="getDailyBoard()"
-                    >Daily</GeoButton
-                >
+                <GeoButton v-if="isOverall" class="daily-button-active" font-size="1.125rem" @click="getDailyBoard"
+                >Daily</GeoButton>
                 <GeoButton v-else class="daily-button-disabled" font-size="1.125rem">Daily</GeoButton>
+
+                <GeoButton v-if="isOverall" class="overall-button-disabled" font-size="1.125rem">Overall</GeoButton>
+                <GeoButton v-else class="overall-button-active" font-size="1.125rem" @click="getOverallBoard"
+                    >Overall</GeoButton>
             </div>
-
-            <img id="crown" src="/images/crown.svg" alt="Winner's crown." />
-
-            <div id="profile-pictures-wrapper" class="field">
-                <div class="profile-picture-div">
-                    <img id="profile-picture-second" src="/images/gubbe-left.svg" alt="Second place profile picture" />
-                    <label class="medallion" id="medallion-second">2</label>
-                    <img
-                        id="profile-picture-first"
-                        src="/images/default-profile-picture.svg"
-                        alt="First place profile picture" />
-                    <label class="medallion" id="medallion-first">1</label>
-                    <img id="profile-picture-third" src="/images/gubbe-right.svg" alt="Third place profile picture" />
-                    <label class="medallion" id="medallion-third">3</label>
+            <PageLoad v-if="awaitingResponse" />
+            <div v-else class="wrapper">
+                <div id="profile-pictures-wrapper" >
+                    <div class="profile-picture-div">
+                        <img
+                            id="profile-picture-second"
+                            src="/images/gubbe-left.svg"
+                            alt="Second place profile picture" />
+                        <label class="medallion" id="medallion-second">2</label>
+                        <img
+                            id="profile-picture-first"
+                            src="/images/default-profile-picture.svg"
+                            alt="First place profile picture" />
+                        <label class="medallion" id="medallion-first">1</label>
+                        <img
+                            id="profile-picture-third"
+                            src="/images/gubbe-right.svg"
+                            alt="Third place profile picture" />
+                        <label class="medallion" id="medallion-third">3</label>
+                    </div>
+                        <div id="crown"></div>
                 </div>
-            </div>
-            <div class="medallion-wrapper">
-                <div class="medallion-div"></div>
-            </div>
+                <div class="medallion-wrapper">
+                    <div class="medallion-div"></div>
+                </div>
 
-            <div class="winner-container">
-                <div class="winner-stats">
-                    <label class="winner-name">Second place name</label>
-                    <div class="winner-time-points">
-                        <label class="winner-points">200p</label>
-                        <label class="winner-time">20s</label>
+                <div class="winner-container">
+                    <div class="winner-stats">
+                        <label class="winner-name">Second place name</label>
+                        <div class="winner-time-points">
+                            <label class="winner-points">200p</label>
+                            <label class="winner-time">20s</label>
+                        </div>
+                    </div>
+                    <div class="winner-stats">
+                        <label class="winner-name">First place name</label>
+                        <div class="winner-time-points">
+                            <label class="winner-points">300p</label>
+                            <label class="winner-time">10s</label>
+                        </div>
+                    </div>
+                    <div class="winner-stats">
+                        <label class="winner-name">Third place name</label>
+                        <div class="winner-time-points">
+                            <label class="winner-points">100p</label>
+                            <label class="winner-time">30s</label>
+                        </div>
                     </div>
                 </div>
-                <div class="winner-stats">
-                    <label class="winner-name">First place name</label>
-                    <div class="winner-time-points">
-                        <label class="winner-points">300p</label>
-                        <label class="winner-time">10s</label>
-                    </div>
-                </div>
-                <div class="winner-stats">
-                    <label class="winner-name">Third place name</label>
-                    <div class="winner-time-points">
-                        <label class="winner-points">100p</label>
-                        <label class="winner-time">30s</label>
-                    </div>
-                </div>
-            </div>
 
-            <h3 v-if="isOverall">Overall Table</h3>
-            <h3 v-else>Daily Table</h3>
-            <div class="table-wrapper">
-                <div v-for="(score, index) in scores" :key="index">
-                    <table class="table-scores">
-                        <tr>
-                            <td> <img id="profile-picture-table" src="/images/gubbe-left.svg" alt="User profile picture" /></td>
-                            <td class="table-name">{{ score.displayName }}</td>
-                            <td class="table-points">{{ score.points }}p</td>
-                            <td class="table-time">{{ score.time }}s</td>
-                        </tr>
-                    </table>
+                <h3 v-if="isOverall">Overall Table</h3>
+                <h3 v-else>Daily Table</h3>
+                <div class="table-wrapper">
+                    <div v-for="(score, index) in scoresTable" :key="index">
+                        <table class="table-scores">
+                            <tr>
+                                <td>
+                                    <img
+                                        id="profile-picture-table"
+                                        src="/images/gubbe-left.svg"
+                                        alt="User profile picture" />
+                                </td>
+                                <td class="table-name">{{ score.displayName }}</td>
+                                <td class="table-points">{{ score.points }}p</td>
+                                <td class="table-time">{{ score.time }}s</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
-
-    <PageNotification v-if="awaitingResponse">
-        <div id="notification-wrapper">
-            <PageLoad />
-        </div>
-    </PageNotification>
 </template>
 
 <style scoped>
@@ -292,7 +322,6 @@ main {
     align-items: center;
     display: flex;
     flex-direction: row;
-    margin-bottom: -80px;
     width: 50%;
 }
 
@@ -309,7 +338,6 @@ main {
 
 .table-points {
     text-align: right;
-
 }
 
 .table-scores {
@@ -321,8 +349,6 @@ main {
 .table-time {
     padding: 6px;
     text-align: right;
-
-
 }
 
 .table-wrapper {
@@ -391,9 +417,11 @@ main {
 }
 
 #crown {
-    left: 0;
+    left: 42.5%;
+    background: url(/images/crown.svg);
+    background-size: cover;
     position: relative;
-    top: 60%;
+    top: -289px;
     transform: translate(-105%, 80%);
     height: 80px;
     width: 80px;
@@ -418,16 +446,6 @@ main {
     position: relative;
     left: -80px;
     top: 5px;
-}
-
-#notification-wrapper {
-    align-items: center;
-    background: var(--color-dark-blue);
-    border-radius: var(--radius);
-    display: flex;
-    height: 175px;
-    justify-content: center;
-    width: 80%;
 }
 
 #profile-picture-first {
@@ -461,5 +479,10 @@ main {
     border-radius: 40px;
     height: 60px;
     width: 60px;
+}
+
+#profile-pictures-wrapper {
+    margin-bottom: -80px;
+    margin-top: 20px;
 }
 </style>

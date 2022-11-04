@@ -3,5 +3,5 @@ export interface IScore {
     points: number;
     time: number;
     displayName: string;
-    avatarUrl: string;
+    //    avatarUrl: string;
 }
