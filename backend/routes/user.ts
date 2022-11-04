@@ -272,10 +272,6 @@ userRoute.post('/update', (req, res) => {
                                                 .then((account) => {
                                                     if (account) {
                                                         if (account.email === email) {
-                                                            if (accountBody.profilePicture) {
-                                                                account.profilePicture =
-                                                                    accountBody.profilePicture as string;
-                                                            }
                                                             if (accountBody.leaderboardParticipation) {
                                                                 if (accountBody.leaderboardParticipation as boolean) {
                                                                     account.leaderboardParticipation = 1;
@@ -542,52 +538,61 @@ userRoute.post('/upload-image', (req, res) => {
 });
 
 userRoute.post('/delete-account', (req, res) => {
+    console.log(req.body);
     const token = req.body.token;
     const password = req.body.password;
 
-    verifyToken(token, (error, decoded) => {
-        if (token && password) {
+    if (token && password) {
+        verifyToken(token, (error, decoded) => {
             if (error) {
-                res.statusMessage = 'Invalid token';
+                res.statusMessage = 'Invalid token 1';
                 res.status(400).json({ error: error }).end();
                 return;
             }
             if (decoded) {
                 if ((decoded as JwtPayload).email) {
                     const email = (decoded as JwtPayload).email;
-                    const accountBody = req.body.account;
-                    if (accountBody) {
-                        repository.findOneBy({ email: email }).then((account) => {
-                            if (account) {
-                                bcrypt.compare(password, account.passwordHash).then((validPass) => {
-                                    if (validPass) {
-                                        repository.delete(account).then(() => {
-                                            res.status(200).json({ msg: 'Account deleted' });
-                                            return;
-                                        });
-                                    } else {
-                                        res.statusMessage = 'Invalid password';
-                                        res.status(400).end();
+                    repository.findOneBy({ email: email }).then((account) => {
+                        if (account) {
+                            bcrypt.compare(password, account.passwordHash).then((validPass) => {
+                                if (validPass) {
+                                    repository.delete(account).then(() => {
+                                        res.status(200).json({ msg: 'Account deleted' });
                                         return;
-                                    }
-                                });
-                            } else {
-                                res.statusMessage = 'Account not found';
-                                res.status(404).end();
-                                return;
-                            }
-                        });
-                    } else {
-                        res.statusMessage = 'Missing parameter: account';
-                        res.status(400).end();
-                        return;
-                    }
+                                    });
+                                } else {
+                                    res.statusMessage = 'Invalid password';
+                                    res.status(400).end();
+                                    return;
+                                }
+                            });
+                        } else {
+                            res.statusMessage = 'Account not found';
+                            res.status(404).end();
+                            return;
+                        }
+                    });
                 } else {
-                    res.statusMessage = 'Invalid token';
+                    res.statusMessage = 'Invalid token 2';
                     res.status(400).end();
                     return;
                 }
+            } else {
+                res.status(500).end();
+                return;
             }
-        }
-    });
+        });
+    } else if (!token && password) {
+        res.statusMessage = 'Missing parameter: Token';
+        res.status(400).end();
+        return;
+    } else if (token && !password) {
+        res.statusMessage = 'Missing parameter: Password';
+        res.status(400).end();
+        return;
+    } else {
+        res.statusMessage = 'Missing parameters: Token, Password';
+        res.status(400).end();
+        return;
+    }
 });
