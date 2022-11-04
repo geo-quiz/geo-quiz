@@ -4,11 +4,12 @@ import { computed, onMounted, Ref, ref } from 'vue';
 import ChevronRight from 'vue-material-design-icons/ChevronRight.vue';
 import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue';
 import PageLoad from '@/components/PageLoad.vue';
-import PageNotification from '@/components/PageNotification.vue';
 import router from '@/router/index';
 import type { ILeaderboard } from '@/utility/interfaces/ILeaderboard';
 import type { IScore } from '@/utility/interfaces/IScore';
 import { useRoute } from 'vue-router';
+
+const defaultScore = { id: 0, points: 0, time: 0, displayName: '' } as IScore;
 
 const awaitingResponse = ref(false);
 
@@ -21,10 +22,10 @@ console.log('currentContinent ', currentContinent);
 const continents = ['africa', 'asia', 'europe', 'north-america', 'oceania', 'south-america', 'world'];
 
 const leaderboards: Ref<ILeaderboard[] | null> = ref(null);
-const dailyLeaderboard = computed(() => {
+let dailyLeaderboard = computed(() => {
     return leaderboards.value?.filter((board) => board.daily)[0];
 });
-const overallLeaderboard = computed(() => {
+let overallLeaderboard = computed(() => {
     return leaderboards.value?.filter((board) => !board.daily)[0];
 });
 const userScores: Ref<ILeaderboard[] | null> = ref(null);
@@ -35,22 +36,28 @@ const overallUserScore = computed(() => {
     return userScores.value?.filter((board) => !board.daily)[0];
 });
 
-let scores: Ref<IScore[] | null> = ref(null);
+let scores: Ref<IScore[]> = ref([]);
 
-let first: Ref<IScore | null> = ref(null);
-let second: Ref<IScore | null> = ref(null);
-let third: Ref<IScore | null> = ref(null);
-let scoresTable: Ref<IScore[] | null> = ref(null);
+let first: Ref<IScore> = ref(defaultScore);
+let second: Ref<IScore> = ref(defaultScore);
+let third: Ref<IScore> = ref(defaultScore);
+let scoresTable: Ref<IScore[]> = ref([]);
+scoresTable.value[0] = defaultScore;
 
 let isOverall = ref(true);
 
-function getLeaderboards(currentContinent: string) {
-    fetch(`http://localhost:3000/leaderboard/${currentContinent}`)
-        .then((response) => response.json())
-        .then((data: { continentBoards: ILeaderboard[]; userScore: ILeaderboard[] }) => {
-            leaderboards.value = data.continentBoards;
-            userScores.value = data.userScore;
-        })
+function getLeaderboards(newContinent: string) {
+    console.log('in getLeadersboards');
+    fetch(`http://localhost:3000/leaderboard/${newContinent}`)
+        .then((response) =>
+            response.json().then((data: { continentBoards: ILeaderboard[]; userScore: ILeaderboard[] }) => {
+                leaderboards.value = data.continentBoards;
+                userScores.value = data.userScore;
+                console.log(newContinent, 'loaded');
+                console.log(leaderboards.value[0].id);
+                console.log(leaderboards.value[0].daily);
+            }),
+        )
         .catch(() => {
             router.back();
             alert('Something went wrong, please try again');
@@ -58,15 +65,9 @@ function getLeaderboards(currentContinent: string) {
 }
 
 onMounted(() => {
-    awaitingResponse.value = true;
     let currentContinent: string = route.params.continent as string;
-    getLeaderboards(currentContinent);
-    setTimeout(() => {
-        getDailyBoard();
-        awaitingResponse.value = false;
-    }, 250);
-    //getOverallBoard();
-    console.log('finished mounting');
+    loadContinent(currentContinent);
+    console.log('finished mounting- currentContinent ', currentContinent);
 });
 
 function getSubtitle() {
@@ -95,41 +96,83 @@ function getPrevious() {
     if (previousIndex < 0) {
         previousIndex = 6;
     }
-    currentContinent = continents[previousIndex];
+    const nextContinent = continents[previousIndex];
+    loadContinent(nextContinent);
     getLeaderboards(currentContinent);
 }
 
+function loadContinent(nextContienent: any) {
+    awaitingResponse.value = true;
+    getLeaderboards(nextContienent);
+    currentContinent = nextContienent;
+    setTimeout(() => {
+        getDailyBoard();
+        awaitingResponse.value = false;
+    }, 1000);
+}
+
 function getNext() {
+    console.log('in getNext');
     let nextIndex = continents.findIndex((continent) => continent === currentContinent) + 1;
     if (nextIndex > 6) {
         nextIndex = 0;
     }
-    currentContinent = continents[nextIndex];
-    getLeaderboards(currentContinent);
+    const nextContinent = continents[nextIndex];
+    //router.push('/leaderboard/${currentContinent}');
+    loadContinent(nextContinent);
+    console.log('finished getNext');
+}
+
+function resetScores() {
+    first.value = defaultScore;
+    second.value = defaultScore;
+    third.value = defaultScore;
+    scoresTable.value[0] = defaultScore;
+}
+
+function setupScoresAndTable() {
+    resetScores();
+    if (scores.value[0]) {
+        first.value = scores.value[0];
+    } else {
+        console.log('no value in scores[0]');
+    }
+    if (scores.value[1]) {
+        second.value = scores.value[1];
+    } else {
+        console.log('no value in scores[1]');
+    }
+    if (scores.value[2]) {
+        third.value = scores.value[2];
+    } else {
+        console.log('no value in scores[2]');
+    }
+    if (scores.value[0]) {
+        scoresTable.value = scores.value.slice(3);
+    } else {
+        console.log('no values left in scores to assign to scoresTable');
+    }
+    console.log('daily scores assigned');
+    console.log('first ', first.value?.displayName);
+    console.log('second ', second.value?.displayName);
+    console.log('third ', third.value?.displayName);
 }
 
 function getDailyBoard() {
     console.log('start getDailyBoard()');
+
     if (dailyLeaderboard.value) {
         console.log('dailyBoard has data');
         if (dailyLeaderboard.value.scores) {
             scores.value = dailyLeaderboard.value.scores;
-            first.value = scores.value[0];
-            second.value = scores.value[1];
-            third.value = scores.value[2];
-            scoresTable.value = scores.value.slice(3);
-
-            console.log('daily scores assigned');
-            console.log('first ', first.value?.displayName);
-            console.log('second ', second.value?.displayName);
-            console.log('third ', third.value?.displayName);
+            setupScoresAndTable();
         } else {
             console.log('no value in dailyLeaderboard scores');
         }
     } else {
         console.log('no value in dailyLeaderboard');
     }
-    console.log('daily scores ', scores.value);
+    console.log('daily scoresTable ', scoresTable.value);
 
     isOverall.value = false;
 }
@@ -140,16 +183,7 @@ function getOverallBoard() {
         console.log('overallBoard has data');
         if (overallLeaderboard.value.scores) {
             scores.value = overallLeaderboard.value.scores;
-
-            first.value = scores.value[0];
-            second.value = scores.value[1];
-            third.value = scores.value[2];
-            scoresTable.value = scores.value.slice(3);
-
-            console.log('overall scores assigned');
-            console.log('first ', first.value?.displayName);
-            console.log('second ', second.value?.displayName);
-            console.log('third ', third.value?.displayName);
+            setupScoresAndTable();
         } else {
             console.log('no value in overallLeaderboard scores');
         }
@@ -169,45 +203,43 @@ function getOverallBoard() {
 
         <div class="wrapper">
             <div class="arrows">
-                <div class="arrow-left">
-                    <ChevronLeft size="50" @click="getPrevious()"></ChevronLeft>
+                <div class="arrow-left" @click="getPrevious()">
+                    <ChevronLeft size="50"></ChevronLeft>
                 </div>
-                <h3 class="subtitle">{{ getSubtitle() }}</h3>
-                <div class="arrow-right">
-                    <ChevronRight size="50" @click="getNext()"></ChevronRight>
+                <h3 class="subtitle" v-if="!awaitingResponse">{{ getSubtitle() }}</h3>
+                <div class="arrow-right" @click="getNext()">
+                    <ChevronRight size="50"></ChevronRight>
                 </div>
             </div>
 
             <div class="overall-daily-buttons-wrapper">
-                <GeoButton v-if="isOverall" class="daily-button-active" font-size="1.125rem" @click="getDailyBoard"
-                >Daily</GeoButton>
-                <GeoButton v-else class="daily-button-disabled" font-size="1.125rem">Daily</GeoButton>
+                <GeoButton v-if="isOverall" class="daily-button-active" @click="getDailyBoard"> Daily </GeoButton>
+                <GeoButton v-else class="daily-button-disabled">Daily</GeoButton>
 
-                <GeoButton v-if="isOverall" class="overall-button-disabled" font-size="1.125rem">Overall</GeoButton>
-                <GeoButton v-else class="overall-button-active" font-size="1.125rem" @click="getOverallBoard"
-                    >Overall</GeoButton>
+                <GeoButton v-if="isOverall" class="overall-button-disabled">Overall</GeoButton>
+                <GeoButton v-else class="overall-button-active" @click="getOverallBoard"> Overall </GeoButton>
             </div>
             <PageLoad v-if="awaitingResponse" />
             <div v-else class="wrapper">
-                <div id="profile-pictures-wrapper" >
+                <div id="profile-pictures-wrapper">
                     <div class="profile-picture-div">
                         <img
                             id="profile-picture-second"
-                            src="/images/gubbe-left.svg"
-                            alt="Second place profile picture" />
-                        <label class="medallion" id="medallion-second">2</label>
+                            alt="Second place profile picture"
+                            src="/images/gubbe-left.svg" />
+                        <label id="medallion-second" class="medallion">2</label>
                         <img
                             id="profile-picture-first"
-                            src="/images/default-profile-picture.svg"
-                            alt="First place profile picture" />
-                        <label class="medallion" id="medallion-first">1</label>
+                            alt="First place profile picture"
+                            src="/images/default-profile-picture.svg" />
+                        <label id="medallion-first" class="medallion">1</label>
                         <img
                             id="profile-picture-third"
-                            src="/images/gubbe-right.svg"
-                            alt="Third place profile picture" />
-                        <label class="medallion" id="medallion-third">3</label>
+                            alt="Third place profile picture"
+                            src="/images/gubbe-right.svg" />
+                        <label id="medallion-third" class="medallion">3</label>
                     </div>
-                        <div id="crown"></div>
+                    <div id="crown"></div>
                 </div>
                 <div class="medallion-wrapper">
                     <div class="medallion-div"></div>
@@ -215,39 +247,44 @@ function getOverallBoard() {
 
                 <div class="winner-container">
                     <div class="winner-stats">
-                        <label class="winner-name">Second place name</label>
+                        <label class="winner-name">{{ second.displayName }}</label>
                         <div class="winner-time-points">
-                            <label class="winner-points">200p</label>
-                            <label class="winner-time">20s</label>
+                            <label class="winner-points" v-if="second.displayName">{{ second.points }}</label>
+                            <label class="winner-points" v-else> </label>
+                            <label class="winner-time" v-if="second.displayName">{{ second.time }}</label>
+                            <label class="winner-time" v-else> </label>
                         </div>
                     </div>
                     <div class="winner-stats">
-                        <label class="winner-name">First place name</label>
+                        <label class="winner-name">{{ first.displayName }}</label>
                         <div class="winner-time-points">
-                            <label class="winner-points">300p</label>
-                            <label class="winner-time">10s</label>
+                            <label class="winner-points" v-if="first.displayName">{{ first.points }}</label>
+                            <label class="winner-points" v-else> </label>
+                            <label class="winner-time" v-if="first.displayName">{{ first.time }}</label>
+                            <label class="winner-time" v-else> </label>
                         </div>
                     </div>
                     <div class="winner-stats">
-                        <label class="winner-name">Third place name</label>
+                        <label class="winner-name">{{ third.displayName }}</label>
                         <div class="winner-time-points">
-                            <label class="winner-points">100p</label>
-                            <label class="winner-time">30s</label>
+                            <label class="winner-points" v-if="third.displayName">{{ third.points }}</label>
+                            <label class="winner-points" v-else> </label>
+                            <label class="winner-time" v-if="third.displayName">{{ third.time }}</label>
+                            <label class="winner-time" v-else> </label>
                         </div>
                     </div>
                 </div>
 
-                <h3 v-if="isOverall">Overall Table</h3>
-                <h3 v-else>Daily Table</h3>
                 <div class="table-wrapper">
                     <div v-for="(score, index) in scoresTable" :key="index">
                         <table class="table-scores">
-                            <tr>
-                                <td>
+                            <tr class="table-row" v-if="score.displayName">
+                                <td class="table-number">{{ 4 + index }}</td>
+                                <td class="table-picture">
                                     <img
-                                        id="profile-picture-table"
-                                        src="/images/gubbe-left.svg"
-                                        alt="User profile picture" />
+                                        alt="User profile picture"
+                                        class="profile-picture-table"
+                                        src="/images/gubbe-left.svg" />
                                 </td>
                                 <td class="table-name">{{ score.displayName }}</td>
                                 <td class="table-points">{{ score.points }}p</td>
@@ -269,19 +306,32 @@ function getOverallBoard() {
 }
 
 .arrow-left {
+    cursor: pointer;
 }
 
 .arrow-right {
+    cursor: pointer;
+}
+
+#crown {
+    background: url(/images/crown.svg);
+    background-size: cover;
+    height: 80px;
+    left: 42.5%;
+    position: relative;
+    top: -289px;
+    transform: translate(-105%, 80%);
+    width: 80px;
 }
 
 .daily-button-active {
-    border-radius: 0 var(--radius) var(--radius) 0;
+    border-radius: var(--radius) 0 0 var(--radius);
     font-size: 1.125rem;
 }
 
 .daily-button-disabled {
-    border-radius: 0 var(--radius) var(--radius) 0;
     background: var(--color-light-blue);
+    border-radius: var(--radius) 0 0 var(--radius);
     color: var(--color-black);
     font-size: 1.125rem;
 }
@@ -306,14 +356,35 @@ main {
     width: 40px;
 }
 
+#medallion-first {
+    background: #c29b0c;
+    left: -105px;
+    position: relative;
+    top: 5px;
+}
+
+#medallion-second {
+    background: #71706e;
+    left: -90px;
+    position: relative;
+    top: 5px;
+}
+
+#medallion-third {
+    background: #804a00;
+    left: -80px;
+    position: relative;
+    top: 5px;
+}
+
 .overall-button-active {
-    border-radius: var(--radius) 0 0 var(--radius);
+    border-radius: 0 var(--radius) var(--radius) 0;
     font-size: 1.125rem;
 }
 
 .overall-button-disabled {
-    border-radius: var(--radius) 0 0 var(--radius);
     background: var(--color-light-blue);
+    border-radius: 0 var(--radius) var(--radius) 0;
     color: var(--color-black);
     font-size: 1.125rem;
 }
@@ -332,23 +403,86 @@ main {
     width: 100%;
 }
 
+#profile-picture-first {
+    background: var(--color-light-blue);
+    border: 5px var(--color-blue) solid;
+    border-radius: 90px;
+    height: 180px;
+    width: 180px;
+}
+
+#profile-picture-second {
+    background: var(--color-light-blue);
+    border: 5px var(--color-blue) solid;
+    border-radius: 90px;
+    height: 150px;
+    width: 150px;
+}
+
+.profile-picture-table {
+    align-items: center;
+    background: var(--color-light-blue);
+    border: 3px var(--color-blue) solid;
+    border-radius: 40px;
+    height: 60px;
+    width: 60px;
+}
+
+#profile-picture-third {
+    background: var(--color-light-blue);
+    border: 5px var(--color-blue) solid;
+    border-radius: 90px;
+    height: 130px;
+    width: 130px;
+}
+
+#profile-pictures-wrapper {
+    margin-bottom: -80px;
+    margin-top: 20px;
+}
+
 .subtitle {
     margin-top: 12px;
 }
 
+.table-number {
+    padding-left: 10px;
+    text-align: center;
+    width: 25px;
+}
+
+.table-picture {
+    width: 20%;
+}
+
 .table-points {
     text-align: right;
+    width: 30%;
+}
+
+.table-name {
+    width: 25%;
+}
+
+.table-row {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap);
+    width: 100%;
 }
 
 .table-scores {
-    table-layout: fixed;
     height: 50px;
+    table-layout: fixed;
     width: 100%;
 }
 
 .table-time {
+    margin-right: 10px;
     padding: 6px;
     text-align: right;
+    width: 15%;
 }
 
 .table-wrapper {
@@ -363,14 +497,17 @@ main {
 .winner-container {
     display: flex;
     flex-direction: row;
-    gap: calc(var(--gap) * 3.7);
+    gap: calc(var(--gap) * 3);
     justify-content: center;
+    margin-bottom: 1vh;
+    width: 100%;
 }
 
 .winner-name {
-    display: flex;
     text-align: center;
+    height: 100%;
 }
+
 .winner-points {
     align-items: center;
     background: var(--color-light-blue);
@@ -387,14 +524,15 @@ main {
     flex-direction: column;
     gap: calc(var(--gap) * 2);
     justify-content: center;
+    width: 20%;
 }
 
 .winner-time {
     align-items: center;
     background: var(--color-light-blue);
-    border-radius: 0 var(--radius) var(--radius) 0;
     border-left-color: 1px var(--color-blue);
     border-left-style: solid;
+    border-radius: 0 var(--radius) var(--radius) 0;
     color: var(--color-black);
     display: flex;
     height: 150%;
@@ -414,75 +552,5 @@ main {
     flex-direction: column;
     gap: calc(var(--gap) * 2);
     width: 100%;
-}
-
-#crown {
-    left: 42.5%;
-    background: url(/images/crown.svg);
-    background-size: cover;
-    position: relative;
-    top: -289px;
-    transform: translate(-105%, 80%);
-    height: 80px;
-    width: 80px;
-}
-
-#medallion-first {
-    background: #c29b0c;
-    position: relative;
-    left: -105px;
-    top: 5px;
-}
-
-#medallion-second {
-    background: #71706e;
-    position: relative;
-    left: -90px;
-    top: 5px;
-}
-
-#medallion-third {
-    background: #804a00;
-    position: relative;
-    left: -80px;
-    top: 5px;
-}
-
-#profile-picture-first {
-    background: var(--color-light-blue);
-    border: 5px var(--color-blue) solid;
-    border-radius: 90px;
-    height: 180px;
-    width: 180px;
-}
-
-#profile-picture-second {
-    background: var(--color-light-blue);
-    border: 5px var(--color-blue) solid;
-    border-radius: 90px;
-    height: 150px;
-    width: 150px;
-}
-
-#profile-picture-third {
-    background: var(--color-light-blue);
-    border: 5px var(--color-blue) solid;
-    border-radius: 90px;
-    height: 130px;
-    width: 130px;
-}
-
-#profile-picture-table {
-    align-items: center;
-    background: var(--color-light-blue);
-    border: 3px var(--color-blue) solid;
-    border-radius: 40px;
-    height: 60px;
-    width: 60px;
-}
-
-#profile-pictures-wrapper {
-    margin-bottom: -80px;
-    margin-top: 20px;
 }
 </style>
