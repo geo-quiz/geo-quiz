@@ -26,6 +26,11 @@ export const useAuthStore = defineStore('auth', () => {
         return '';
     }
 
+    function clearToken() {
+        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
+    }
+
     function logout(): Promise<Boolean> {
         return new Promise<Boolean>((success, fail) => {
             const token = getToken();
@@ -73,5 +78,14 @@ export const useAuthStore = defineStore('auth', () => {
         profilePicture.value = newProfilePicture;
     }
 
-    return { setToken, getToken, logout, getDisplayName, setDisplayName, getProfilePicture, setProfilePicture };
+    return {
+        setToken,
+        getToken,
+        clearToken,
+        logout,
+        getDisplayName,
+        setDisplayName,
+        getProfilePicture,
+        setProfilePicture,
+    };
 });
