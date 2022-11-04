@@ -21,13 +21,14 @@ const isEqualPassword = ref(false);
 const isPasswordValid = ref(false);
 const deleteAccountPassword = ref('');
 const showConfirmDeleteAccount = ref(false);
-const confirmDeleteAccount = ref(false);
 const isLeaderboardChecked = ref(true);
 const isPasswordError = ref(false);
 const passwordError = ref('');
 const isCurrentPasswordValid = ref(true);
 const isUpdated = ref(false);
 const awaitingResponse = ref(false);
+const deletionError = ref(false);
+const deletionErrorText = ref('Something went wrong');
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$/;
 
@@ -66,7 +67,45 @@ function cancelDeletion() {
 
 function confirmDeletion() {
     showConfirmDeleteAccount.value = false;
-    confirmDeleteAccount.value = true;
+    awaitingResponse.value = true;
+
+    fetch('http://localhost:3000/delete-account', {
+        method: 'POST',
+        body: JSON.stringify({
+            token: authStore.getToken(),
+            password: deleteAccountPassword.value,
+        }),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+        .then((res) => {
+            if (res.ok) {
+                authStore
+                    .logout()
+                    .then(() => {
+                        awaitingResponse.value = false;
+                        router.push('/');
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        awaitingResponse.value = false;
+                        router.push('/');
+                    });
+            } else {
+                deletionError.value = true;
+                deletionErrorText.value = res.statusText;
+                awaitingResponse.value = false;
+                deleteAccountPassword.value = '';
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            deletionError.value = true;
+            deletionErrorText.value = 'Something went wrong';
+            awaitingResponse.value = false;
+            deleteAccountPassword.value = '';
+        });
 }
 
 function checkPassword() {
@@ -162,7 +201,7 @@ onMounted(() => {
 <template>
     <main>
         <h2>Your Profile</h2>
-        <form id="profile-form">
+        <form id="profile-form" @submit.prevent="submitIfValid">
             <div id="profile-picture-wrapper" class="field">
                 <div class="profile-picture-div">
                     <img id="profile-picture" :src="'http://127.0.0.1:3000/' + profilePicture" alt="Profile picture" />
@@ -242,8 +281,8 @@ onMounted(() => {
         </form>
     </main>
 
-    <PageNotification v-if="isUpdated || awaitingResponse">
-        <div class="notification-wrapper">
+    <PageNotification v-if="isUpdated || awaitingResponse || showConfirmDeleteAccount || deletionError">
+        <div v-if="isUpdated || awaitingResponse || deletionError" class="notification-wrapper">
             <div v-if="isUpdated" class="wrapper">
                 <p>Account details updated!</p>
                 <div class="notification-button-wrapper">
@@ -253,11 +292,14 @@ onMounted(() => {
             <div v-if="awaitingResponse" class="wrapper">
                 <PageLoad />
             </div>
+            <div v-if="deletionError" class="wrapper">
+                <p class="deletion-error">{{ deletionErrorText }}</p>
+                <div class="notification-button-wrapper">
+                    <GeoButton size="small" @click="deletionError = false">OK</GeoButton>
+                </div>
+            </div>
         </div>
-    </PageNotification>
-
-    <PageNotification v-if="showConfirmDeleteAccount">
-        <form id="deletion-form">
+        <form v-if="showConfirmDeleteAccount" id="deletion-form" @submit.prevent="confirmDeletion">
             <div id="deletion-field" class="field">
                 <label for="display-name">Enter your password to confirm deletion of your account</label>
                 <input
@@ -298,6 +340,7 @@ onMounted(() => {
     padding: 25px;
     text-align: center;
     width: 75%;
+    max-width: 530px;
 }
 
 #deletion-field {
@@ -307,6 +350,12 @@ onMounted(() => {
 #delete-account:hover {
     color: var(--color-white);
     cursor: pointer;
+}
+
+.deletion-error {
+    text-align: center;
+    overflow-wrap: normal;
+    padding: 0 20px;
 }
 
 .error {
