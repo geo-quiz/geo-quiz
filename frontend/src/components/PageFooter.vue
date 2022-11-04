@@ -1,6 +1,4 @@
-<script lang="ts" setup>
-
-</script>
+<script lang="ts" setup></script>
 
 <template>
     <footer>
@@ -22,5 +20,9 @@ p {
     font-size: 0.65rem;
     margin: 0;
     width: 100%;
+}
+
+footer {
+    margin-bottom: calc(var(--gap) * 3);
 }
 </style>

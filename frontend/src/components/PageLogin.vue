@@ -40,14 +40,7 @@ function login() {
             return res.json();
         })
         .then((data: any) => {
-            if (rememberMe.value) {
-                localStorage.setItem('token', data.accessToken);
-                sessionStorage.removeItem('token');
-            } else {
-                sessionStorage.setItem('token', data.accessToken);
-                localStorage.removeItem('token');
-            }
-            authStore.setToken(data.accessToken);
+            authStore.setToken(data.accessToken, rememberMe.value);
             router.push('/home');
             awaitingResponse.value = false;
         })
@@ -56,15 +49,6 @@ function login() {
             loginError.value = true;
             awaitingResponse.value = false;
         });
-
-    let possibleToken = localStorage.getItem('token');
-    if (possibleToken) {
-        authStore.setToken(possibleToken);
-    }
-    possibleToken = sessionStorage.getItem('token');
-    if (possibleToken) {
-        authStore.setToken(possibleToken);
-    }
 }
 </script>
 
