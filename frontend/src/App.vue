@@ -3,6 +3,7 @@ import { onMounted, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import router from '@/router/index';
 import { useRoute } from 'vue-router';
+
 const authStore = useAuthStore();
 const route = useRoute();
 
@@ -16,25 +17,37 @@ watch(
 );
 
 function checkAuthentication() {
-    const sessionToken = sessionStorage.getItem('token');
-    const localToken = localStorage.getItem('token');
+    const token = authStore.getToken();
+
     const hrefParts = location.href.split('/');
     const url = hrefParts[hrefParts.length - 1];
-    console.log('url ', { value: url });
-    if (!authStore.token) {
-        if (localToken) {
-            authStore.setToken(localToken);
-            redirectIfLoggedIn();
-        } else if (sessionToken) {
-            authStore.setToken(sessionToken);
-            redirectIfLoggedIn();
-        } else {
-            if (url !== 'login' && url !== 'register') {
-                router.push('/');
-            }
-        }
-    } else {
+    if (token) {
+        fetch('http://localhost:3000/verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    res.json().then((data) => {
+                        authStore.setDisplayName(data.displayName);
+                        authStore.setProfilePicture(data.profilePicture);
+                    });
+                } else {
+                    authStore.clearToken();
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                authStore.clearToken();
+            });
         redirectIfLoggedIn();
+    } else {
+        if (url !== 'login' && url !== 'register') {
+            router.push('/');
+        }
     }
 }
 
