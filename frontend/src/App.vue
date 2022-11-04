@@ -28,14 +28,21 @@ function checkAuthentication() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ token }),
-        }).then((res) => {
-            if (res.ok) {
-                res.json().then((data) => {
-                    authStore.setDisplayName(data.displayName);
-                    authStore.setProfilePicture(data.profilePicture);
-                });
-            }
-        });
+        })
+            .then((res) => {
+                if (res.ok) {
+                    res.json().then((data) => {
+                        authStore.setDisplayName(data.displayName);
+                        authStore.setProfilePicture(data.profilePicture);
+                    });
+                } else {
+                    authStore.clearToken();
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                authStore.clearToken();
+            });
         redirectIfLoggedIn();
     } else {
         if (url !== 'login' && url !== 'register') {
