@@ -381,8 +381,7 @@ userRoute.post('/logout', (req, res) => {
                     if (!existingToken) {
                         repository.findOneBy({ email: (decoded as JwtPayload).email }).then((account) => {
                             if (account) {
-                                const tokenEntity = new Token(req.body.token, account);
-                                tokenRepository.insert(tokenEntity).then((savedToken) => {
+                                tokenRepository.insert(new Token(req.body.token)).then((savedToken) => {
                                     if (savedToken) {
                                         res.statusMessage = 'Logged out';
                                         res.status(200).json({ msg: 'Logged Out' }).end();
@@ -455,7 +454,7 @@ userRoute.post('/upload-image', (req, res) => {
                                         if (account) {
                                             if (account.id) {
                                                 const newPath = path.join(uploadFolder, account.id + '.' + fileEnding);
-                                                if (account.profilePicture === '') {
+                                                if (account.profilePicture === 'images/default.svg') {
                                                     fs.rename(
                                                         image.filepath,
                                                         path.join(uploadFolder, account.id + '.' + fileEnding),
@@ -538,7 +537,6 @@ userRoute.post('/upload-image', (req, res) => {
 });
 
 userRoute.post('/delete-account', (req, res) => {
-    console.log(req.body);
     const token = req.body.token;
     const password = req.body.password;
 
@@ -557,14 +555,15 @@ userRoute.post('/delete-account', (req, res) => {
                             bcrypt.compare(password, account.passwordHash).then((validPass) => {
                                 if (validPass) {
                                     tokenRepository
-                                        .insert(token)
+                                        .insert(new Token(token))
                                         .then(() => {
                                             repository.delete(account).then(() => {
                                                 res.status(200).json({ msg: 'Account deleted' });
                                                 return;
                                             });
                                         })
-                                        .catch(() => {
+                                        .catch((error) => {
+                                            console.error(error);
                                             res.statusMessage = 'Something went wrong';
                                             res.status(500).end();
                                             return;

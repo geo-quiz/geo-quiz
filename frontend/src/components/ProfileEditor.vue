@@ -247,12 +247,9 @@ onMounted(() => {
                 </div>
                 <label v-if="!isPasswordChanging && passwordError" class="error">{{ passwordError }}</label>
             </div>
-            <div>
-                <GeoCheckbox
-                    :startingValue="isLeaderboardChecked"
-                    class="extra-space"
-                    @value="updateLeaderboardCheckedValue">
-                    Leaderboard participation
+            <div class="checkbox">
+                <GeoCheckbox :startingValue="isLeaderboardChecked" @value="updateLeaderboardCheckedValue">
+                    <p class="checkbox-text">Leaderboard participation</p>
                 </GeoCheckbox>
             </div>
             <div class="field">
@@ -314,6 +311,15 @@ onMounted(() => {
 <style scoped>
 .button-wrapper {
     width: calc(50% - var(--gap) / 2);
+}
+
+.checkbox {
+    align-self: flex-start;
+}
+
+.checkbox-text {
+    margin: 0;
+    font-size: 0.9rem;
 }
 
 #delete-account {
