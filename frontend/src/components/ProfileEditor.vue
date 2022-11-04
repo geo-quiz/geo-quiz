@@ -48,6 +48,7 @@ function uploadImage() {
             if (res.ok) {
                 res.json().then((data) => {
                     profilePicture.value = data.image;
+                    router.go(0);
                 });
             }
         })
