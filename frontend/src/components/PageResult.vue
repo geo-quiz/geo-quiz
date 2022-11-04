@@ -10,10 +10,10 @@ import type { IQuestion } from '@/utility/interfaces/IQuestion';
 import router from '@/router';
 import ResultAnswer from '@/components/ResultAnswer.vue';
 import { useCurrentQuizStore } from '@/stores/currentQuiz';
-// import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/stores/auth';
 
 const userAnswersStore = useUserAnswerStore();
-// const authStore = useAuthStore();
+const authStore = useAuthStore();
 const currentQuiz = useCurrentQuizStore();
 
 const usersAnswer: Ref<Map<number, number>> = ref(userAnswersStore.answers);
@@ -47,8 +47,8 @@ function sendToBackend() {
         body: JSON.stringify({
             continent: continent.value,
             time: totalTime.value,
-            score: userAnswersStore.score,
-            // token: authStore.getToken(),
+            score: currentQuiz.points,
+            token: authStore.getToken(),
         }),
     });
 }
