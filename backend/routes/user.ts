@@ -267,10 +267,12 @@ userRoute.post('/update', (req, res) => {
                                 bcrypt.compare(password, account.passwordHash).then((validPass) => {
                                     if (validPass) {
                                         if (accountBody.displayName) {
+                                            account.displayName = accountBody.displayName as string;
+
                                             repository
-                                                .findOneBy({ displayName: accountBody.displayName })
-                                                .then((account) => {
-                                                    if (account) {
+                                                .findOneBy({ displayName: account.displayName })
+                                                .then((existingAccount) => {
+                                                    if (!existingAccount) {
                                                         if (account.email === email) {
                                                             if (accountBody.leaderboardParticipation) {
                                                                 if (accountBody.leaderboardParticipation as boolean) {
@@ -324,14 +326,13 @@ userRoute.post('/update', (req, res) => {
                                                                         return;
                                                                     });
                                                             }
-                                                        } else {
-                                                            res.statusMessage = 'Display name already taken';
-                                                            res.status(400).end();
-                                                            return;
                                                         }
+                                                    } else {
+                                                        res.statusMessage = 'Display name already taken';
+                                                        res.status(400).end();
+                                                        return;
                                                     }
                                                 });
-                                            account.displayName = accountBody.displayName as string;
                                         }
                                     } else {
                                         res.statusMessage = 'Invalid password';
@@ -370,6 +371,11 @@ userRoute.post('/update', (req, res) => {
         res.status(400).end();
         return;
     }
+
+    setTimeout(() => {
+        res.statusMessage = 'Something went wrong';
+        res.status(500).end();
+    }, 10000);
 });
 
 userRoute.post('/logout', (req, res) => {
