@@ -83,6 +83,7 @@ function confirmDeletion() {
             if (res.ok) {
                 authStore.clearToken();
                 awaitingResponse.value = false;
+                router.push('/');
             } else {
                 deletionError.value = true;
                 deletionErrorText.value = res.statusText;
