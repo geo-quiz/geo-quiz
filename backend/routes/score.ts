@@ -155,7 +155,7 @@ scoreRoute.post(baseUrl, (req, res) => {
     // const time = req.body.time;
     // const score = req.body.score;
     const token = req.body.token;
-    console.log(req.body);
+    console.log(token);
 
     if (token) {
         verifyToken(token, (error, decoded) => {
@@ -167,9 +167,10 @@ scoreRoute.post(baseUrl, (req, res) => {
             if (decoded) {
                 if ((decoded as JwtPayload).displayName) {
                     const displayName = (decoded as JwtPayload).displayName;
-
-                    const scoreBody = req.body.score;
-                    if (scoreBody) {
+console.log(displayName)
+                    const scoreBody = req.body;
+           console.log(scoreBody)
+if (scoreBody) {
                         repository.findOneBy({ displayName: displayName }).then((score) => {
                             /* if(score) {
                                  displayName.compare(displayName, score.displayName).then((validPass) => {
