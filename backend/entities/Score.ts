@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
 import { Leaderboard } from './Leaderboard';
 
 @Entity()
@@ -10,21 +10,22 @@ export class Score {
     }
 
     @PrimaryGeneratedColumn()
-    id: number | undefined;
+        id: number | undefined;
 
     @Column()
-    points: number;
+        points: number;
 
     @Column()
-    time: number;
+        time: number;
 
     @Column()
-    displayName: string;
+        displayName: string;
 
     @Column()
     profilePicture: string;
 
     @ManyToMany(() => Leaderboard, (leaderboard) => leaderboard.scores)
-    leaderboards: Leaderboard[] | undefined;
+    @JoinTable()
+        leaderboards: Leaderboard[] | undefined;
     
 }
