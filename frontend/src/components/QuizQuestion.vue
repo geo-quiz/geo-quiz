@@ -51,6 +51,7 @@ onMounted(() => {
         .then((response) => response.json())
         .then((data) => {
             currentQuiz.setQuestions(data);
+            currentQuiz.setCurrentContinent(props.id);
             nrOfQuestions.value = currentQuiz.questions.length;
             countdown();
             resetAnswerResponses();
