@@ -158,10 +158,14 @@ function submitIfValid() {
                         const statusText = response.statusText;
                         if (statusText === 'Invalid password') {
                             isCurrentPasswordValid.value = false;
-                        }
-                        if (statusText === 'Display name already taken') {
+                        } else if (statusText === 'Display name already taken') {
                             isDisplayNameError.value = true;
                             isDisplayNameChanging.value = false;
+                        } else if (statusText === 'Invalid token') {
+                            alert('Invalid token');
+                            authStore.clearToken();
+                            router.push('/');
+                            router.go(0);
                         }
                     }
                     awaitingResponse.value = false;
@@ -171,7 +175,10 @@ function submitIfValid() {
                     awaitingResponse.value = false;
                 });
         } else {
-            console.log('No token');
+            alert('Invalid token');
+            authStore.clearToken();
+            router.push('/');
+            router.go(0);
         }
     } else {
         isCurrentPasswordValid.value = false;
