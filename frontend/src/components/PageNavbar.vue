@@ -9,8 +9,10 @@ const isLoggedIn = ref(false);
 const authStore = useAuthStore();
 const loginOrLogout = ref('Logout');
 const isRouteLoginOrRegister = ref(false);
+const checked = ref(false);
 
 onMounted(() => {
+    checked.value = false;
     window.addEventListener('resize', onResize);
     onResize();
     if (localStorage.getItem('token') || sessionStorage.getItem('token')) {
@@ -21,6 +23,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+    checked.value = false;
     window.removeEventListener('resize', onResize);
 });
 
@@ -39,14 +42,18 @@ function logout() {
 function checkIfRouteIsLoginOrRegister() {
     const hrefParts = location.href.split('/');
     const url = hrefParts[hrefParts.length - 1];
-    if (url === 'login' || url === 'register')
-        isRouteLoginOrRegister.value = true;
+    if (url === 'login' || url === 'register') isRouteLoginOrRegister.value = true;
 }
 </script>
 
 <template>
     <div v-if="isTouchScreen && !isRouteLoginOrRegister" class="hamburger-container">
-        <input id="hamburger-toggle" aria-label="Toggle Navigation" class="checkbox" type="checkbox" />
+        <input
+            id="hamburger-toggle"
+            aria-label="Toggle Navigation"
+            class="checkbox"
+            type="checkbox"
+            v-model="checked" />
         <label class="hamburger" for="hamburger-toggle">
             <span class="slice"></span>
             <span class="slice"></span>

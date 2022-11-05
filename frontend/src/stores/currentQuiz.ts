@@ -12,6 +12,7 @@ export const useCurrentQuizStore = defineStore('currentQuiz', () => {
     const currentQuestion = computed<IQuestion>(() => {
         return questions.value[currentQuestionIndex.value];
     });
+    const currentContinent = ref('');
 
     function setQuestions(newQuestions: IQuestion[]) {
         questions.value = newQuestions;
@@ -57,10 +58,16 @@ export const useCurrentQuizStore = defineStore('currentQuiz', () => {
         totalTime.value = 150;
     }
 
+    function setCurrentContinent(continent: string) {
+        currentContinent.value = continent;
+    }
+
     return {
         questions,
         currentQuestionIndex,
         currentQuestion,
+        currentContinent,
+        setCurrentContinent,
         setQuestions,
         nextQuestion,
         resetQuestions,

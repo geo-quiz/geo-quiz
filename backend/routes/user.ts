@@ -6,6 +6,9 @@ import { Account } from '../entities/Account';
 import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import { Role } from '../entities/Role';
 import { Token } from '../entities/Token';
+import formidable from 'formidable';
+import path from 'path';
+import * as fs from 'fs';
 
 dotenv.config();
 const repository = AppDataSource.getRepository(Account);
@@ -19,7 +22,6 @@ const secretToken = process.env.SECRET_TOKEN_SECRETS as string;
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 const emailPattern = /^[a-zA-Z0-9.!#$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+$/;
 
-//routes
 userRoute.post('/register', (req, res) => {
     const body = req.body;
 
@@ -152,7 +154,7 @@ userRoute.post('/login', (req, res) => {
                                                 {
                                                     email: account.email,
                                                     role: account.role.id,
-                                                    displayName: account.displayName
+                                                    displayName: account.displayName,
                                                 },
                                                 secretToken,
                                                 { expiresIn: 2629800000 },
@@ -205,9 +207,9 @@ function verifyToken(
     jwt.verify(token, secretToken, callback);
 }
 
-userRoute.post('/validate', (req, res) => {
+userRoute.post('/verify', (req, res) => {
     const body = req.body;
-    if (body.token && body.password) {
+    if (body.token) {
         verifyToken(body.token, (error, decoded) => {
             tokenRepository.findOneBy({ token: body.token }).then((token) => {
                 if (token) {
@@ -223,26 +225,23 @@ userRoute.post('/validate', (req, res) => {
             if (decoded) {
                 repository.findOneBy({ email: (decoded as JwtPayload).email }).then((account) => {
                     if (account) {
-                        bcrypt.compare(body.password, account.passwordHash).then((validPass) => {
-                            if (validPass) {
-                                res.status(200).json({ msg: 'Correct password' });
-                                return;
-                            } else {
-                                res.statusMessage = 'Incorrect password';
-                                res.status(400).end();
-                                return;
-                            }
+                        res.status(200).json({
+                            displayName: account.displayName,
+                            profilePicture: account.profilePicture,
                         });
                     } else {
-                        res.statusMessage = 'Account not found';
+                        res.statusMessage = 'Invalid token';
                         res.status(400).end();
                         return;
                     }
                 });
+            } else {
+                res.statusMessage = 'Account not found';
+                res.status(400).end();
+                return;
             }
         });
     } else {
-        res.statusMessage = 'Missing token and/or password';
         res.status(400).end();
         return;
     }
@@ -250,62 +249,98 @@ userRoute.post('/validate', (req, res) => {
 
 userRoute.post('/update', (req, res) => {
     const token = req.body.token;
+    const password = req.body.password;
 
-    if (token) {
+    if (token && password) {
         verifyToken(token, (error, decoded) => {
             if (error) {
                 res.statusMessage = 'Invalid token';
-                res.status(400).end();
+                res.status(400).json({ error: error }).end();
                 return;
             }
             if (decoded) {
                 if ((decoded as JwtPayload).email) {
                     const email = (decoded as JwtPayload).email;
-
-                    const body = req.body.account;
-                    if (body) {
+                    const accountBody = req.body.account;
+                    if (accountBody) {
                         repository.findOneBy({ email: email }).then((account) => {
                             if (account) {
-                                if (body.displayName) {
-                                    account.displayName = body.displayName as string;
-                                }
-                                if (body.profilePicture) {
-                                    account.profilePicture = body.profilePicture as string;
-                                }
-                                if (body.leaderboardParticipation) {
-                                    if (body.leaderboardParticipation as boolean) {
-                                        account.leaderboardParticipation = 1;
+                                bcrypt.compare(password, account.passwordHash).then((validPass) => {
+                                    if (validPass) {
+                                        if (accountBody.displayName) {
+                                            account.displayName = accountBody.displayName as string;
+
+                                            repository
+                                                .findOneBy({ displayName: account.displayName })
+                                                .then((existingAccount) => {
+                                                    if (!existingAccount) {
+                                                        if (account.email === email) {
+                                                            if (accountBody.leaderboardParticipation) {
+                                                                if (accountBody.leaderboardParticipation as boolean) {
+                                                                    account.leaderboardParticipation = 1;
+                                                                } else {
+                                                                    account.leaderboardParticipation = 0;
+                                                                }
+                                                            }
+                                                            if (accountBody.password) {
+                                                                if (
+                                                                    passwordPattern.test(accountBody.password as string)
+                                                                ) {
+                                                                    bcrypt
+                                                                        .hash(accountBody.password as string, 10)
+                                                                        .then((hash) => {
+                                                                            account.passwordHash = hash;
+                                                                            repository
+                                                                                .save(account)
+                                                                                .then(() => {
+                                                                                    res.status(200).json({
+                                                                                        msg: 'Account updated',
+                                                                                    });
+                                                                                    return;
+                                                                                })
+                                                                                .catch(() => {
+                                                                                    res.statusMessage =
+                                                                                        'Something went wrong while updating the account';
+                                                                                    res.status(500).end();
+                                                                                    return;
+                                                                                });
+                                                                        });
+                                                                } else {
+                                                                    res.statusMessage = 'Invalid password format';
+                                                                    res.status(400).end();
+                                                                    return;
+                                                                }
+                                                            } else {
+                                                                repository
+                                                                    .save(account)
+                                                                    .then(() => {
+                                                                        res.status(200).json({
+                                                                            msg: 'Account updated',
+                                                                        });
+                                                                        return;
+                                                                    })
+                                                                    .catch((err) => {
+                                                                        console.log(error);
+                                                                        res.statusMessage =
+                                                                            'Something went wrong while updating the account';
+                                                                        res.status(500).json({ msg: err }).end();
+                                                                        return;
+                                                                    });
+                                                            }
+                                                        }
+                                                    } else {
+                                                        res.statusMessage = 'Display name already taken';
+                                                        res.status(400).end();
+                                                        return;
+                                                    }
+                                                });
+                                        }
                                     } else {
-                                        account.leaderboardParticipation = 0;
-                                    }
-                                }
-                                if (body.password) {
-                                    if (passwordPattern.test(body.password as string)) {
-                                        bcrypt.hash(body.password as string, 10).then((hash) => {
-                                            account.passwordHash = hash;
-                                            repository.save(account).then(() => {
-                                                res.status(200).json({ msg: 'Account updated' });
-                                                return;
-                                            });
-                                        });
-                                    } else {
-                                        res.statusMessage = 'Invalid password format';
+                                        res.statusMessage = 'Invalid password';
                                         res.status(400).end();
                                         return;
                                     }
-                                } else {
-                                    repository
-                                        .save(account)
-                                        .then(() => {
-                                            res.status(200).json({ msg: 'Account updated' });
-                                            return;
-                                        })
-                                        .catch((err) => {
-                                            res.statusMessage = 'Something went wrong while updating the account';
-                                            res.status(400).json({ msg: err }).end();
-                                            return;
-                                        });
-                                }
+                                });
                             } else {
                                 res.statusMessage = 'Account not found';
                                 res.status(404).end();
@@ -313,23 +348,39 @@ userRoute.post('/update', (req, res) => {
                             }
                         });
                     } else {
-                        res.statusMessage = 'Missing parameters';
+                        res.statusMessage = 'Missing parameter: account';
                         res.status(400).end();
                         return;
                     }
+                } else {
+                    res.statusMessage = 'Invalid token';
+                    res.status(400).end();
+                    return;
                 }
             }
         });
+    } else if (!token && password) {
+        res.statusMessage = 'Missing parameter: token';
+        res.status(400).end();
+        return;
+    } else if (token && !password) {
+        res.statusMessage = 'Missing parameter: password';
+        res.status(400).end();
+        return;
     } else {
-        res.statusMessage = 'Missing parameters';
+        res.statusMessage = 'Missing parameters: token & password';
         res.status(400).end();
         return;
     }
+
+    setTimeout(() => {
+        res.statusMessage = 'Something went wrong';
+        res.status(500).end();
+    }, 10000);
 });
 
 userRoute.post('/logout', (req, res) => {
     const token = req.body.token;
-    console.log(req.body);
     if (token) {
         verifyToken(token, (error, decoded) => {
             if (decoded) {
@@ -337,8 +388,7 @@ userRoute.post('/logout', (req, res) => {
                     if (!existingToken) {
                         repository.findOneBy({ email: (decoded as JwtPayload).email }).then((account) => {
                             if (account) {
-                                const tokenEntity = new Token(req.body.token, account);
-                                tokenRepository.insert(tokenEntity).then((savedToken) => {
+                                tokenRepository.insert(new Token(req.body.token)).then((savedToken) => {
                                     if (savedToken) {
                                         res.statusMessage = 'Logged out';
                                         res.status(200).json({ msg: 'Logged Out' }).end();
@@ -369,6 +419,192 @@ userRoute.post('/logout', (req, res) => {
         });
     } else {
         res.statusMessage = 'Missing parameters';
+        res.status(400).end();
+        return;
+    }
+});
+
+userRoute.post('/upload-image', (req, res) => {
+    const uploadFolder = path.join(__dirname, '../../', 'public', 'images');
+
+    const form = new formidable.IncomingForm({ uploadDir: uploadFolder });
+
+    form.parse(req, (err, fields, files) => {
+        if (err) {
+            console.log(err);
+            res.statusMessage = 'Something went wrong';
+            res.status(500).end();
+            return;
+        }
+        if (files && fields) {
+            if (files.image && fields.token) {
+                const token = fields.token as string;
+                verifyToken(token, (error, decoded) => {
+                    if (error) {
+                        res.statusMessage = 'Invalid token';
+                        res.status(400).end();
+                        return;
+                    }
+                    if (decoded) {
+                        if ((decoded as JwtPayload).email) {
+                            const email = (decoded as JwtPayload).email;
+                            let image: formidable.File;
+                            if (files.image instanceof Array) {
+                                image = files.image[0] as formidable.File;
+                            } else {
+                                image = files.image as formidable.File;
+                            }
+                            if (image) {
+                                if (image.mimetype) {
+                                    const fileEnding = image.mimetype.split('/')[1];
+                                    repository.findOneBy({ email: email }).then((account) => {
+                                        if (account) {
+                                            if (account.id) {
+                                                const newPath = path.join(uploadFolder, account.id + '.' + fileEnding);
+                                                if (account.profilePicture === 'images/default.svg') {
+                                                    fs.rename(
+                                                        image.filepath,
+                                                        path.join(uploadFolder, account.id + '.' + fileEnding),
+                                                        () => {
+                                                            account.profilePicture =
+                                                                'images/' + account.id + '.' + fileEnding;
+
+                                                            repository
+                                                                .save(account)
+                                                                .then(() => {
+                                                                    res.status(200)
+                                                                        .json({ image: account.profilePicture })
+                                                                        .end();
+                                                                    return;
+                                                                })
+                                                                .catch((err) => {
+                                                                    console.error(err);
+                                                                    res.statusMessage = 'Something went wrong';
+                                                                    res.status(500).end();
+                                                                    return;
+                                                                });
+                                                        },
+                                                    );
+                                                } else {
+                                                    fs.rm('public\\' + account.profilePicture, (err) => {
+                                                        if (err) {
+                                                            console.log(err);
+                                                            res.statusMessage = 'Could not remove file';
+                                                            res.status(500).end();
+                                                            return;
+                                                        } else {
+                                                            fs.rename(image.filepath, newPath, () => {
+                                                                account.profilePicture =
+                                                                    'images/' + account.id + '.' + fileEnding;
+
+                                                                repository
+                                                                    .save(account)
+                                                                    .then(() => {
+                                                                        res.status(200)
+                                                                            .json({ image: account.profilePicture })
+                                                                            .end();
+                                                                        return;
+                                                                    })
+                                                                    .catch((err) => {
+                                                                        console.error(err);
+                                                                        res.statusMessage = 'Something went wrong';
+                                                                        res.status(500).end();
+                                                                        return;
+                                                                    });
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                res.statusMessage = 'Invalid token';
+                                res.status(400).end();
+                                return;
+                            }
+                        }
+                    }
+                });
+            } else {
+                res.statusMessage = 'Something went wrong';
+                res.status(500).end();
+                return;
+            }
+        }
+    });
+    setTimeout(() => {
+        res.statusMessage = 'Something went wrong';
+        res.status(500).end();
+        return;
+    }, 5000);
+});
+
+userRoute.post('/delete-account', (req, res) => {
+    const token = req.body.token;
+    const password = req.body.password;
+
+    if (token && password) {
+        verifyToken(token, (error, decoded) => {
+            if (error) {
+                res.statusMessage = 'Invalid token';
+                res.status(400).json({ error: error }).end();
+                return;
+            }
+            if (decoded) {
+                if ((decoded as JwtPayload).email) {
+                    const email = (decoded as JwtPayload).email;
+                    repository.findOneBy({ email: email }).then((account) => {
+                        if (account) {
+                            bcrypt.compare(password, account.passwordHash).then((validPass) => {
+                                if (validPass) {
+                                    tokenRepository
+                                        .insert(new Token(token))
+                                        .then(() => {
+                                            repository.delete(account).then(() => {
+                                                res.status(200).json({ msg: 'Account deleted' });
+                                                return;
+                                            });
+                                        })
+                                        .catch((error) => {
+                                            console.error(error);
+                                            res.statusMessage = 'Something went wrong';
+                                            res.status(500).end();
+                                            return;
+                                        });
+                                } else {
+                                    res.statusMessage = 'Invalid password';
+                                    res.status(400).end();
+                                    return;
+                                }
+                            });
+                        } else {
+                            res.statusMessage = 'Account not found';
+                            res.status(404).end();
+                            return;
+                        }
+                    });
+                } else {
+                    res.statusMessage = 'Invalid token';
+                    res.status(400).end();
+                    return;
+                }
+            } else {
+                res.status(500).end();
+                return;
+            }
+        });
+    } else if (!token && password) {
+        res.statusMessage = 'Missing parameter: Token';
+        res.status(400).end();
+        return;
+    } else if (token && !password) {
+        res.statusMessage = 'Missing parameter: Password';
+        res.status(400).end();
+        return;
+    } else {
+        res.statusMessage = 'Missing parameters: Token, Password';
         res.status(400).end();
         return;
     }
