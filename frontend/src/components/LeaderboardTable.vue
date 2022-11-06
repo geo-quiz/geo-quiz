@@ -9,7 +9,7 @@ import type { ILeaderboard } from '@/utility/interfaces/ILeaderboard';
 import type { IScore } from '@/utility/interfaces/IScore';
 import { useRoute } from 'vue-router';
 
-const defaultScore = { id: 0, points: 0, time: 0, displayName: '' } as IScore;
+const defaultScore = { id: -1, points: -1, time: -1, displayName: '' } as IScore;
 
 const awaitingResponse = ref(false);
 
@@ -45,6 +45,10 @@ let scoresTable: Ref<IScore[]> = ref([]);
 scoresTable.value[0] = defaultScore;
 
 let isOverall = ref(true);
+let showUserScore = ref(false);
+let userIndex = ref(-1);
+let userTableScore = ref(defaultScore);
+
 
 function getLeaderboards(newContinent: string) {
     console.log('in getLeadersboards');
@@ -175,6 +179,14 @@ function getDailyBoard() {
     console.log('daily scoresTable ', scoresTable.value);
 
     isOverall.value = false;
+
+    if (dailyUserScore.value) {
+        if (isInScoresTable(dailyUserScore.value)) {
+            showUserScore.value = true;
+        }
+    } else {
+        showUserScore.value = false;
+    }
 }
 
 function getOverallBoard() {
@@ -194,7 +206,43 @@ function getOverallBoard() {
     console.log('overall scores ', scores.value);
 
     isOverall.value = true;
+
+    if (overallUserScore.value) {
+        if (isInScoresTable(overallUserScore.value)) {
+            showUserScore.value = true;
+        }
+    } else {
+        showUserScore.value = false;
+    }
 }
+
+function isInScoresTable(userScore: ILeaderboard) {
+    let isInList = ref(false);
+    for (let i = 0; i < scoresTable.value.length; i++) {
+        if (userScore.scores[0].displayName != scoresTable.value[i].displayName) {
+            isInList.value = true;
+        }
+    }
+    if (isInList.value) {
+        for (let i = 0; i < scoresTable.value.length; i++) {
+            if (userScore.scores[0].displayName == scoresTable.value[i].displayName) {
+                userIndex.value = i+3;
+                userTableScore.value.displayName = scoresTable.value[i].displayName;
+                userTableScore.value.points = scoresTable.value[i].points;
+                userTableScore.value.time = scoresTable.value[i].time;
+                console.log('i ',i)
+            }
+        }
+    }
+    else {
+        userTableScore.value = defaultScore;
+    }
+    console.log('userIndex: ', userIndex);
+
+    return isInList;
+}
+
+
 </script>
 
 <template>
@@ -249,27 +297,27 @@ function getOverallBoard() {
                     <div class="winner-stats">
                         <label class="winner-name">{{ second.displayName }}</label>
                         <div class="winner-time-points">
-                            <label class="winner-points" v-if="second.displayName">{{ second.points }}</label>
+                            <label class="winner-points" v-if="second.displayName">{{ second.points }}p</label>
                             <label class="winner-points" v-else> </label>
-                            <label class="winner-time" v-if="second.displayName">{{ second.time }}</label>
+                            <label class="winner-time" v-if="second.displayName">{{ second.time }}s</label>
                             <label class="winner-time" v-else> </label>
                         </div>
                     </div>
                     <div class="winner-stats">
                         <label class="winner-name">{{ first.displayName }}</label>
                         <div class="winner-time-points">
-                            <label class="winner-points" v-if="first.displayName">{{ first.points }}</label>
+                            <label class="winner-points" v-if="first.displayName">{{ first.points }}p</label>
                             <label class="winner-points" v-else> </label>
-                            <label class="winner-time" v-if="first.displayName">{{ first.time }}</label>
+                            <label class="winner-time" v-if="first.displayName">{{ first.time }}s</label>
                             <label class="winner-time" v-else> </label>
                         </div>
                     </div>
                     <div class="winner-stats">
                         <label class="winner-name">{{ third.displayName }}</label>
                         <div class="winner-time-points">
-                            <label class="winner-points" v-if="third.displayName">{{ third.points }}</label>
+                            <label class="winner-points" v-if="third.displayName">{{ third.points }}p</label>
                             <label class="winner-points" v-else> </label>
-                            <label class="winner-time" v-if="third.displayName">{{ third.time }}</label>
+                            <label class="winner-time" v-if="third.displayName">{{ third.time }}s</label>
                             <label class="winner-time" v-else> </label>
                         </div>
                     </div>
@@ -289,6 +337,24 @@ function getOverallBoard() {
                                 <td class="table-name">{{ score.displayName }}</td>
                                 <td class="table-points">{{ score.points }}p</td>
                                 <td class="table-time">{{ score.time }}s</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div v-if="showUserScore">
+                        <h3>Overall Board & showUserScore </h3>
+                        <table class="table-scores">
+                            <tr class="table-row-user-score">
+                                <td class="table-number">{{ 1 + userIndex }}</td>
+
+                                <td class="table-picture">
+                                    <img
+                                        alt="User profile picture"
+                                        class="profile-picture-table"
+                                        src="/images/gubbe-left.svg" />
+                                </td>
+                                <td class="table-name">{{ userTableScore.displayName }}</td>
+                                <td class="table-points">{{ userTableScore.points }}p</td>
+                                <td class="table-time">{{ userTableScore.time }}s</td>
                             </tr>
                         </table>
                     </div>
@@ -342,7 +408,7 @@ h3 {
 }
 
 main {
-    width: 100%;
+    width: 90%;
 }
 
 .medallion {
@@ -471,6 +537,18 @@ main {
     gap: var(--gap);
     width: 100%;
 }
+
+.table-row-user-score {
+    align-items: center;
+    background-color: var(--color-green);
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap);
+    padding: .5vh;
+    width: 100%;
+}
+
+
 
 .table-scores {
     height: 50px;
