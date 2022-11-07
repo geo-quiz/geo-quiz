@@ -34,7 +34,6 @@ function login() {
     })
         .then((res) => {
             if (!res.ok) {
-                console.log('statusText ', res);
                 throw Error(res.statusText);
             }
             return res.json();

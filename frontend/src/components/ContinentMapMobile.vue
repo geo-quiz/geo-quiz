@@ -29,7 +29,6 @@ onMounted(() => {
         ),
     ]).then(function (loadData) {
         let topo: any = loadData[0];
-        console.log(topo);
 
         function mouseOver() {
             d3.selectAll('.Continent').transition().duration(50).style('opacity', 0.5);
@@ -44,7 +43,6 @@ onMounted(() => {
         function mouseClick(event: PointerEvent) {
             if (event.target) {
                 const target = event.target as Element;
-                console.log('clicked', target.id);
 
                 switch (target.id) {
                     case 'Africa':

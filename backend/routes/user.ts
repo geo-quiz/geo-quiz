@@ -125,7 +125,6 @@ userRoute.post('/login', (req, res) => {
     if (body.email && body.password) {
         const email = body.email as string;
         if (!emailPattern.test(email)) {
-            console.log('Email is wrong');
             res.statusMessage = 'Invalid email format';
             res.status(400).end();
             return;
@@ -140,7 +139,6 @@ userRoute.post('/login', (req, res) => {
                         const password = body.password as string;
                         const passwordHash = account.passwordHash as string;
                         if (passwordHash === undefined) {
-                            console.log('passwordHash is undefined');
                             res.statusMessage = 'Problem with database password';
                             res.status(400).end();
                             return;
@@ -172,7 +170,7 @@ userRoute.post('/login', (req, res) => {
                                     }
                                 })
                                 .catch((err) => {
-                                    console.log('error: ' + err);
+                                    console.error(err);
                                     res.statusMessage = 'Something went wrong while checking the password';
                                     res.status(400).end();
                                     return;
@@ -431,7 +429,7 @@ userRoute.post('/upload-image', (req, res) => {
 
     form.parse(req, (err, fields, files) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.statusMessage = 'Something went wrong';
             res.status(500).end();
             return;
@@ -488,7 +486,7 @@ userRoute.post('/upload-image', (req, res) => {
                                                 } else {
                                                     fs.rm('public\\' + account.profilePicture, (err) => {
                                                         if (err) {
-                                                            console.log(err);
+                                                            console.error(err);
                                                             res.statusMessage = 'Could not remove file';
                                                             res.status(500).end();
                                                             return;

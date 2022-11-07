@@ -29,7 +29,7 @@ function proceed() {
             userAnswersStore.clearQuestions();
         })
         .catch((error) => {
-            console.log(error);
+            console.error(error);
         });
 }
 

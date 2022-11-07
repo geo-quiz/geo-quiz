@@ -49,7 +49,6 @@ function isValidPassword() {
 }
 
 function checkErrors(res: Response) {
-    console.log(res);
     const error = res.statusText;
     if (error == 'Password does not meet the requirements') {
         isErrorPassword.value = true;
@@ -88,8 +87,6 @@ function submitIfValid() {
     } else {
         awaitingResponse.value = true;
         isSubmitted.value = true;
-
-        console.log('Sending request to server...');
 
         if (isEqualPassword.value) {
             fetch('http://localhost:3000/register', {

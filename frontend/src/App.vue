@@ -45,7 +45,7 @@ function checkAuthentication() {
                 }
             })
             .catch((err) => {
-                console.log(err);
+                console.error(err);
                 authStore.clearToken();
             });
         redirectIfLoggedIn();
