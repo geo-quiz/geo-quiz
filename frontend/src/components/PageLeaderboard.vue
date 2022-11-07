@@ -54,6 +54,8 @@ let isOverall = ref(true);
 let showUserScore = ref(false);
 let userIndex = ref(-1);
 let userTableScore = ref(defaultScore);
+let isInList = ref(false);
+
 
 function getLeaderboards(newContinent: string) {
     fetch(`http://localhost:3000/leaderboard/${newContinent}`, {
@@ -164,17 +166,23 @@ function setupScoresAndTable() {
         if (scores.value[3 + rowsToShow.value]) {
             nextTableIndex.value = 3 + rowsToShow.value;
             hasNext.value = true;
+        } else {
+            hasNext.value = false;
         }
     }
 }
 
 function nextTable() {
-    if (scores.value[nextTableIndex.value]) {
+    if (scores.value.length > 7 && scores.value[nextTableIndex.value]) {
         setPreviousTableIndex(currentTableIndex.value);
         currentTableIndex.value = nextTableIndex.value;
         if (scores.value[currentTableIndex.value + rowsToShow.value]) {
             hasNext.value = true;
             nextTableIndex.value = currentTableIndex.value + rowsToShow.value;
+        }
+        else {
+            console.log('next nextTable doesnt has stuff');
+            hasNext.value = false;
         }
         scoresTable.value = scores.value.slice(currentTableIndex.value, currentTableIndex.value + rowsToShow.value);
     } else {
@@ -193,12 +201,15 @@ function setPreviousTableIndex(index: number) {
 }
 
 function previousTable() {
-    if (scores.value[previousTableIndex.value]) {
+    if (previousTableIndex.value > 2 && scores.value[previousTableIndex.value]) {
         setNextTableIndex(currentTableIndex.value);
         currentTableIndex.value = previousTableIndex.value;
         if (scores.value[currentTableIndex.value - rowsToShow.value]) {
             hasPrevious.value = true;
             previousTableIndex.value = currentTableIndex.value - rowsToShow.value;
+        } else {
+            console.log('previousTable doesnt has stuff');
+            hasPrevious.value = false;
         }
         scoresTable.value = scores.value.slice(currentTableIndex.value, currentTableIndex.value + rowsToShow.value);
     } else {
@@ -234,8 +245,8 @@ function getOverallBoard() {
     }
 }
 
+
 function isInScoresTable(userScore: ILeaderboard) {
-    let isInList = ref(false);
     let isInThisList = ref(false);
     let index = ref(0);
 
@@ -259,8 +270,8 @@ function isInScoresTable(userScore: ILeaderboard) {
     } else {
         isInThisList.value = false;
         userTableScore.value = defaultScore;
+        showUserScore.value = false;
     }
-    return isInThisList;
 }
 </script>
 
