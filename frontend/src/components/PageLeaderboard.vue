@@ -54,7 +54,7 @@ let isOverall = ref(true);
 let showUserScore = ref(false);
 let userIndex = ref(-1);
 let userTableScore = ref(defaultScore);
-let isInList = ref(false);
+let isInScoresList = ref(false);
 
 function getLeaderboards(newContinent: string) {
     fetch(`http://localhost:3000/leaderboard/${newContinent}`, {
@@ -169,6 +169,7 @@ function setupScoresAndTable() {
             hasNext.value = false;
         }
     }
+    hasPrevious.value = false;
 }
 
 function nextTable() {
@@ -220,7 +221,18 @@ function getDailyBoard() {
                 scores.value = dailyLeaderboard.value.scores;
                 setupScoresAndTable();
                 if (dailyUserScore.value) {
-                    isInScoresTable(dailyUserScore.value);
+                    if (isInScores(dailyUserScore.value)) {
+                        if (isNotInCurrentScoresTable(dailyUserScore.value)) {
+                            showUserScore.value = true;
+                        } else {
+                            showUserScore.value = false;
+                        }
+                    } else {
+                        showUserScore.value = false;
+                    }
+                } else {
+                    isInScoresList.value = false;
+                    showUserScore.value = false;
                 }
             }
         }
@@ -234,39 +246,52 @@ function getOverallBoard() {
             scores.value = overallLeaderboard.value.scores;
             setupScoresAndTable();
             if (overallUserScore.value) {
-                isInScoresTable(overallUserScore.value);
+                if (isInScores(overallUserScore.value)) {
+                    if (isNotInCurrentScoresTable(overallUserScore.value)) {
+                        showUserScore.value = true;
+                    } else {
+                        showUserScore.value = false;
+                    }
+                } else {
+                    showUserScore.value = false;
+                }
+            } else {
+                isInScoresList.value = false;
+                showUserScore.value = false;
             }
         }
         isOverall.value = true;
     }
 }
 
-function isInScoresTable(userScore: ILeaderboard) {
+function isInScores(userScore: ILeaderboard) {
+    isInScoresList = ref(false);
+    let untilFound = scores.value.length;
+
+    for (let i = 3; i < untilFound; i++) {
+        if (userScore.scores[0].account.displayName === scores.value[i].account.displayName) {
+            isInScoresList.value = true;
+            userTableScore.value.account.displayName = scores.value[i].account.displayName;
+            userTableScore.value.points = scores.value[i].points;
+            userTableScore.value.time = scores.value[i].time;
+            userIndex.value = i;
+            untilFound = i;
+        }
+    }
+    return isInScoresList;
+}
+
+function isNotInCurrentScoresTable(userScore: ILeaderboard) {
     let isInThisList = ref(false);
-    let index = ref(0);
 
     for (let i = 0; i < scoresTable.value.length; i++) {
-        if (userScore.scores[0].account.displayName === scores.value[i].account.displayName) {
-            isInList.value = true;
-        }
         if (userScore.scores[0].account.displayName === scoresTable.value[i].account.displayName) {
             isInThisList.value = true;
-            userIndex.value = i + currentTableIndex.value;
-            index.value = i;
         } else {
-            isInList.value = false;
+            isInThisList.value = false;
         }
     }
-    if (isInList.value && !isInThisList.value) {
-        userTableScore.value.account.displayName = scoresTable.value[index.value].account.displayName;
-        userTableScore.value.points = scoresTable.value[index.value].points;
-        userTableScore.value.time = scoresTable.value[index.value].time;
-        showUserScore.value = true;
-    } else {
-        isInThisList.value = false;
-        userTableScore.value = defaultScore;
-        showUserScore.value = false;
-    }
+    return isInThisList;
 }
 </script>
 
@@ -748,4 +773,5 @@ p {
         gap: calc(var(--gap) * 7);
     }
 }
+
 </style>
