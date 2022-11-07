@@ -43,7 +43,6 @@ if (token) {
             }
         }, 1000 * 60);
     });
-
 } else {
     console.error('No token provided');
     process.exit(1);
@@ -52,11 +51,14 @@ if (token) {
 function clearTableIfNewDay() {
     const repository = AppDataSource.getRepository(Leaderboard);
 
-    repository.delete({daily: true}).then(() => {
-        console.log('Cleared daily tables');
-    }).catch((error) => {
-        console.error(error);
-    });
+    repository
+        .delete({ daily: true })
+        .then(() => {
+            console.log('Cleared daily tables');
+        })
+        .catch((error) => {
+            console.error(error);
+        });
 }
 
 function removeUnusedImages() {

@@ -43,30 +43,30 @@ onMounted(() => {
                 const target = event.target as Element;
 
                 switch (target.id) {
-                case 'Africa':
-                    router.push({ name: 'quiz-question', params: { id: 'africa' } });
-                    break;
-                case 'Asia':
-                    router.push({ name: 'quiz-question', params: { id: 'asia' } });
-                    break;
-                case 'Europe':
-                    router.push({ name: 'quiz-question', params: { id: 'europe' } });
-                    break;
-                case 'North America':
-                    router.push({ name: 'quiz-question', params: { id: 'north-america' } });
-                    break;
-                case 'South America':
-                    router.push({ name: 'quiz-question', params: { id: 'south-america' } });
-                    break;
-                case 'Oceania':
-                    router.push({ name: 'quiz-question', params: { id: 'oceania' } });
-                    break;
-                case 'World':
-                    router.push({ name: 'quiz-question', params: { id: 'world' } });
-                    break;
-                default:
-                    router.push('/quiz');
-                    break;
+                    case 'Africa':
+                        router.push({ name: 'quiz-question', params: { id: 'africa' } });
+                        break;
+                    case 'Asia':
+                        router.push({ name: 'quiz-question', params: { id: 'asia' } });
+                        break;
+                    case 'Europe':
+                        router.push({ name: 'quiz-question', params: { id: 'europe' } });
+                        break;
+                    case 'North America':
+                        router.push({ name: 'quiz-question', params: { id: 'north-america' } });
+                        break;
+                    case 'South America':
+                        router.push({ name: 'quiz-question', params: { id: 'south-america' } });
+                        break;
+                    case 'Oceania':
+                        router.push({ name: 'quiz-question', params: { id: 'oceania' } });
+                        break;
+                    case 'World':
+                        router.push({ name: 'quiz-question', params: { id: 'world' } });
+                        break;
+                    default:
+                        router.push('/quiz');
+                        break;
                 }
             }
         }
@@ -110,9 +110,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
 h1 {
-    margin: 0
+    margin: 0;
 }
 
 .header_under__title {

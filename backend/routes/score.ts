@@ -6,7 +6,6 @@ import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import { Account } from '../entities/Account';
 import { Continent } from '../entities/Continent';
 
-
 const baseUrl = '/scores';
 const repository = AppDataSource.getRepository(Score);
 const continentRepository = AppDataSource.getRepository(Continent);
@@ -30,21 +29,27 @@ scoreRoute.post(baseUrl, (req, res) => {
             continentRepository.findOneBy({ name: continent }).then((foundContinent) => {
                 if (foundContinent) {
                     leaderboardRepository
-                        .findOne({ where: { continent: foundContinent, daily: daily }, relations: { continent: true, scores: true } }, )
+                        .findOne({
+                            where: { continent: foundContinent, daily: daily },
+                            relations: { continent: true, scores: true },
+                        })
                         .then((leaderboard) => {
                             if (leaderboard) {
                                 if (leaderboard.scores != undefined) {
                                     (leaderboard.scores as Score[]).push(savedScore);
-                                    leaderboardRepository.save(leaderboard).then(() => {
-                                        success(leaderboard);
-                                        return;
-                                    }).catch((error) => {
-                                        console.error(error);
-                                        res.statusMessage = 'Error while updating leaderboard';
-                                        res.status(500).end();
-                                        fail();
-                                        return;
-                                    });
+                                    leaderboardRepository
+                                        .save(leaderboard)
+                                        .then(() => {
+                                            success(leaderboard);
+                                            return;
+                                        })
+                                        .catch((error) => {
+                                            console.error(error);
+                                            res.statusMessage = 'Error while updating leaderboard';
+                                            res.status(500).end();
+                                            fail();
+                                            return;
+                                        });
                                 } else {
                                     res.statusMessage = 'No leaderboard';
                                     res.status(500).end();
@@ -100,36 +105,44 @@ scoreRoute.post(baseUrl, (req, res) => {
                                     repository
                                         .save(savedScore)
                                         .then((score) => {
-                                            saveToLeaderboard(continent, score, true).then(() => {
-                                                saveToLeaderboard(continent, score, false).then(() => {
-                                                    saveToLeaderboard('all', score, true).then(() => {
-                                                        saveToLeaderboard('all', score, false).then(() => {
-                                                            res.status(200).end();
-                                                            return;
-                                                        }).catch((error) => {
+                                            saveToLeaderboard(continent, score, true)
+                                                .then(() => {
+                                                    saveToLeaderboard(continent, score, false)
+                                                        .then(() => {
+                                                            saveToLeaderboard('all', score, true)
+                                                                .then(() => {
+                                                                    saveToLeaderboard('all', score, false)
+                                                                        .then(() => {
+                                                                            res.status(200).end();
+                                                                            return;
+                                                                        })
+                                                                        .catch((error) => {
+                                                                            console.error(error);
+                                                                            res.statusMessage = 'Error while saving 1';
+                                                                            res.status(500).end();
+                                                                            return;
+                                                                        });
+                                                                })
+                                                                .catch((error) => {
+                                                                    console.error(error);
+                                                                    res.statusMessage = 'Error while saving 2';
+                                                                    res.status(500).end();
+                                                                    return;
+                                                                });
+                                                        })
+                                                        .catch((error) => {
                                                             console.error(error);
-                                                            res.statusMessage = 'Error while saving 1';
+                                                            res.statusMessage = 'Error while saving 3';
                                                             res.status(500).end();
                                                             return;
                                                         });
-                                                    }).catch((error) => {
-                                                        console.error(error);
-                                                        res.statusMessage = 'Error while saving 2';
-                                                        res.status(500).end();
-                                                        return;
-                                                    });
-                                                }).catch((error) => {
+                                                })
+                                                .catch((error) => {
                                                     console.error(error);
-                                                    res.statusMessage = 'Error while saving 3';
+                                                    res.statusMessage = 'Error while saving 4';
                                                     res.status(500).end();
                                                     return;
                                                 });
-                                            }).catch((error) => {
-                                                console.error(error);
-                                                res.statusMessage = 'Error while saving 4';
-                                                res.status(500).end();
-                                                return;
-                                            });
                                         })
                                         .catch((error) => {
                                             console.error(error);
@@ -159,5 +172,6 @@ scoreRoute.post(baseUrl, (req, res) => {
     setTimeout(() => {
         res.statusMessage = 'Request timed out';
         res.status(500).end();
-        return;}, 10000);
+        return;
+    }, 10000);
 });

@@ -2,13 +2,14 @@
 import PageHeader from '@/components/PageHeader.vue';
 import PageFooter from '@/components/PageFooter.vue';
 import PageLeaderboard from '@/components/PageLeaderboard.vue';
-import {useRoute} from 'vue-router';
+import { useRoute } from 'vue-router';
+
 const route = useRoute();
 </script>
 
 <template>
     <PageHeader />
-    <PageLeaderboard :continent="route.path"/>
+    <PageLeaderboard :continent="route.path" />
     <PageFooter />
 </template>
 

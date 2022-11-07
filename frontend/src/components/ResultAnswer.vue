@@ -18,14 +18,14 @@ const answerText = ref('');
 const correctAnswerText = ref('');
 
 function getAnswerText() {
-    const answer = props.question.answers.find((answer) => (answer.id == props.answer));
+    const answer = props.question.answers.find((answer) => answer.id == props.answer);
     if (answer) {
         answerText.value = answer.answer;
     }
 }
 
 function getCorrectAnswerText() {
-    const text = props.question.answers.find((answer) => (answer.id == props.question.correctAnswer));
+    const text = props.question.answers.find((answer) => answer.id == props.question.correctAnswer);
     if (text) {
         correctAnswerText.value = text.answer;
     }

@@ -19,7 +19,7 @@ function verifyToken(
 
 leaderBoardRoute.get('/leaderboard/:continent', (req, res) => {
     const continentParam = (req.params.continent as string).toLowerCase();
-    const token = (req.headers.authorization)?.replace('Bearer ', '');
+    const token = req.headers.authorization?.replace('Bearer ', '');
 
     if (token && continentParam) {
         verifyToken(token, (err, decoded) => {
@@ -33,68 +33,72 @@ leaderBoardRoute.get('/leaderboard/:continent', (req, res) => {
                     const email = (decoded as JwtPayload).email;
                     accountRepository.findOneBy({ email: email }).then((foundAccount) => {
                         if (foundAccount) {
-                            repository.find({
-                                relations: {
-                                    scores: { account: true },
-                                    continent: true,
-                                },
-                                order: { scores: { points: 'DESC', time: 'ASC' } },
-                                where: { continent: { name: continentParam } },
-                                select: {
-                                    daily: true,
-                                    id: true,
-                                    continent: { name: true, id: true, },
-                                    scores: {
-                                        points: true,
+                            repository
+                                .find({
+                                    relations: {
+                                        scores: { account: true },
+                                        continent: true,
+                                    },
+                                    order: { scores: { points: 'DESC', time: 'ASC' } },
+                                    where: { continent: { name: continentParam } },
+                                    select: {
+                                        daily: true,
                                         id: true,
-                                        time: true,
-                                        account: {
-                                            displayName: true,
-                                            profilePicture: true,
-                                            passwordHash: false,
-                                        }
-                                    }
-                                }
-                            }).then((leaderboards) => {
-                                if (leaderboards) {
-                                    repository.find({
-                                        relations: {
-                                            scores: { account: true },
-                                            continent: true,
-                                        },
-                                        order: { scores: { points: 'DESC', time: 'ASC' } },
-                                        where: {
-                                            continent: { name: continentParam },
-                                            scores: { account: foundAccount }
-                                        },
-                                        select: {
-                                            daily: true,
+                                        continent: { name: true, id: true },
+                                        scores: {
+                                            points: true,
                                             id: true,
-                                            continent: { name: true, id: true, },
-                                            scores: {
-                                                points: true,
-                                                id: true,
-                                                time: true,
-                                                account: {
-                                                    displayName: true,
-                                                    profilePicture: true,
-                                                    passwordHash: false,
-                                                }
-                                            }
-                                        }
-                                    }).then((userLeaderboard) => {
-                                        const responseData = {
-                                            userScore: userLeaderboard,
-                                            continentBoards: leaderboards,
-                                        };
-                                        res.status(200).json(responseData);
-                                    });
-                                } else {
-                                    res.statusMessage = 'Could not find leaderboard';
-                                    res.status(404).end();
-                                    return;
-                                }
-                            });
+                                            time: true,
+                                            account: {
+                                                displayName: true,
+                                                profilePicture: true,
+                                                passwordHash: false,
+                                            },
+                                        },
+                                    },
+                                })
+                                .then((leaderboards) => {
+                                    if (leaderboards) {
+                                        repository
+                                            .find({
+                                                relations: {
+                                                    scores: { account: true },
+                                                    continent: true,
+                                                },
+                                                order: { scores: { points: 'DESC', time: 'ASC' } },
+                                                where: {
+                                                    continent: { name: continentParam },
+                                                    scores: { account: foundAccount },
+                                                },
+                                                select: {
+                                                    daily: true,
+                                                    id: true,
+                                                    continent: { name: true, id: true },
+                                                    scores: {
+                                                        points: true,
+                                                        id: true,
+                                                        time: true,
+                                                        account: {
+                                                            displayName: true,
+                                                            profilePicture: true,
+                                                            passwordHash: false,
+                                                        },
+                                                    },
+                                                },
+                                            })
+                                            .then((userLeaderboard) => {
+                                                const responseData = {
+                                                    userScore: userLeaderboard,
+                                                    continentBoards: leaderboards,
+                                                };
+                                                res.status(200).json(responseData);
+                                            });
+                                    } else {
+                                        res.statusMessage = 'Could not find leaderboard';
+                                        res.status(404).end();
+                                        return;
+                                    }
+                                });
                         } else {
                             res.statusMessage = 'Could not find account';
                             res.status(404).end();
