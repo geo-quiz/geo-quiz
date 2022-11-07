@@ -1,27 +1,24 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
-import { Leaderboard } from './Leaderboard';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Account } from './Account';
 
 @Entity()
 export class Score {
-    constructor(points: number, time: number, displayName: string) {
+    constructor(points: number, time: number, account: Account) {
         this.points = points;
         this.time = time;
-        this.displayName = displayName;
+        this.account = account;
     }
 
     @PrimaryGeneratedColumn()
-    id: number | undefined;
+        id: number | undefined;
 
     @Column()
-    points: number;
+        points: number;
 
     @Column()
-    time: number;
+        time: number;
 
-    @Column()
-    displayName: string;
-
-    @ManyToMany(() => Leaderboard, (leaderboard) => leaderboard.scores)
-    leaderboards: Leaderboard[] | undefined;
+    @ManyToOne(() => Account, (account) => account.id)
+        account: Account | undefined;
     
 }
