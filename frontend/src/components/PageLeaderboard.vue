@@ -298,17 +298,17 @@ function isInScoresTable(userScore: ILeaderboard) {
                     <div class="profile-picture-div">
                         <img
                             id="profile-picture-second"
-                            alt="Second place profile picture"
+                            alt=" "
                             :src="'http://localhost:3000/' + second.account.profilePicture" />
                         <label id="medallion-second" class="medallion">2</label>
                         <img
                             id="profile-picture-first"
-                            alt="First place profile picture"
+                            alt=" "
                             :src="'http://localhost:3000/' + first.account.profilePicture" />
                         <label id="medallion-first" class="medallion">1</label>
                         <img
                             id="profile-picture-third"
-                            alt="Third place profile picture"
+                            alt=" "
                             :src="'http://localhost:3000/' + third.account.profilePicture" />
                         <label id="medallion-third" class="medallion">3</label>
                     </div>
@@ -440,12 +440,12 @@ function isInScoresTable(userScore: ILeaderboard) {
 #crown {
     background: url(/images/crown.svg);
     background-size: cover;
-    height: 80px;
-    left: 42.5%;
+    height: 60px;
+    left: 45.5%;
     position: relative;
-    top: -289px;
+    top: -187px;
     transform: translate(-105%, 80%);
-    width: 80px;
+    width: 60px;
 }
 
 .daily-button-active {
@@ -479,29 +479,29 @@ main {
     border: 3px var(--color-light-blue) solid;
     border-radius: 90px;
     display: flex;
-    height: 40px;
+    height: 30px;
     justify-content: center;
     margin: -15px;
-    width: 40px;
+    width: 30px;
 }
 
 #medallion-first {
     background: #c29b0c;
-    left: -105px;
+    left: -60px;
     position: relative;
     top: 5px;
 }
 
 #medallion-second {
     background: #71706e;
-    left: -90px;
+    left: -45px;
     position: relative;
     top: 5px;
 }
 
 #medallion-third {
     background: #804a00;
-    left: -80px;
+    left: -35px;
     position: relative;
     top: 5px;
 }
@@ -541,17 +541,17 @@ p {
 #profile-picture-first {
     background: var(--color-light-blue);
     border: 5px var(--color-blue) solid;
-    border-radius: 90px;
-    height: 180px;
-    width: 180px;
+    border-radius: 50%;
+    height: 100px;
+    width: 100px;
 }
 
 #profile-picture-second {
     background: var(--color-light-blue);
     border: 5px var(--color-blue) solid;
-    border-radius: 90px;
-    height: 150px;
-    width: 150px;
+    border-radius: 50%;
+    height: 70px;
+    width: 70px;
 }
 
 .profile-picture-table {
@@ -566,9 +566,9 @@ p {
 #profile-picture-third {
     background: var(--color-light-blue);
     border: 5px var(--color-blue) solid;
-    border-radius: 90px;
-    height: 130px;
-    width: 130px;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
 }
 
 #profile-pictures-wrapper {
@@ -650,7 +650,7 @@ p {
 }
 
 .winner-name {
-    height: 100%;
+    width: fit-content;
     text-align: center;
 }
 
@@ -663,13 +663,14 @@ p {
     height: 150%;
     justify-content: center;
     width: 100%;
+    padding: 0 calc(var(--gap) / 2);
 }
 
 .winner-stats {
     display: flex;
     flex-direction: column;
     gap: calc(var(--gap) * 2);
-    justify-content: center;
+    align-items: center;
     width: 20%;
 }
 
@@ -684,6 +685,7 @@ p {
     height: 150%;
     justify-content: center;
     width: 100%;
+    padding: 0 calc(var(--gap) / 2);
 }
 
 .winner-time-points {
