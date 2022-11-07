@@ -34,6 +34,11 @@ function checkAuthentication() {
                     res.json().then((data) => {
                         authStore.setDisplayName(data.displayName);
                         authStore.setProfilePicture(data.profilePicture);
+                        let participation = true;
+                        if (data.leaderboardParticipation == '0') {
+                            participation = false;
+                        }
+                        authStore.setParticipation(participation);
                     });
                 } else {
                     authStore.clearToken();
