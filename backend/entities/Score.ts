@@ -1,12 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
-import { Leaderboard } from './Leaderboard';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Account } from './Account';
 
 @Entity()
 export class Score {
-    constructor(points: number, time: number, displayName: string, profilePicture: any) {
+    constructor(points: number, time: number, account: Account) {
         this.points = points;
         this.time = time;
-        this.displayName = displayName;
+        this.account = account;
     }
 
     @PrimaryGeneratedColumn()
@@ -18,14 +18,7 @@ export class Score {
     @Column()
         time: number;
 
-    @Column()
-        displayName: string;
-
-    @Column()
-    profilePicture: string;
-
-    @ManyToMany(() => Leaderboard, (leaderboard) => leaderboard.scores)
-    @JoinTable()
-        leaderboards: Leaderboard[] | undefined;
+    @ManyToOne(() => Account, (account) => account.id)
+        account: Account | undefined;
     
 }

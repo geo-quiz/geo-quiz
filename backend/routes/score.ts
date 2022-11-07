@@ -3,143 +3,19 @@ import { AppDataSource } from '../AppDataSource';
 import { Score } from '../entities/Score';
 import { Leaderboard } from '../entities/Leaderboard';
 import jwt, { JwtPayload, VerifyErrors } from 'jsonwebtoken';
+import { Account } from '../entities/Account';
 import { Continent } from '../entities/Continent';
 
 
 const baseUrl = '/scores';
 const repository = AppDataSource.getRepository(Score);
-//const accountRepository = AppDataSource.getRepository(Account);
+const continentRepository = AppDataSource.getRepository(Continent);
+const accountRepository = AppDataSource.getRepository(Account);
 const leaderboardRepository = AppDataSource.getRepository(Leaderboard);
-// const answerRepository = AppDataSource.getRepository(Answer);
-// const tokenRepository = AppDataSource.getRepository(Token);
-// const continentRepository = AppDataSource.getRepository(Continent);
-
 
 const secretToken = process.env.SECRET_TOKEN_SECRETS as string;
 
 export const scoreRoute = Router();
-
-
-/*body: JSON.stringify({
-    continent: continent.value,
-    time: totalTime.value,
-    score: currentQuiz.points,
-    token: authStore.getToken(),*/
-// receive: Continent & Array of Answers? & token & time
-
-/*
-scoreRoute.get(baseUrl, (_req, res) => {
-    repository
-        .find({
-            relations: ['leaderboards'],
-        })
-        .then((scores) => {
-            res.status(200).json(scores);
-        })
-        .catch((error) => res.status(404).json({ errorMessage: 'Could not be found', error: error }));
-});
-*/
-
-/*//Ger alla scores fördelat per leaderboard
-scoreRoute.get('/scores/:continent', (req, res) => {
-    const displaynameParam = (req.params.continent as string).toLowerCase();
-    const user = 'Trilliam';
-//1. receive: Continent & Array of Answers? & token & time
-    repository
-        .find({
-            relations: ['leaderboards'],
-            order: { leaderboards: { daily: 'DESC' } },
-            where: { displayName: displaynameParam }
-        })
-        .then((leaderboards) => {
-
-
-            const responseData = {
-                //  userScore: userleaderboards,
-                continentBoards: leaderboards,
-
-
-            };
-            res.status(200).json(responseData);
-        });
-});
-*/
-
-/*//Ger alla svaren från databasen och id
-scoreRoute.get(baseUrl, (_req, res) => {
-
-    answerRepository
-        .find({
-            order: {
-                id: 'ASC'
-            },
-            skip: 0,
-
-        })
-        .then((scores) => {
-            res.status(200).json(scores);
-
-        });*/
-
-/*//Ger Continent i stigande ordning
-scoreRoute.get(baseUrl, (_req, res) => {
-
-    continentRepository
-        .find({
-            order: {
-                id: 'ASC'
-            },
-            skip: 0,
-
-        })
-        .then((scores) => {
-            res.status(200).json(scores);
-
-        });*/
-
-/*//Ger scores i fallande ordning om 10
-scoreRoute.get(baseUrl, (_req, res) => {
-
-    repository
-        .find({
-            order: {
-                points: 'DESC'
-            },
-            skip: 0,
-            take: 10,
-        })
-        .then((scores) => {
-            res.status(200).json(scores);
-
-});*/
-
-
-//1. receive: Continent & Array of Answers? & token & time
-/*
-scoreRoute.get('/scores/:continent', (req, res) => {
-    const displaynameParam = (req.params.continent as string).toLowerCase();
-    const user = 'Trilliam';
-
-    answerRepository
-        .find({
-            relations: ['leaderboards'],
-            order: { id:  'DESC'  },
-            where: { id: displaynameParam  }
-        })
-        .then((leaderboards) => {
-
-
-            const responseData = {
-                //  userScore: userleaderboards,
-                continentBoards: leaderboards,
-
-
-            };
-            res.status(200).json(responseData);
-        });
-});
-*/
-
 
 function verifyToken(
     token: string,
@@ -148,16 +24,63 @@ function verifyToken(
     jwt.verify(token, secretToken, callback);
 }
 
-//const worldDailyBoardRepo = AppDataSource.getRepository(Leaderboard);
-
 scoreRoute.post(baseUrl, (req, res) => {
-    // const continent = req.body.continent;
-    // const time = req.body.time;
-    // const score = req.body.score;
-    const token = req.body.token;
-    console.log(token);
+    function saveToLeaderboard(continent: string, savedScore: Score, daily: boolean): Promise<Leaderboard> {
+        return new Promise<Leaderboard>((success, fail) => {
+            continentRepository.findOneBy({ name: continent }).then((foundContinent) => {
+                if (foundContinent) {
+                    leaderboardRepository
+                        .findOne({ where: { continent: foundContinent, daily: daily }, relations: { continent: true, scores: true } }, )
+                        .then((leaderboard) => {
+                            if (leaderboard) {
+                                if (leaderboard.scores != undefined) {
+                                    (leaderboard.scores as Score[]).push(savedScore);
+                                    leaderboardRepository.save(leaderboard).then(() => {
+                                        success(leaderboard);
+                                        return;
+                                    }).catch((error) => {
+                                        console.error(error);
+                                        res.statusMessage = 'Error while updating leaderboard';
+                                        res.status(500).end();
+                                        fail();
+                                        return;
+                                    });
+                                } else {
+                                    res.statusMessage = 'No leaderboard';
+                                    res.status(500).end();
+                                    fail();
+                                    return;
+                                }
+                            } else {
+                                res.statusMessage = 'Could not find leaderboard for: ' + continent;
+                                res.status(500).end();
+                                fail();
+                                return;
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            res.statusMessage = 'Leaderboard could not be found for: ' + continent;
+                            res.status(500).end();
+                            fail();
+                            return;
+                        });
+                } else {
+                    res.statusMessage = 'Could not find continent with name: ' + continent;
+                    res.status(404).end();
+                    fail();
+                    return;
+                }
+            });
+        });
+    }
 
-    if (token) {
+    const continent = req.body.continent;
+    const time = req.body.time;
+    const score = req.body.score;
+    const token = req.body.token;
+
+    if (token && continent && time && score) {
         verifyToken(token, (error, decoded) => {
             if (error) {
                 res.statusMessage = 'Invalid token';
@@ -165,163 +88,76 @@ scoreRoute.post(baseUrl, (req, res) => {
                 return;
             }
             if (decoded) {
-                if ((decoded as JwtPayload).displayName) {
-                    const displayName = (decoded as JwtPayload).displayName;
-console.log(displayName)
-                    const scoreBody = req.body;
-           console.log(scoreBody)
-if (scoreBody) {
-                        repository.findOneBy({ displayName: displayName }).then((score) => {
-                            /* if(score) {
-                                 displayName.compare(displayName, score.displayName).then((validPass) => {
-                                         if (validPass) {
-                            */
-                            if (score) {
-                                if (scoreBody.displayName) {
-                                    score.displayName = scoreBody.displayName as string;
-                                }
-                                if (scoreBody.time) {
-                                    score.time = scoreBody.time as number;
-                                }
-                                if (scoreBody.points) {
-                                    score.points = scoreBody.points as number;
-                                }
-                                repository.save(score)
-                                    .then(() => {
-                                        res.status(200).json({
-                                            msg: 'saved',
+                if ((decoded as JwtPayload).email) {
+                    const email = (decoded as JwtPayload).email;
+
+                    if (email) {
+                        accountRepository.findOneBy({ email: email }).then((account) => {
+                            if (account) {
+                                if (score >= 0 && !(score > 10) && time > 0 && continent) {
+                                    const savedScore = new Score(score, time, account);
+
+                                    repository
+                                        .save(savedScore)
+                                        .then((score) => {
+                                            saveToLeaderboard(continent, score, true).then(() => {
+                                                saveToLeaderboard(continent, score, false).then(() => {
+                                                    saveToLeaderboard('all', score, true).then(() => {
+                                                        saveToLeaderboard('all', score, false).then(() => {
+                                                            res.status(200).end();
+                                                            return;
+                                                        }).catch((error) => {
+                                                            console.error(error);
+                                                            res.statusMessage = 'Error while saving 1';
+                                                            res.status(500).end();
+                                                            return;
+                                                        });
+                                                    }).catch((error) => {
+                                                        console.error(error);
+                                                        res.statusMessage = 'Error while saving 2';
+                                                        res.status(500).end();
+                                                        return;
+                                                    });
+                                                }).catch((error) => {
+                                                    console.error(error);
+                                                    res.statusMessage = 'Error while saving 3';
+                                                    res.status(500).end();
+                                                    return;
+                                                });
+                                            }).catch((error) => {
+                                                console.error(error);
+                                                res.statusMessage = 'Error while saving 4';
+                                                res.status(500).end();
+                                                return;
+                                            });
                                         })
-                                    })
+                                        .catch((error) => {
+                                            console.error(error);
+                                            res.statusMessage = 'Error while saving 5';
+                                            res.status(500).end();
+                                            return;
+                                        });
+                                } else {
+                                    res.statusMessage = 'Improbable score';
+                                    res.status(400).end();
+                                    return;
+                                }
                             }
-
-
-                            function saveToContinentLeaderboards(continent: Continent, savedScore: Score) {
-                                leaderboardRepository
-                                    .findOneBy({ continent: continent, daily: false })
-                                    .then((leaderboard) => {
-                                        if (leaderboard) {
-                                            if (leaderboard.scores != undefined) {
-                                                leaderboard.scores.push(savedScore);
-                                            } else {
-                                                console.error('Could not save score to ' + leaderboard.continent);
-                                            }
-                                        }
-                                    })
-                                    .catch((error) =>
-                                        res.status(404).json({
-                                            errorMessage: continent + ' overall repo could not be found',
-                                            error: error,
-                                        }),
-                                    );
-
-                                leaderboardRepository
-                                    .findOneBy({ continent: continent, daily: true })
-                                    .then((leaderboard) => {
-                                        if (leaderboard) {
-                                            if (leaderboard.scores != undefined) {
-                                                leaderboard.scores.push(savedScore);
-                                            } else {
-                                                console.error('Could not save score to ' + leaderboard.continent);
-                                            }
-                                        }
-                                    })
-                                    .catch((error) =>
-                                        res.status(404).json({
-                                            errorMessage: continent + ' daily repo could not be found',
-                                            error: error,
-                                        }),
-                                    );
-                            }
-
-                            function saveToWorldLeaderboards(world: Continent, savedScore: Score) {
-                                leaderboardRepository
-                                    .findOneBy({ continent: world, daily: false })
-                                    .then((leaderboard) => {
-                                        if (leaderboard) {
-                                            if (leaderboard.scores != undefined) {
-                                                leaderboard.scores.push(savedScore);
-                                            } else {
-                                                console.error('Could not save score to ' + leaderboard.continent);
-                                            }
-                                        }
-                                    })
-                                    .catch((error) =>
-                                        res.status(404).json({
-                                            errorMessage: 'World overall leaderboard could not be found',
-                                            error: error,
-                                        }),
-                                    );
-                                leaderboardRepository
-                                    .findOneBy({ continent: world, daily: true })
-                                    .then((leaderboard) => {
-                                        if (leaderboard) {
-                                            if (leaderboard.scores != undefined) {
-                                                leaderboard.scores.push(savedScore);
-                                            } else {
-                                                console.error('Could not save score to ' + leaderboard.continent);
-                                            }
-                                        }
-                                    })
-                                    .catch((error) =>
-                                        res.status(404).json({
-                                            errorMessage: 'World daily leaderboard could not be found',
-                                            error: error,
-                                        }),
-                                    );
-                            }
-
-                            /*  if (token) {
-                                  verifyToken(token, (error, decoded) => {
-                                      if (error) {
-                                          res.statusMessage = 'Invalid token,';
-                                          res.status(400).end();
-                                          return;
-                                      }
-                                      if (decoded) {
-                                          if ((decoded as JwtPayload).email) {
-                                              const displayName = (decoded as JwtPayload).email;
-
-                                              if (displayName) {
-                                                  accountRepository.findOneBy({ displayName: displayName })
-                                                      .then((account) => {
-                                                          if (account) {
-                                                              const points = scoreBody.points as number;
-                                                              const time = scoreBody.time as number;
-                                                              const continent = scoreBody.continent as Continent;
-                                                              const displayName = account.displayName;
-                                                              const profilePicture = account.profilePicture;
-
-                                                              if (points >= 0 && time > 0 && continent) {
-                                                                  const savedScore = new Score(points, time, displayName, profilePicture);
-                                                                  const world = new Continent('world');
-
-
-                                                                  saveToContinentLeaderboards(continent, savedScore);
-                                                                  saveToWorldLeaderboards(world, savedScore);
-
-
-                                                                  repository
-                                                                      .save(savedScore)
-                                                                      .then((score) => {
-                                                                          res.status(200).json(score);
-                                                                      })
-                                                                      .catch((error) =>
-                                                                          res
-                                                                              .status(404)
-                                                                              .json({
-                                                                                  errorMessage: 'Score repo could not be found',
-                                                                                  error: error
-                                                                              }),
-                                                                      );
-                                                              }
-                                                          }
-                                                      });
-                                              } else {
-                                                  res.statusMessage = 'Account not found';
-                                                  res.status(404).end();
-                                                  return;
-                                              }
-                                          }
-                                      }
-                                  */
-                        })}}}})}})
+                        });
+                    } else {
+                        res.statusMessage = 'Account not found';
+                        res.status(404).end();
+                        return;
+                    }
+                }
+            }
+        });
+    } else {
+        res.status(400).end();
+        return;
+    }
+    setTimeout(() => {
+        res.statusMessage = 'Request timed out';
+        res.status(500).end();
+        return;}, 10000);
+});

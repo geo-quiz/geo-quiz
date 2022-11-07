@@ -7,7 +7,6 @@ export class Leaderboard {
     constructor(continent: Continent, daily: boolean) {
         this.continent = continent;
         this.daily = daily;
-        this.scores = undefined;
     }
 
     @PrimaryGeneratedColumn()
@@ -19,7 +18,7 @@ export class Leaderboard {
     @ManyToOne(() => Continent, (continent) => continent.id)
     continent: Continent | undefined;
 
-    @ManyToMany(() => Score, (score) => score.leaderboards)
+    @ManyToMany(() => Score)
     @JoinTable()
     scores: Score[] | undefined;
 }
