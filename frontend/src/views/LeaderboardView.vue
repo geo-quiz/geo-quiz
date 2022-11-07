@@ -1,15 +1,15 @@
 <script lang="ts" setup>
 import PageHeader from '@/components/PageHeader.vue';
-import LeaderboardTable from '@/components/LeaderboardTable.vue';
+import PageFooter from '@/components/PageFooter.vue';
+import PageLeaderboard from '@/components/PageLeaderboard.vue';
 import {useRoute} from 'vue-router';
 const route = useRoute();
 </script>
 
-const props = defineProps({ id: { type: String, required: true, }, });
-
 <template>
     <PageHeader />
-    <LeaderboardTable :continent="route.path"/>
+    <PageLeaderboard :continent="route.path"/>
+    <PageFooter />
 </template>
 
 <style scoped></style>

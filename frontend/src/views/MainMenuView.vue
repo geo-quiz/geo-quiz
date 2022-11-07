@@ -16,7 +16,7 @@ import MainMenuContainer from '@/components/MainMenuContainer.vue';
                     <GeoButton @click="router.push('/profile')">Profile</GeoButton>
                 </div>
                 <div class="button-wrapper">
-                    <GeoButton @click="router.push('/leaderboard/world')">Leaderboard</GeoButton>
+                    <GeoButton @click="router.push('/leaderboard/all')">Leaderboard</GeoButton>
                 </div>
             </div>
         </div>

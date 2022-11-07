@@ -1,16 +1,19 @@
 <script lang="ts" setup>
-import GeoButton from '@/components/GeoButton.vue';
+import ArrowRightThinCircleOutline from 'vue-material-design-icons/arrowrightthincircleoutline.vue';
+import ArrowLeftThinCircleOutline from 'vue-material-design-icons/arrowleftthincircleoutline.vue';
 import { computed, onMounted, Ref, ref } from 'vue';
 import ChevronRight from 'vue-material-design-icons/ChevronRight.vue';
 import ChevronLeft from 'vue-material-design-icons/ChevronLeft.vue';
+import GeoButton from '@/components/GeoButton.vue';
 import PageLoad from '@/components/PageLoad.vue';
 import router from '@/router/index';
 import type { ILeaderboard } from '@/utility/interfaces/ILeaderboard';
 import type { IScore } from '@/utility/interfaces/IScore';
+import { useAuthStore } from '@/stores/auth';
 import { useRoute } from 'vue-router';
 
-const defaultScore = { id: -1, points: -1, time: -1, displayName: '' } as IScore;
-
+const defaultScore = { id: -1, points: -1, time: -1, account: {displayName: '', profilePicture: ''} } as IScore;
+const authStore = useAuthStore();
 const awaitingResponse = ref(false);
 
 const route = useRoute();
@@ -19,7 +22,7 @@ console.log('continent ', route.params.continent);
 let currentContinent: string = route.params.continent as string;
 console.log('currentContinent ', currentContinent);
 
-const continents = ['africa', 'asia', 'europe', 'north-america', 'oceania', 'south-america', 'world'];
+const continents = ['africa', 'all', 'asia', 'europe', 'north-america', 'oceania', 'south-america', 'world'];
 
 const leaderboards: Ref<ILeaderboard[] | null> = ref(null);
 let dailyLeaderboard = computed(() => {
@@ -36,27 +39,36 @@ const overallUserScore = computed(() => {
     return userScores.value?.filter((board) => !board.daily)[0];
 });
 
-let scores: Ref<IScore[]> = ref([]);
+const rowsToShow = ref(5);
 
+let scores: Ref<IScore[]> = ref([]);
 let first: Ref<IScore> = ref(defaultScore);
 let second: Ref<IScore> = ref(defaultScore);
 let third: Ref<IScore> = ref(defaultScore);
 let scoresTable: Ref<IScore[]> = ref([]);
-scoresTable.value[0] = defaultScore;
+let currentTableIndex = ref(0);
+let nextTableIndex = ref(0);
+let previousTableIndex = ref(0);
+let hasPrevious = ref(false);
+let hasNext = ref(false);
 
 let isOverall = ref(true);
 let showUserScore = ref(false);
 let userIndex = ref(-1);
 let userTableScore = ref(defaultScore);
 
-
 function getLeaderboards(newContinent: string) {
     console.log('in getLeadersboards');
-    fetch(`http://localhost:3000/leaderboard/${newContinent}`)
+    fetch(`http://localhost:3000/leaderboard/${newContinent}`, {
+        headers: {
+            Authorization: 'Bearer ' + authStore.getToken(),
+        },
+    })
         .then((response) =>
             response.json().then((data: { continentBoards: ILeaderboard[]; userScore: ILeaderboard[] }) => {
                 leaderboards.value = data.continentBoards;
                 userScores.value = data.userScore;
+                console.log(leaderboards.value);
                 console.log(newContinent, 'loaded');
                 console.log(leaderboards.value[0].id);
                 console.log(leaderboards.value[0].daily);
@@ -90,9 +102,22 @@ function getSubtitle() {
             return 'OCEANIA';
         case 'world':
             return 'WORLD';
+        case 'all':
+            return 'ALL';
         default:
             return 'UNKNOWN';
     }
+}
+
+function loadContinent(nextContinent: any) {
+    awaitingResponse.value = true;
+    resetScores();
+    getLeaderboards(nextContinent);
+    currentContinent = nextContinent;
+    setTimeout(() => {
+        getDailyBoard();
+        awaitingResponse.value = false;
+    }, 350);
 }
 
 function getPrevious() {
@@ -102,17 +127,7 @@ function getPrevious() {
     }
     const nextContinent = continents[previousIndex];
     loadContinent(nextContinent);
-    getLeaderboards(currentContinent);
-}
-
-function loadContinent(nextContienent: any) {
-    awaitingResponse.value = true;
-    getLeaderboards(nextContienent);
-    currentContinent = nextContienent;
-    setTimeout(() => {
-        getDailyBoard();
-        awaitingResponse.value = false;
-    }, 1000);
+    console.log('finished getPrevious');
 }
 
 function getNext() {
@@ -128,121 +143,158 @@ function getNext() {
 }
 
 function resetScores() {
+    scoresTable.value = [];
+    currentTableIndex.value = 0;
+    nextTableIndex.value = 0;
+    previousTableIndex.value = 0;
     first.value = defaultScore;
     second.value = defaultScore;
     third.value = defaultScore;
-    scoresTable.value[0] = defaultScore;
 }
 
 function setupScoresAndTable() {
     resetScores();
     if (scores.value[0]) {
         first.value = scores.value[0];
+        console.log((first.value));
     } else {
-        console.log('no value in scores[0]');
+        third.value = defaultScore;
     }
     if (scores.value[1]) {
         second.value = scores.value[1];
     } else {
-        console.log('no value in scores[1]');
+        third.value = defaultScore;
     }
     if (scores.value[2]) {
         third.value = scores.value[2];
     } else {
-        console.log('no value in scores[2]');
+        third.value = defaultScore;
     }
-    if (scores.value[0]) {
-        scoresTable.value = scores.value.slice(3);
+    if (scores.value[3]) {
+        currentTableIndex.value = 3;
+        scoresTable.value = scores.value.slice(currentTableIndex.value, currentTableIndex.value + rowsToShow.value);
+        if (scores.value[3 + rowsToShow.value]) {
+            nextTableIndex.value = 3 + rowsToShow.value;
+            hasNext.value = true;
+        }
     } else {
         console.log('no values left in scores to assign to scoresTable');
     }
-    console.log('daily scores assigned');
-    console.log('first ', first.value?.displayName);
-    console.log('second ', second.value?.displayName);
-    console.log('third ', third.value?.displayName);
+}
+
+function nextTable() {
+    if (scores.value[nextTableIndex.value]) {
+        setPreviousTableIndex(currentTableIndex.value);
+        currentTableIndex.value = nextTableIndex.value;
+        if (scores.value[currentTableIndex.value + rowsToShow.value]) {
+            console.log('nextTable has stuff');
+            hasNext.value = true;
+            nextTableIndex.value = currentTableIndex.value + rowsToShow.value;
+        }
+        scoresTable.value = scores.value.slice(currentTableIndex.value, currentTableIndex.value + rowsToShow.value);
+    } else {
+        console.log('nextTable doesnt has stuff');
+
+        hasNext.value = false;
+    }
+}
+
+function setNextTableIndex(index: number) {
+    hasNext.value = true;
+    nextTableIndex.value = index;
+}
+
+function setPreviousTableIndex(index: number) {
+    hasPrevious.value = true;
+    previousTableIndex.value = index;
+}
+
+function previousTable() {
+    if (scores.value[previousTableIndex.value]) {
+        setNextTableIndex(currentTableIndex.value);
+        currentTableIndex.value = previousTableIndex.value;
+        if (scores.value[currentTableIndex.value - rowsToShow.value]) {
+            console.log('previousTable has stuff');
+
+            hasPrevious.value = true;
+            previousTableIndex.value = currentTableIndex.value - rowsToShow.value;
+        }
+        scoresTable.value = scores.value.slice(currentTableIndex.value, currentTableIndex.value + rowsToShow.value);
+    } else {
+        console.log('previousTable doesnt has stuff');
+        hasPrevious.value = false;
+    }
 }
 
 function getDailyBoard() {
     console.log('start getDailyBoard()');
 
     if (dailyLeaderboard.value) {
-        console.log('dailyBoard has data');
         if (dailyLeaderboard.value.scores) {
-            scores.value = dailyLeaderboard.value.scores;
-            setupScoresAndTable();
+            if (dailyLeaderboard.value.scores.length > 0) {
+                console.log('dailyBoard has data');
+                scores.value = dailyLeaderboard.value.scores;
+                setupScoresAndTable();
+                if (dailyUserScore.value) {
+                    isInScoresTable(dailyUserScore.value);
+                } else {
+                    console.log('no value in dailyUserLeaderboard scores');
+                }
+            }
         } else {
-            console.log('no value in dailyLeaderboard scores');
+            console.log('no value in dailyLeaderboard');
         }
-    } else {
-        console.log('no value in dailyLeaderboard');
-    }
-    console.log('daily scoresTable ', scoresTable.value);
-
-    isOverall.value = false;
-
-    if (dailyUserScore.value) {
-        if (isInScoresTable(dailyUserScore.value)) {
-            showUserScore.value = true;
-        }
-    } else {
-        showUserScore.value = false;
+        isOverall.value = false;
     }
 }
 
 function getOverallBoard() {
-    console.log('start getoverallBoard()');
+    console.log('start getOverallBoard()');
     if (overallLeaderboard.value) {
         console.log('overallBoard has data');
         if (overallLeaderboard.value.scores) {
             scores.value = overallLeaderboard.value.scores;
             setupScoresAndTable();
+            if (overallUserScore.value) {
+                isInScoresTable(overallUserScore.value);
+            } else {
+                console.log('no value in overallLeaderboard scores');
+            }
         } else {
-            console.log('no value in overallLeaderboard scores');
+            console.log('no value in overallLeaderboard');
         }
-    } else {
-        console.log('no value in overallLeaderboard');
-    }
-
-    console.log('overall scores ', scores.value);
-
-    isOverall.value = true;
-
-    if (overallUserScore.value) {
-        if (isInScoresTable(overallUserScore.value)) {
-            showUserScore.value = true;
-        }
-    } else {
-        showUserScore.value = false;
+        isOverall.value = true;
     }
 }
 
 function isInScoresTable(userScore: ILeaderboard) {
     let isInList = ref(false);
+    let isInThisList = ref(false);
+    let index = ref(0);
+
     for (let i = 0; i < scoresTable.value.length; i++) {
-        if (userScore.scores[0].displayName != scoresTable.value[i].displayName) {
+        if (userScore.scores[0].account.displayName === scores.value[i].account.displayName) {
             isInList.value = true;
         }
-    }
-    if (isInList.value) {
-        for (let i = 0; i < scoresTable.value.length; i++) {
-            if (userScore.scores[0].displayName == scoresTable.value[i].displayName) {
-                userIndex.value = i+3;
-                userTableScore.value.displayName = scoresTable.value[i].displayName;
-                userTableScore.value.points = scoresTable.value[i].points;
-                userTableScore.value.time = scoresTable.value[i].time;
-                console.log('i ',i)
-            }
+        if (userScore.scores[0].account.displayName === scoresTable.value[i].account.displayName) {
+            isInThisList.value = true;
+            userIndex.value = i + currentTableIndex.value;
+            index.value = i;
+        } else {
+            isInList.value = false;
         }
     }
-    else {
+    if (isInList.value && !isInThisList.value) {
+        userTableScore.value.account.displayName = scoresTable.value[index.value].account.displayName;
+        userTableScore.value.points = scoresTable.value[index.value].points;
+        userTableScore.value.time = scoresTable.value[index.value].time;
+        showUserScore.value = true;
+    } else {
+        isInThisList.value = false;
         userTableScore.value = defaultScore;
     }
-    console.log('userIndex: ', userIndex);
-
-    return isInList;
+    return isInThisList;
 }
-
-
 </script>
 
 <template>
@@ -252,20 +304,20 @@ function isInScoresTable(userScore: ILeaderboard) {
         <div class="wrapper">
             <div class="arrows">
                 <div class="arrow-left" @click="getPrevious()">
-                    <ChevronLeft size="50"></ChevronLeft>
+                    <ChevronLeft :size="50"></ChevronLeft>
                 </div>
-                <h3 class="subtitle" v-if="!awaitingResponse">{{ getSubtitle() }}</h3>
+                <h3 v-if="!awaitingResponse" class="subtitle">{{ getSubtitle() }}</h3>
                 <div class="arrow-right" @click="getNext()">
-                    <ChevronRight size="50"></ChevronRight>
+                    <ChevronRight :size="50"></ChevronRight>
                 </div>
             </div>
 
             <div class="overall-daily-buttons-wrapper">
-                <GeoButton v-if="isOverall" class="daily-button-active" @click="getDailyBoard"> Daily </GeoButton>
+                <GeoButton v-if="isOverall" class="daily-button-active" @click="getDailyBoard">Daily</GeoButton>
                 <GeoButton v-else class="daily-button-disabled">Daily</GeoButton>
 
                 <GeoButton v-if="isOverall" class="overall-button-disabled">Overall</GeoButton>
-                <GeoButton v-else class="overall-button-active" @click="getOverallBoard"> Overall </GeoButton>
+                <GeoButton v-else class="overall-button-active" @click="getOverallBoard">Overall</GeoButton>
             </div>
             <PageLoad v-if="awaitingResponse" />
             <div v-else class="wrapper">
@@ -274,17 +326,17 @@ function isInScoresTable(userScore: ILeaderboard) {
                         <img
                             id="profile-picture-second"
                             alt="Second place profile picture"
-                            src="/images/gubbe-left.svg" />
+                            :src="'http://localhost:3000/' + second.account.profilePicture" />
                         <label id="medallion-second" class="medallion">2</label>
                         <img
                             id="profile-picture-first"
                             alt="First place profile picture"
-                            src="/images/default-profile-picture.svg" />
+                            :src="'http://localhost:3000/' + first.account.profilePicture" />
                         <label id="medallion-first" class="medallion">1</label>
                         <img
                             id="profile-picture-third"
                             alt="Third place profile picture"
-                            src="/images/gubbe-right.svg" />
+                            :src="'http://localhost:3000/' + third.account.profilePicture" />
                         <label id="medallion-third" class="medallion">3</label>
                     </div>
                     <div id="crown"></div>
@@ -295,30 +347,30 @@ function isInScoresTable(userScore: ILeaderboard) {
 
                 <div class="winner-container">
                     <div class="winner-stats">
-                        <label class="winner-name">{{ second.displayName }}</label>
+                        <label class="winner-name">{{ second.account.displayName }}</label>
                         <div class="winner-time-points">
-                            <label class="winner-points" v-if="second.displayName">{{ second.points }}p</label>
-                            <label class="winner-points" v-else> </label>
-                            <label class="winner-time" v-if="second.displayName">{{ second.time }}s</label>
-                            <label class="winner-time" v-else> </label>
+                            <label v-if="second.account.displayName" class="winner-points">{{ second.points }}p</label>
+                            <label v-else class="winner-points"> </label>
+                            <label v-if="second.account.displayName" class="winner-time">{{ second.time }}s</label>
+                            <label v-else class="winner-time"> </label>
                         </div>
                     </div>
                     <div class="winner-stats">
-                        <label class="winner-name">{{ first.displayName }}</label>
+                        <label class="winner-name">{{ first.account.displayName }}</label>
                         <div class="winner-time-points">
-                            <label class="winner-points" v-if="first.displayName">{{ first.points }}p</label>
-                            <label class="winner-points" v-else> </label>
-                            <label class="winner-time" v-if="first.displayName">{{ first.time }}s</label>
-                            <label class="winner-time" v-else> </label>
+                            <label v-if="first.account.displayName" class="winner-points">{{ first.points }}p</label>
+                            <label v-else class="winner-points"> </label>
+                            <label v-if="first.account.displayName" class="winner-time">{{ first.time }}s</label>
+                            <label v-else class="winner-time"> </label>
                         </div>
                     </div>
                     <div class="winner-stats">
-                        <label class="winner-name">{{ third.displayName }}</label>
+                        <label class="winner-name">{{ third.account.displayName }}</label>
                         <div class="winner-time-points">
-                            <label class="winner-points" v-if="third.displayName">{{ third.points }}p</label>
-                            <label class="winner-points" v-else> </label>
-                            <label class="winner-time" v-if="third.displayName">{{ third.time }}s</label>
-                            <label class="winner-time" v-else> </label>
+                            <label v-if="third.account.displayName" class="winner-points">{{ third.points }}p</label>
+                            <label v-else class="winner-points"> </label>
+                            <label v-if="third.account.displayName" class="winner-time">{{ third.time }}s</label>
+                            <label v-else class="winner-time"> </label>
                         </div>
                     </div>
                 </div>
@@ -326,22 +378,22 @@ function isInScoresTable(userScore: ILeaderboard) {
                 <div class="table-wrapper">
                     <div v-for="(score, index) in scoresTable" :key="index">
                         <table class="table-scores">
-                            <tr class="table-row" v-if="score.displayName">
-                                <td class="table-number">{{ 4 + index }}</td>
+                            <tr v-if="score.account.displayName" class="table-row">
+                                <td class="table-number">{{ 1 + index + currentTableIndex }}</td>
                                 <td class="table-picture">
                                     <img
                                         alt="User profile picture"
                                         class="profile-picture-table"
-                                        src="/images/gubbe-left.svg" />
+                                        :src="'http://localhost:3000/' + score.account.profilePicture " />
                                 </td>
-                                <td class="table-name">{{ score.displayName }}</td>
+                                <td class="table-name">{{ score.account.displayName }}</td>
                                 <td class="table-points">{{ score.points }}p</td>
                                 <td class="table-time">{{ score.time }}s</td>
                             </tr>
                         </table>
                     </div>
                     <div v-if="showUserScore">
-                        <h3>Overall Board & showUserScore </h3>
+                        <h3>Player Score</h3>
                         <table class="table-scores">
                             <tr class="table-row-user-score">
                                 <td class="table-number">{{ 1 + userIndex }}</td>
@@ -352,13 +404,40 @@ function isInScoresTable(userScore: ILeaderboard) {
                                         class="profile-picture-table"
                                         src="/images/gubbe-left.svg" />
                                 </td>
-                                <td class="table-name">{{ userTableScore.displayName }}</td>
+                                <td class="table-name">{{ userTableScore.account.displayName }}</td>
                                 <td class="table-points">{{ userTableScore.points }}p</td>
                                 <td class="table-time">{{ userTableScore.time }}s</td>
                             </tr>
                         </table>
                     </div>
                 </div>
+            </div>
+            <div class="buttons">
+                <GeoButton v-if="hasPrevious" @click="previousTable">
+                    <ArrowLeftThinCircleOutline class="icons" />
+                    Back
+                </GeoButton>
+                <GeoButton v-else class="disabled">
+                    <ArrowLeftThinCircleOutline class="icons" />
+                    Back
+                </GeoButton>
+
+                <GeoButton v-if="hasNext" @click="nextTable">
+                    More
+                    <ArrowRightThinCircleOutline class="icons" />
+                </GeoButton>
+                <GeoButton v-else class="disabled">
+                    More
+                    <ArrowRightThinCircleOutline class="icons" />
+                </GeoButton>
+            </div>
+            <div>
+                <p>
+                    Original crown svg published by
+                    <a href="https://freesvg.org/by/OpenClipart"> OpenClipart</a>
+                    from
+                    <a href="https://freesvg.org/simplified-crown" target="_blank"> https://freesvg.org</a>
+                </p>
             </div>
         </div>
     </main>
@@ -377,6 +456,12 @@ function isInScoresTable(userScore: ILeaderboard) {
 
 .arrow-right {
     cursor: pointer;
+}
+
+.buttons {
+    display: flex;
+    gap: calc(var(--gap) * 2);
+    width: 100%;
 }
 
 #crown {
@@ -405,6 +490,11 @@ function isInScoresTable(userScore: ILeaderboard) {
 h1,
 h3 {
     text-align: center;
+}
+
+.icons {
+    position: relative;
+    top: 4px;
 }
 
 main {
@@ -460,6 +550,12 @@ main {
     display: flex;
     flex-direction: row;
     width: 50%;
+}
+
+p {
+    font-size: 0.65rem;
+    margin: 0;
+    width: 100%;
 }
 
 .profile-picture-div {
@@ -540,15 +636,12 @@ main {
 
 .table-row-user-score {
     align-items: center;
-    background-color: var(--color-green);
     display: flex;
     flex-direction: row;
     gap: var(--gap);
-    padding: .5vh;
+    padding: 0.5vh;
     width: 100%;
 }
-
-
 
 .table-scores {
     height: 50px;
@@ -566,7 +659,7 @@ main {
 .table-wrapper {
     background: var(--color-light-blue);
     border: none;
-    border-radius: var(--radius) var(--radius) 0 0;
+    border-radius: var(--radius);
     color: var(--color-black);
     padding: 3px 6px;
     width: 100%;
@@ -582,8 +675,8 @@ main {
 }
 
 .winner-name {
-    text-align: center;
     height: 100%;
+    text-align: center;
 }
 
 .winner-points {
