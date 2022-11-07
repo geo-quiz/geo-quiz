@@ -298,18 +298,18 @@ function isInScoresTable(userScore: ILeaderboard) {
                     <div class="profile-picture-div">
                         <img
                             id="profile-picture-second"
-                            alt=" "
-                            :src="'http://localhost:3000/' + second.account.profilePicture" />
+                            :src="'http://localhost:3000/' + second.account.profilePicture"
+                            alt=" " />
                         <label id="medallion-second" class="medallion">2</label>
                         <img
                             id="profile-picture-first"
-                            alt=" "
-                            :src="'http://localhost:3000/' + first.account.profilePicture" />
+                            :src="'http://localhost:3000/' + first.account.profilePicture"
+                            alt=" " />
                         <label id="medallion-first" class="medallion">1</label>
                         <img
                             id="profile-picture-third"
-                            alt=" "
-                            :src="'http://localhost:3000/' + third.account.profilePicture" />
+                            :src="'http://localhost:3000/' + third.account.profilePicture"
+                            alt=" " />
                         <label id="medallion-third" class="medallion">3</label>
                     </div>
                     <div id="crown"></div>
@@ -355,9 +355,9 @@ function isInScoresTable(userScore: ILeaderboard) {
                                 <td class="table-number">{{ 1 + index + currentTableIndex }}</td>
                                 <td class="table-picture">
                                     <img
+                                        :src="'http://localhost:3000/' + score.account.profilePicture"
                                         alt="User profile picture"
-                                        class="profile-picture-table"
-                                        :src="'http://localhost:3000/' + score.account.profilePicture" />
+                                        class="profile-picture-table" />
                                 </td>
                                 <td class="table-name">{{ score.account.displayName }}</td>
                                 <td class="table-points">{{ score.points }}p</td>
@@ -373,9 +373,9 @@ function isInScoresTable(userScore: ILeaderboard) {
 
                                 <td class="table-picture">
                                     <img
+                                        :src="'http://localhost:3000/' + userTableScore.account.profilePicture"
                                         alt="User profile picture"
-                                        class="profile-picture-table"
-                                        :src="'http://localhost:3000/' + userTableScore.account.profilePicture" />
+                                        class="profile-picture-table" />
                                 </td>
                                 <td class="table-name">{{ userTableScore.account.displayName }}</td>
                                 <td class="table-points">{{ userTableScore.points }}p</td>
@@ -501,7 +501,7 @@ main {
 
 #medallion-third {
     background: #804a00;
-    left: -35px;
+    left: -37.5px;
     position: relative;
     top: 5px;
 }
@@ -567,8 +567,8 @@ p {
     background: var(--color-light-blue);
     border: 5px var(--color-blue) solid;
     border-radius: 50%;
-    height: 50px;
-    width: 50px;
+    height: 60px;
+    width: 60px;
 }
 
 #profile-pictures-wrapper {
@@ -597,8 +597,8 @@ p {
 }
 
 .table-name {
-    width: 50%;
     text-align: center;
+    width: 50%;
 }
 
 .table-row {
@@ -650,8 +650,8 @@ p {
 }
 
 .winner-name {
-    width: fit-content;
     text-align: center;
+    width: fit-content;
 }
 
 .winner-points {
@@ -662,16 +662,17 @@ p {
     display: flex;
     height: 150%;
     justify-content: center;
-    width: 100%;
     padding: 0 calc(var(--gap) / 2);
+    width: 100%;
 }
 
 .winner-stats {
+    align-items: center;
     display: flex;
     flex-direction: column;
     gap: calc(var(--gap) * 2);
-    align-items: center;
     width: 20%;
+    max-width: 100px;
 }
 
 .winner-time {
@@ -684,14 +685,15 @@ p {
     display: flex;
     height: 150%;
     justify-content: center;
-    width: 100%;
     padding: 0 calc(var(--gap) / 2);
+    width: 100%;
 }
 
 .winner-time-points {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    width: 100%;
 }
 
 .wrapper {
@@ -700,5 +702,50 @@ p {
     flex-direction: column;
     gap: calc(var(--gap) * 2);
     width: 100%;
+}
+
+@media only screen and (min-width: 550px) {
+    #crown {
+        height: 80px;
+        left: 42.5%;
+        top: -289px;
+        width: 80px;
+    }
+
+    .medallion {
+        height: 40px;
+        width: 40px;
+    }
+
+    #medallion-first {
+        left: -105px;
+    }
+
+    #medallion-second {
+        left: -90px;
+    }
+
+    #medallion-third {
+        left: -80px;
+    }
+
+    #profile-picture-first {
+        height: 180px;
+        width: 180px;
+    }
+
+    #profile-picture-second {
+        height: 150px;
+        width: 150px;
+    }
+
+    #profile-picture-third {
+        height: 130px;
+        width: 130px;
+    }
+
+    .winner-container {
+        gap: calc(var(--gap) * 7);
+    }
 }
 </style>
