@@ -277,7 +277,7 @@ userRoute.post('/update', (req, res) => {
                                                         (existingAccount && existingAccount.email === email) ||
                                                         !existingAccount
                                                     ) {
-                                                        if (accountBody.leaderboardParticipation) {
+                                                        if (accountBody.leaderboardParticipation !== undefined) {
                                                             if (accountBody.leaderboardParticipation as boolean) {
                                                                 account.leaderboardParticipation = 1;
                                                             } else {
