@@ -273,60 +273,60 @@ userRoute.post('/update', (req, res) => {
                                             repository
                                                 .findOneBy({ displayName: account.displayName })
                                                 .then((existingAccount) => {
-                                                    if (!existingAccount) {
-                                                        if (account.email === email) {
-                                                            if (accountBody.leaderboardParticipation) {
-                                                                if (accountBody.leaderboardParticipation as boolean) {
-                                                                    account.leaderboardParticipation = 1;
-                                                                } else {
-                                                                    account.leaderboardParticipation = 0;
-                                                                }
-                                                            }
-                                                            if (accountBody.password) {
-                                                                if (
-                                                                    passwordPattern.test(accountBody.password as string)
-                                                                ) {
-                                                                    bcrypt
-                                                                        .hash(accountBody.password as string, 10)
-                                                                        .then((hash) => {
-                                                                            account.passwordHash = hash;
-                                                                            repository
-                                                                                .save(account)
-                                                                                .then(() => {
-                                                                                    res.status(200).json({
-                                                                                        msg: 'Account updated',
-                                                                                    });
-                                                                                    return;
-                                                                                })
-                                                                                .catch(() => {
-                                                                                    res.statusMessage =
-                                                                                        'Something went wrong while updating the account';
-                                                                                    res.status(500).end();
-                                                                                    return;
-                                                                                });
-                                                                        });
-                                                                } else {
-                                                                    res.statusMessage = 'Invalid password format';
-                                                                    res.status(400).end();
-                                                                    return;
-                                                                }
+                                                    if (
+                                                        (existingAccount && existingAccount.email === email) ||
+                                                        !existingAccount
+                                                    ) {
+                                                        if (accountBody.leaderboardParticipation) {
+                                                            if (accountBody.leaderboardParticipation as boolean) {
+                                                                account.leaderboardParticipation = 1;
                                                             } else {
-                                                                repository
-                                                                    .save(account)
-                                                                    .then(() => {
-                                                                        res.status(200).json({
-                                                                            msg: 'Account updated',
-                                                                        });
-                                                                        return;
-                                                                    })
-                                                                    .catch((err) => {
-                                                                        console.log(error);
-                                                                        res.statusMessage =
-                                                                            'Something went wrong while updating the account';
-                                                                        res.status(500).json({ msg: err }).end();
-                                                                        return;
-                                                                    });
+                                                                account.leaderboardParticipation = 0;
                                                             }
+                                                        }
+                                                        if (accountBody.password) {
+                                                            if (passwordPattern.test(accountBody.password as string)) {
+                                                                bcrypt
+                                                                    .hash(accountBody.password as string, 10)
+                                                                    .then((hash) => {
+                                                                        account.passwordHash = hash;
+                                                                        repository
+                                                                            .save(account)
+                                                                            .then(() => {
+                                                                                res.status(200).json({
+                                                                                    msg: 'Account updated',
+                                                                                });
+                                                                                return;
+                                                                            })
+                                                                            .catch(() => {
+                                                                                res.statusMessage =
+                                                                                    'Something went wrong while' +
+                                                                                    ' updating the account 1';
+                                                                                res.status(500).end();
+                                                                                return;
+                                                                            });
+                                                                    });
+                                                            } else {
+                                                                res.statusMessage = 'Invalid password format';
+                                                                res.status(400).end();
+                                                                return;
+                                                            }
+                                                        } else {
+                                                            repository
+                                                                .save(account)
+                                                                .then(() => {
+                                                                    res.status(200).json({
+                                                                        msg: 'Account updated',
+                                                                    });
+                                                                    return;
+                                                                })
+                                                                .catch(() => {
+                                                                    res.statusMessage =
+                                                                        'Something went wrong while updating the' +
+                                                                        ' account 2';
+                                                                    res.status(500).end();
+                                                                    return;
+                                                                });
                                                         }
                                                     } else {
                                                         res.statusMessage = 'Display name already taken';
