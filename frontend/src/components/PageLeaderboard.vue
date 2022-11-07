@@ -12,15 +12,13 @@ import type { IScore } from '@/utility/interfaces/IScore';
 import { useAuthStore } from '@/stores/auth';
 import { useRoute } from 'vue-router';
 
-const defaultScore = { id: -1, points: -1, time: -1, account: {displayName: '', profilePicture: ''} } as IScore;
+const defaultScore = { id: -1, points: -1, time: -1, account: { displayName: '', profilePicture: '' } } as IScore;
 const authStore = useAuthStore();
 const awaitingResponse = ref(false);
 
 const route = useRoute();
-console.log('continent ', route.params.continent);
 
 let currentContinent: string = route.params.continent as string;
-console.log('currentContinent ', currentContinent);
 
 const continents = ['africa', 'all', 'asia', 'europe', 'north-america', 'oceania', 'south-america', 'world'];
 
@@ -58,7 +56,6 @@ let userIndex = ref(-1);
 let userTableScore = ref(defaultScore);
 
 function getLeaderboards(newContinent: string) {
-    console.log('in getLeadersboards');
     fetch(`http://localhost:3000/leaderboard/${newContinent}`, {
         headers: {
             Authorization: 'Bearer ' + authStore.getToken(),
@@ -68,10 +65,6 @@ function getLeaderboards(newContinent: string) {
             response.json().then((data: { continentBoards: ILeaderboard[]; userScore: ILeaderboard[] }) => {
                 leaderboards.value = data.continentBoards;
                 userScores.value = data.userScore;
-                console.log(leaderboards.value);
-                console.log(newContinent, 'loaded');
-                console.log(leaderboards.value[0].id);
-                console.log(leaderboards.value[0].daily);
             }),
         )
         .catch(() => {
@@ -83,7 +76,6 @@ function getLeaderboards(newContinent: string) {
 onMounted(() => {
     let currentContinent: string = route.params.continent as string;
     loadContinent(currentContinent);
-    console.log('finished mounting- currentContinent ', currentContinent);
 });
 
 function getSubtitle() {
@@ -117,7 +109,7 @@ function loadContinent(nextContinent: any) {
     setTimeout(() => {
         getDailyBoard();
         awaitingResponse.value = false;
-    }, 350);
+    }, 500);
 }
 
 function getPrevious() {
@@ -127,11 +119,9 @@ function getPrevious() {
     }
     const nextContinent = continents[previousIndex];
     loadContinent(nextContinent);
-    console.log('finished getPrevious');
 }
 
 function getNext() {
-    console.log('in getNext');
     let nextIndex = continents.findIndex((continent) => continent === currentContinent) + 1;
     if (nextIndex > 6) {
         nextIndex = 0;
@@ -139,7 +129,6 @@ function getNext() {
     const nextContinent = continents[nextIndex];
     //router.push('/leaderboard/${currentContinent}');
     loadContinent(nextContinent);
-    console.log('finished getNext');
 }
 
 function resetScores() {
@@ -156,7 +145,6 @@ function setupScoresAndTable() {
     resetScores();
     if (scores.value[0]) {
         first.value = scores.value[0];
-        console.log((first.value));
     } else {
         third.value = defaultScore;
     }
@@ -177,8 +165,6 @@ function setupScoresAndTable() {
             nextTableIndex.value = 3 + rowsToShow.value;
             hasNext.value = true;
         }
-    } else {
-        console.log('no values left in scores to assign to scoresTable');
     }
 }
 
@@ -187,14 +173,11 @@ function nextTable() {
         setPreviousTableIndex(currentTableIndex.value);
         currentTableIndex.value = nextTableIndex.value;
         if (scores.value[currentTableIndex.value + rowsToShow.value]) {
-            console.log('nextTable has stuff');
             hasNext.value = true;
             nextTableIndex.value = currentTableIndex.value + rowsToShow.value;
         }
         scoresTable.value = scores.value.slice(currentTableIndex.value, currentTableIndex.value + rowsToShow.value);
     } else {
-        console.log('nextTable doesnt has stuff');
-
         hasNext.value = false;
     }
 }
@@ -214,54 +197,38 @@ function previousTable() {
         setNextTableIndex(currentTableIndex.value);
         currentTableIndex.value = previousTableIndex.value;
         if (scores.value[currentTableIndex.value - rowsToShow.value]) {
-            console.log('previousTable has stuff');
-
             hasPrevious.value = true;
             previousTableIndex.value = currentTableIndex.value - rowsToShow.value;
         }
         scoresTable.value = scores.value.slice(currentTableIndex.value, currentTableIndex.value + rowsToShow.value);
     } else {
-        console.log('previousTable doesnt has stuff');
         hasPrevious.value = false;
     }
 }
 
 function getDailyBoard() {
-    console.log('start getDailyBoard()');
-
     if (dailyLeaderboard.value) {
         if (dailyLeaderboard.value.scores) {
             if (dailyLeaderboard.value.scores.length > 0) {
-                console.log('dailyBoard has data');
                 scores.value = dailyLeaderboard.value.scores;
                 setupScoresAndTable();
                 if (dailyUserScore.value) {
                     isInScoresTable(dailyUserScore.value);
-                } else {
-                    console.log('no value in dailyUserLeaderboard scores');
                 }
             }
-        } else {
-            console.log('no value in dailyLeaderboard');
         }
         isOverall.value = false;
     }
 }
 
 function getOverallBoard() {
-    console.log('start getOverallBoard()');
     if (overallLeaderboard.value) {
-        console.log('overallBoard has data');
         if (overallLeaderboard.value.scores) {
             scores.value = overallLeaderboard.value.scores;
             setupScoresAndTable();
             if (overallUserScore.value) {
                 isInScoresTable(overallUserScore.value);
-            } else {
-                console.log('no value in overallLeaderboard scores');
             }
-        } else {
-            console.log('no value in overallLeaderboard');
         }
         isOverall.value = true;
     }
@@ -384,7 +351,7 @@ function isInScoresTable(userScore: ILeaderboard) {
                                     <img
                                         alt="User profile picture"
                                         class="profile-picture-table"
-                                        :src="'http://localhost:3000/' + score.account.profilePicture " />
+                                        :src="'http://localhost:3000/' + score.account.profilePicture" />
                                 </td>
                                 <td class="table-name">{{ score.account.displayName }}</td>
                                 <td class="table-points">{{ score.points }}p</td>
@@ -402,7 +369,7 @@ function isInScoresTable(userScore: ILeaderboard) {
                                     <img
                                         alt="User profile picture"
                                         class="profile-picture-table"
-                                        src="/images/gubbe-left.svg" />
+                                        :src="'http://localhost:3000/' + userTableScore.account.profilePicture" />
                                 </td>
                                 <td class="table-name">{{ userTableScore.account.displayName }}</td>
                                 <td class="table-points">{{ userTableScore.points }}p</td>
@@ -614,16 +581,18 @@ p {
 }
 
 .table-picture {
-    width: 20%;
+    height: 72px;
+    width: 72px;
 }
 
 .table-points {
     text-align: right;
-    width: 30%;
+    width: 15%;
 }
 
 .table-name {
-    width: 25%;
+    width: 50%;
+    text-align: center;
 }
 
 .table-row {
