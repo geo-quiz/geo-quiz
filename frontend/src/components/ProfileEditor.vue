@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
 
+const isLoading = ref(true);
 const profilePicture = ref('');
 const displayName = ref('');
 const isDisplayNameChanging = ref(true);
@@ -193,6 +194,8 @@ onMounted(() => {
     setTimeout(() => {
         displayName.value = authStore.getDisplayName();
         profilePicture.value = authStore.getProfilePicture();
+        isLeaderboardChecked.value = authStore.getParticipation();
+        isLoading.value = false;
     }, 500);
 });
 </script>
@@ -200,7 +203,10 @@ onMounted(() => {
 <template>
     <main>
         <h2>Your Profile</h2>
-        <form id="profile-form" @submit.prevent="submitIfValid">
+        <div v-if="isLoading">
+            <PageLoad />
+        </div>
+        <form id="profile-form" @submit.prevent="submitIfValid" v-else>
             <div id="profile-picture-wrapper" class="field">
                 <div class="profile-picture-div">
                     <img id="profile-picture" :src="'http://127.0.0.1:3000/' + profilePicture" alt="Profile picture" />

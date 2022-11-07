@@ -12,4 +12,3 @@ routes.use(quizRoute);
 routes.use(userRoute);
 routes.use(leaderBoardRoute);
 routes.use(scoreRoute);
-

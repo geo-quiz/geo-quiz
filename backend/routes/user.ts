@@ -125,7 +125,6 @@ userRoute.post('/login', (req, res) => {
     if (body.email && body.password) {
         const email = body.email as string;
         if (!emailPattern.test(email)) {
-            console.log('Email is wrong');
             res.statusMessage = 'Invalid email format';
             res.status(400).end();
             return;
@@ -140,7 +139,6 @@ userRoute.post('/login', (req, res) => {
                         const password = body.password as string;
                         const passwordHash = account.passwordHash as string;
                         if (passwordHash === undefined) {
-                            console.log('passwordHash is undefined');
                             res.statusMessage = 'Problem with database password';
                             res.status(400).end();
                             return;
@@ -172,7 +170,7 @@ userRoute.post('/login', (req, res) => {
                                     }
                                 })
                                 .catch((err) => {
-                                    console.log('error: ' + err);
+                                    console.error(err);
                                     res.statusMessage = 'Something went wrong while checking the password';
                                     res.status(400).end();
                                     return;
@@ -200,7 +198,6 @@ userRoute.post('/login', (req, res) => {
 });
 
 function verifyToken(
-
     token: string,
     callback: (err: VerifyErrors | null, decoded: JwtPayload | string | undefined) => void,
 ) {
@@ -228,6 +225,7 @@ userRoute.post('/verify', (req, res) => {
                         res.status(200).json({
                             displayName: account.displayName,
                             profilePicture: account.profilePicture,
+                            leaderboardParticipation: account.leaderboardParticipation,
                         });
                     } else {
                         res.statusMessage = 'Invalid token';
@@ -273,60 +271,60 @@ userRoute.post('/update', (req, res) => {
                                             repository
                                                 .findOneBy({ displayName: account.displayName })
                                                 .then((existingAccount) => {
-                                                    if (!existingAccount) {
-                                                        if (account.email === email) {
-                                                            if (accountBody.leaderboardParticipation) {
-                                                                if (accountBody.leaderboardParticipation as boolean) {
-                                                                    account.leaderboardParticipation = 1;
-                                                                } else {
-                                                                    account.leaderboardParticipation = 0;
-                                                                }
-                                                            }
-                                                            if (accountBody.password) {
-                                                                if (
-                                                                    passwordPattern.test(accountBody.password as string)
-                                                                ) {
-                                                                    bcrypt
-                                                                        .hash(accountBody.password as string, 10)
-                                                                        .then((hash) => {
-                                                                            account.passwordHash = hash;
-                                                                            repository
-                                                                                .save(account)
-                                                                                .then(() => {
-                                                                                    res.status(200).json({
-                                                                                        msg: 'Account updated',
-                                                                                    });
-                                                                                    return;
-                                                                                })
-                                                                                .catch(() => {
-                                                                                    res.statusMessage =
-                                                                                        'Something went wrong while updating the account';
-                                                                                    res.status(500).end();
-                                                                                    return;
-                                                                                });
-                                                                        });
-                                                                } else {
-                                                                    res.statusMessage = 'Invalid password format';
-                                                                    res.status(400).end();
-                                                                    return;
-                                                                }
+                                                    if (
+                                                        (existingAccount && existingAccount.email === email) ||
+                                                        !existingAccount
+                                                    ) {
+                                                        if (accountBody.leaderboardParticipation !== undefined) {
+                                                            if (accountBody.leaderboardParticipation as boolean) {
+                                                                account.leaderboardParticipation = 1;
                                                             } else {
-                                                                repository
-                                                                    .save(account)
-                                                                    .then(() => {
-                                                                        res.status(200).json({
-                                                                            msg: 'Account updated',
-                                                                        });
-                                                                        return;
-                                                                    })
-                                                                    .catch((err) => {
-                                                                        console.log(error);
-                                                                        res.statusMessage =
-                                                                            'Something went wrong while updating the account';
-                                                                        res.status(500).json({ msg: err }).end();
-                                                                        return;
-                                                                    });
+                                                                account.leaderboardParticipation = 0;
                                                             }
+                                                        }
+                                                        if (accountBody.password) {
+                                                            if (passwordPattern.test(accountBody.password as string)) {
+                                                                bcrypt
+                                                                    .hash(accountBody.password as string, 10)
+                                                                    .then((hash) => {
+                                                                        account.passwordHash = hash;
+                                                                        repository
+                                                                            .save(account)
+                                                                            .then(() => {
+                                                                                res.status(200).json({
+                                                                                    msg: 'Account updated',
+                                                                                });
+                                                                                return;
+                                                                            })
+                                                                            .catch(() => {
+                                                                                res.statusMessage =
+                                                                                    'Something went wrong while' +
+                                                                                    ' updating the account 1';
+                                                                                res.status(500).end();
+                                                                                return;
+                                                                            });
+                                                                    });
+                                                            } else {
+                                                                res.statusMessage = 'Invalid password format';
+                                                                res.status(400).end();
+                                                                return;
+                                                            }
+                                                        } else {
+                                                            repository
+                                                                .save(account)
+                                                                .then(() => {
+                                                                    res.status(200).json({
+                                                                        msg: 'Account updated',
+                                                                    });
+                                                                    return;
+                                                                })
+                                                                .catch(() => {
+                                                                    res.statusMessage =
+                                                                        'Something went wrong while updating the' +
+                                                                        ' account 2';
+                                                                    res.status(500).end();
+                                                                    return;
+                                                                });
                                                         }
                                                     } else {
                                                         res.statusMessage = 'Display name already taken';
@@ -431,7 +429,7 @@ userRoute.post('/upload-image', (req, res) => {
 
     form.parse(req, (err, fields, files) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.statusMessage = 'Something went wrong';
             res.status(500).end();
             return;
@@ -488,7 +486,7 @@ userRoute.post('/upload-image', (req, res) => {
                                                 } else {
                                                     fs.rm('public\\' + account.profilePicture, (err) => {
                                                         if (err) {
-                                                            console.log(err);
+                                                            console.error(err);
                                                             res.statusMessage = 'Could not remove file';
                                                             res.status(500).end();
                                                             return;

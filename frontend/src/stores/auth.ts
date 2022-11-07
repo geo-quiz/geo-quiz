@@ -5,6 +5,7 @@ import { ref } from 'vue';
 export const useAuthStore = defineStore('auth', () => {
     const displayName = ref('');
     const profilePicture = ref('');
+    const participation = ref(true);
 
     function setToken(token: string, rememberMe: boolean) {
         if (rememberMe) {
@@ -78,6 +79,14 @@ export const useAuthStore = defineStore('auth', () => {
         profilePicture.value = newProfilePicture;
     }
 
+    function getParticipation() {
+        return participation.value;
+    }
+
+    function setParticipation(newParticipation: boolean) {
+        participation.value = newParticipation;
+    }
+
     return {
         setToken,
         getToken,
@@ -87,5 +96,7 @@ export const useAuthStore = defineStore('auth', () => {
         setDisplayName,
         getProfilePicture,
         setProfilePicture,
+        getParticipation,
+        setParticipation,
     };
 });

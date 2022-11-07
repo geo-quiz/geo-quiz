@@ -1,12 +1,15 @@
 <script lang="ts" setup>
 import PageHeader from '@/components/PageHeader.vue';
-import PageResult from '@/components/PageResult.vue';
 import PageFooter from '@/components/PageFooter.vue';
+import PageLeaderboard from '@/components/PageLeaderboard.vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 </script>
 
 <template>
     <PageHeader />
-    <PageResult />
+    <PageLeaderboard :continent="route.path" />
     <PageFooter />
 </template>
 

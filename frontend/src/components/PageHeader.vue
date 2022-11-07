@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import PageNavbar from '@/components/PageNavbar.vue';
-import ArrowLeftCircleOutlineIcon from 'vue-material-design-icons/ArrowLeftCircleOutline.vue';</script>
+import ArrowLeftCircleOutlineIcon from 'vue-material-design-icons/ArrowLeftCircleOutline.vue';
+</script>
 
 <template>
     <header class="header-background">

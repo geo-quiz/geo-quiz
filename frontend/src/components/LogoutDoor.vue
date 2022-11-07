@@ -14,21 +14,28 @@ const failed = ref(false);
 
 function logout() {
     isAwaitingResponse.value = true;
-    authStore.logout().then(() => {
-        failed.value = false;
-        isAwaitingResponse.value = false;
-    }).catch((error) => {
-        console.log(error);
-        failed.value = true;
-        isAwaitingResponse.value = false;
-    });
+    authStore
+        .logout()
+        .then(() => {
+            failed.value = false;
+            isAwaitingResponse.value = false;
+        })
+        .catch((error) => {
+            console.error(error);
+            failed.value = true;
+            isAwaitingResponse.value = false;
+        });
 }
 </script>
 
 <template>
     <div class="logout-door">
-        <Door :size="48" fillColor="var(--color-white)" @mouseover="isHovering = true" v-if="!isHovering"
-              @click="logout" />
+        <Door
+            :size="48"
+            fillColor="var(--color-white)"
+            @mouseover="isHovering = true"
+            v-if="!isHovering"
+            @click="logout" />
         <DoorOpen :size="48" fillColor="var(--color-white)" @mouseleave="isHovering = false" v-else @click="logout" />
     </div>
 
@@ -38,9 +45,12 @@ function logout() {
                 <PageLoad />
             </div>
             <div v-if="failed" class="wrapper">
-                <p>Failed to log out <br> Try again</p>
+                <p>
+                    Failed to log out <br />
+                    Try again
+                </p>
                 <div class="button-wrapper">
-                    <GeoButton @click="failed = false;" size="small">Ok</GeoButton>
+                    <GeoButton @click="failed = false" size="small">Ok</GeoButton>
                 </div>
             </div>
         </div>

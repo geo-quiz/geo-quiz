@@ -8,6 +8,7 @@ import ContinentView from '@/views/ContinentView.vue';
 import ProfileView from '@/views/ProfileView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ForgotPasswordView from '@/views/ForgotPasswordView.vue';
+import LeaderboardView from '@/views/LeaderboardView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +58,11 @@ const router = createRouter({
             path: '/forgot-password',
             name: 'forgot-password',
             component: ForgotPasswordView,
+        },
+        {
+            path: '/leaderboard/:continent',
+            name: 'leaderboard',
+            component: LeaderboardView,
         },
     ],
 });
