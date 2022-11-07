@@ -56,7 +56,6 @@ let userIndex = ref(-1);
 let userTableScore = ref(defaultScore);
 let isInList = ref(false);
 
-
 function getLeaderboards(newContinent: string) {
     fetch(`http://localhost:3000/leaderboard/${newContinent}`, {
         headers: {
@@ -179,9 +178,7 @@ function nextTable() {
         if (scores.value[currentTableIndex.value + rowsToShow.value]) {
             hasNext.value = true;
             nextTableIndex.value = currentTableIndex.value + rowsToShow.value;
-        }
-        else {
-            console.log('next nextTable doesnt has stuff');
+        } else {
             hasNext.value = false;
         }
         scoresTable.value = scores.value.slice(currentTableIndex.value, currentTableIndex.value + rowsToShow.value);
@@ -208,7 +205,6 @@ function previousTable() {
             hasPrevious.value = true;
             previousTableIndex.value = currentTableIndex.value - rowsToShow.value;
         } else {
-            console.log('previousTable doesnt has stuff');
             hasPrevious.value = false;
         }
         scoresTable.value = scores.value.slice(currentTableIndex.value, currentTableIndex.value + rowsToShow.value);
@@ -244,7 +240,6 @@ function getOverallBoard() {
         isOverall.value = true;
     }
 }
-
 
 function isInScoresTable(userScore: ILeaderboard) {
     let isInThisList = ref(false);
