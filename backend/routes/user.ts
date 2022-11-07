@@ -200,7 +200,6 @@ userRoute.post('/login', (req, res) => {
 });
 
 function verifyToken(
-
     token: string,
     callback: (err: VerifyErrors | null, decoded: JwtPayload | string | undefined) => void,
 ) {
@@ -228,6 +227,7 @@ userRoute.post('/verify', (req, res) => {
                         res.status(200).json({
                             displayName: account.displayName,
                             profilePicture: account.profilePicture,
+                            leaderboardParticipation: account.leaderboardParticipation,
                         });
                     } else {
                         res.statusMessage = 'Invalid token';
