@@ -19,7 +19,6 @@ onMounted(() => {
         isLoggedIn.value = true;
     }
     checkIfRouteIsLoginOrRegister();
-    console.log(isRouteLoginOrRegister.value);
 });
 
 onUnmounted(() => {
