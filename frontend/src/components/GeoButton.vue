@@ -82,4 +82,9 @@ function getColor() {
 .disabled {
     opacity: 0.75;
 }
+
+.disabled:hover {
+    background-color: var(--color-blue);
+    color: var(--color-white);
+}
 </style>
