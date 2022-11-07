@@ -22,18 +22,21 @@ const totalTime: Ref<Number> = ref(currentQuiz.totalTime);
 const continent = ref(currentQuiz.currentContinent);
 
 function proceed() {
-    router.push('/home').then(() => {
-        userAnswersStore.clearAnswers();
-        userAnswersStore.clearQuestions();
-    }).catch((error) => {
-        console.log(error);
-    });
+    router
+        .push('/home')
+        .then(() => {
+            userAnswersStore.clearAnswers();
+            userAnswersStore.clearQuestions();
+        })
+        .catch((error) => {
+            console.log(error);
+        });
 }
 
 onMounted(() => {
     if (usersAnswer.value.size <= 0) {
         router.push('/home');
-    } else {
+    } else if (authStore.getParticipation()) {
         sendToBackend();
     }
 });
