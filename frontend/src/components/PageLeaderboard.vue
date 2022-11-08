@@ -261,7 +261,7 @@ function isInScores(userScore: ILeaderboard) {
     isInScoresList = ref(false);
     let untilFound = scores.value.length;
 
-    for (let i = 3; i < untilFound; i++) {
+    for (let i = 0; i < untilFound; i++) {
         if (userScore.scores[0].account.displayName === scores.value[i].account.displayName) {
             isInScoresList.value = true;
             userTableScore.value = scores.value[i];
@@ -378,7 +378,7 @@ function isNotInCurrentScoresTable(userScore: ILeaderboard) {
                         </table>
                     </div>
                     <div v-if="showUserScore">
-                        <h3>Player Score</h3>
+                        <h3>Player's Highest Score</h3>
                         <table class="table-scores">
                             <tr class="table-row-user-score">
                                 <td class="table-number">{{ 1 + userIndex }}</td>
