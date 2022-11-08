@@ -54,7 +54,7 @@ let isOverall = ref(true);
 let showUserScore = ref(false);
 let userIndex = ref(-1);
 let userTableScore = ref(defaultScore);
-let isInList = ref(false);
+let isInScoresList = ref(false);
 
 function getLeaderboards(newContinent: string) {
     fetch(`http://localhost:3000/leaderboard/${newContinent}`, {
@@ -108,6 +108,7 @@ function loadContinent(nextContinent: any) {
     getLeaderboards(nextContinent);
     currentContinent = nextContinent;
     setTimeout(() => {
+        getOverallBoard();
         getDailyBoard();
         awaitingResponse.value = false;
     }, 500);
@@ -169,6 +170,7 @@ function setupScoresAndTable() {
             hasNext.value = false;
         }
     }
+    hasPrevious.value = false;
 }
 
 function nextTable() {
@@ -220,7 +222,14 @@ function getDailyBoard() {
                 scores.value = dailyLeaderboard.value.scores;
                 setupScoresAndTable();
                 if (dailyUserScore.value) {
-                    isInScoresTable(dailyUserScore.value);
+                    if (isInScores(dailyUserScore.value)) {
+                        showUserScore.value = !!isNotInCurrentScoresTable(dailyUserScore.value);
+                    } else {
+                        showUserScore.value = false;
+                    }
+                } else {
+                    isInScoresList.value = false;
+                    showUserScore.value = false;
                 }
             }
         }
@@ -234,39 +243,42 @@ function getOverallBoard() {
             scores.value = overallLeaderboard.value.scores;
             setupScoresAndTable();
             if (overallUserScore.value) {
-                isInScoresTable(overallUserScore.value);
+                if (isInScores(overallUserScore.value)) {
+                    showUserScore.value = !!isNotInCurrentScoresTable(overallUserScore.value);
+                } else {
+                    showUserScore.value = false;
+                }
+            } else {
+                isInScoresList.value = false;
+                showUserScore.value = false;
             }
         }
         isOverall.value = true;
     }
 }
 
-function isInScoresTable(userScore: ILeaderboard) {
+function isInScores(userScore: ILeaderboard) {
+    isInScoresList = ref(false);
+    let untilFound = scores.value.length;
+
+    for (let i = 3; i < untilFound; i++) {
+        if (userScore.scores[0].account.displayName === scores.value[i].account.displayName) {
+            isInScoresList.value = true;
+            userTableScore.value = scores.value[i];
+            userIndex.value = i;
+            untilFound = i;
+        }
+    }
+    return isInScoresList;
+}
+
+function isNotInCurrentScoresTable(userScore: ILeaderboard) {
     let isInThisList = ref(false);
-    let index = ref(0);
 
     for (let i = 0; i < scoresTable.value.length; i++) {
-        if (userScore.scores[0].account.displayName === scores.value[i].account.displayName) {
-            isInList.value = true;
-        }
-        if (userScore.scores[0].account.displayName === scoresTable.value[i].account.displayName) {
-            isInThisList.value = true;
-            userIndex.value = i + currentTableIndex.value;
-            index.value = i;
-        } else {
-            isInList.value = false;
-        }
+        isInThisList.value = userScore.scores[0].account.displayName === scoresTable.value[i].account.displayName;
     }
-    if (isInList.value && !isInThisList.value) {
-        userTableScore.value.account.displayName = scoresTable.value[index.value].account.displayName;
-        userTableScore.value.points = scoresTable.value[index.value].points;
-        userTableScore.value.time = scoresTable.value[index.value].time;
-        showUserScore.value = true;
-    } else {
-        isInThisList.value = false;
-        userTableScore.value = defaultScore;
-        showUserScore.value = false;
-    }
+    return isInThisList;
 }
 </script>
 
@@ -406,7 +418,7 @@ function isInScoresTable(userScore: ILeaderboard) {
             </div>
             <div>
                 <p>
-                    Original crown svg published by
+                    Original crown art published by
                     <a href="https://freesvg.org/by/OpenClipart"> OpenClipart</a>
                     from
                     <a href="https://freesvg.org/simplified-crown" target="_blank"> https://freesvg.org</a>
@@ -417,6 +429,14 @@ function isInScoresTable(userScore: ILeaderboard) {
 </template>
 
 <style scoped>
+a {
+    color: var(--color-light-blue);
+}
+
+a:hover {
+    color: var(--color-white);
+}
+
 .arrows {
     display: flex;
     justify-content: space-between;
@@ -671,8 +691,8 @@ p {
     display: flex;
     flex-direction: column;
     gap: calc(var(--gap) * 2);
-    width: 20%;
     max-width: 100px;
+    width: 20%;
 }
 
 .winner-time {
