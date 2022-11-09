@@ -216,6 +216,7 @@ function previousTable() {
 }
 
 function getDailyBoard() {
+    resetAllScores();
     if (dailyLeaderboard.value) {
         if (dailyLeaderboard.value.scores) {
             if (dailyLeaderboard.value.scores.length > 0) {
@@ -238,6 +239,7 @@ function getDailyBoard() {
 }
 
 function getOverallBoard() {
+    resetAllScores();
     if (overallLeaderboard.value) {
         if (overallLeaderboard.value.scores) {
             scores.value = overallLeaderboard.value.scores;
@@ -255,6 +257,15 @@ function getOverallBoard() {
         }
         isOverall.value = true;
     }
+}
+
+function resetAllScores() {
+    scores.value = [];
+    resetScores();
+    showUserScore.value = false;
+    isInScoresList = ref(false);
+    userTableScore.value = defaultScore;
+    userIndex.value = -1;
 }
 
 function isInScores(userScore: ILeaderboard) {
