@@ -3,5 +3,6 @@
 
 A project made with Vue3, Node.js and MySQL.
 
-
-By <a href="#">Christian</a>, <a href="#">Juris</a>, <a href="#">Marcus</a>, <a href="#">Madde</a>, <a href="#">Oscar</a> and <a href="#">Toni</a>.
+By <a href="https://github.com/ChristianLofqvist">Christian</a>, <a href="https://github.com/Yuriks1">Juris</a>
+, <a href="https://github.com/DarkendHall">Marcus</a>, <a href="https://github.com/GreenGard">Madde</a>
+, <a href="https://github.com/OscarStjernfeldt">Oscar</a> and <a href="https://github.com/ToniKaru">Toni</a>.
