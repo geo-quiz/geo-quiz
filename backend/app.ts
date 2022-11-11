@@ -7,7 +7,6 @@ import dotenv from 'dotenv';
 import * as fs from 'fs';
 import { AppDataSource } from './AppDataSource';
 import { Account } from './entities/Account';
-import { Leaderboard } from './entities/Leaderboard';
 
 const app = express();
 
@@ -34,6 +33,8 @@ if (token) {
                 removeUnusedImages();
             }, 1000 * 60 * 60);
         }, 5000);
+        setTimeout(() => {clearTableIfNewDay();}, 1500);
+
 
         //Deletes everything in the daily leaderboards on date change
         setInterval(() => {
@@ -49,16 +50,9 @@ if (token) {
 }
 
 function clearTableIfNewDay() {
-    const repository = AppDataSource.getRepository(Leaderboard);
-
-    repository
-        .delete({ daily: true })
-        .then(() => {
-            console.log('Cleared daily tables');
-        })
-        .catch((error) => {
-            console.error(error);
-        });
+    AppDataSource.query('DELETE FROM leaderboard_scores_score WHERE leaderboardId > 30').then(() => {
+        console.log('Cleared daily scores');
+    });
 }
 
 function removeUnusedImages() {
