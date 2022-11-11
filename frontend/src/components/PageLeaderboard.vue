@@ -108,7 +108,6 @@ function loadContinent(nextContinent: any) {
     getLeaderboards(nextContinent);
     currentContinent = nextContinent;
     setTimeout(() => {
-        getOverallBoard();
         getDailyBoard();
         awaitingResponse.value = false;
     }, 500);
@@ -129,7 +128,6 @@ function getNext() {
         nextIndex = 0;
     }
     const nextContinent = continents[nextIndex];
-    //router.push('/leaderboard/${currentContinent}');
     loadContinent(nextContinent);
 }
 
