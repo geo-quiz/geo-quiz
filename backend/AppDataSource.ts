@@ -25,7 +25,7 @@ export const AppDataSource = new DataSource({
     password: password,
     database: database,
     entities: [Question, Continent, Answer, Account, Role, Leaderboard, Token, Score],
-    synchronize: true,
+    synchronize: false,
     logging: false,
 });
 
